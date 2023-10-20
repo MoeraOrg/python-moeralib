@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moeralib"
+version = "0.14.0"
+authors = [
+    {name = "Shmuel Leib Melamud", email = "balu@moera.org"},
+]
+description = "Library to interact with Moera decentralized social network"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["Moera", "library", "naming", "node", "API"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = [
+    "requests>=2.31.0",
+    "camel-converter",
+    "jsonschema>=4.19.0"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/MoeraOrg/python-moeralib"
+"Bug Tracker" = "https://github.com/MoeraOrg/moera-issues/issues"
+"Overview" = "https://moera.org"
