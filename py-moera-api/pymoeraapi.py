@@ -345,34 +345,33 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
             call_params = f'"{function}", location, method="{request["type"]}"'
 
             tail_params = ''
-            url_params: Mapping[str, str] = {}
+            url_params: dict[str, str] = {}
             flag_name: str | None = None
             flag_py_name: str | None = None
             flags: Sequence[str] = []
-            if 'params' in request:
-                for param in request['params']:
-                    if 'name' not in param:
-                        print('Missing name of parameter of the request "{method} {url}"'
-                              .format(method=request['type'], url=request['url']))
-                        exit(1)
-                    name = param['name']
-                    py_name = to_snake(name)
-                    url_params[name] = py_name
-                    if 'enum' in param:
-                        py_type = 'types.' + param['enum']
+            for param in request.get('params', []) + request.get('query', []):
+                if 'name' not in param:
+                    print('Missing name of parameter of the request "{method} {url}"'
+                          .format(method=request['type'], url=request['url']))
+                    exit(1)
+                name = param['name']
+                py_name = to_snake(name)
+                url_params[name] = py_name
+                if 'enum' in param:
+                    py_type = 'types.' + param['enum']
+                else:
+                    py_type = to_py_type(param['type'])
+                if 'flags' in param:
+                    flag_name = name
+                    flag_py_name = py_name
+                    flags = [flag['name'] for flag in param['flags']]
+                    for flag in flags:
+                        params += f', with_{flag}: bool = False'
+                else:
+                    if param.get('optional', False):
+                        tail_params += f', {py_name}: {py_type} | None = None'
                     else:
-                        py_type = to_py_type(param['type'])
-                    if 'flags' in param:
-                        flag_name = name
-                        flag_py_name = py_name
-                        flags = [flag['name'] for flag in param['flags']]
-                        for flag in flags:
-                            params += f', with_{flag}: bool = False'
-                    else:
-                        if param.get('optional', False):
-                            tail_params += f', {py_name}: {py_type} | None = None'
-                        else:
-                            params += f', {py_name}: {py_type}'
+                        params += f', {py_name}: {py_type}'
             if 'in' in request:
                 inp = request['in']
                 if 'type' in inp:
