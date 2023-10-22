@@ -9,6 +9,7 @@ from ..structure import comma_separated_flags, structure_list
 
 
 class MoeraNode(Caller):
+    """Node API interface."""
 
     def __init__(self, node_url: str | None = None):
         if node_url is not None:
@@ -438,7 +439,7 @@ class MoeraNode(Caller):
 
         :param posting_id: ID of the posting
         :param comment_id: ID of the comment
-        :param negative: ``true``, to filter negative reactions, ``false``, to filter positive ones
+        :param negative: ``True``, to filter negative reactions, ``False``, to filter positive ones
         :param emoji: filter by reaction code, usually interpreted by clients as emoji code point
         :param before: filter reactions created at or before this moment
         :param limit: maximum number of reactions returned
@@ -1015,7 +1016,7 @@ class MoeraNode(Caller):
         :param id: media file ID
         :param width: preferred width of the media in pixels; if present, the node will try to return the smallest
             in size, but the best in quality variant of the media, according to the width provided
-        :param download: if ``true``, the node will add ``Content-Disposition: attachment`` header to the output
+        :param download: if ``True``, the node will add ``Content-Disposition: attachment`` header to the output
         """
         location = "/media/private/{id}/data".format(id=quote_plus(id))
         params = {"width": width, "download": download}
@@ -1068,7 +1069,7 @@ class MoeraNode(Caller):
         :param id: media file ID
         :param width: preferred width of the media in pixels; if present, the node will try to return the smallest
             in size, but the best in quality variant of the media, according to the width provided
-        :param download: if ``true``, the node will add ``Content-Disposition: attachment`` header to the output
+        :param download: if ``True``, the node will add ``Content-Disposition: attachment`` header to the output
         """
         location = "/media/public/{id}/data".format(id=quote_plus(id))
         params = {"width": width, "download": download}
@@ -1333,7 +1334,7 @@ class MoeraNode(Caller):
         descending.
 
         :param posting_id: ID of the posting
-        :param negative: ``true``, to filter negative reactions, ``false``, to filter positive ones
+        :param negative: ``True``, to filter negative reactions, ``False``, to filter positive ones
         :param emoji: filter by reaction code, usually interpreted by clients as emoji code point
         :param before: filter reactions created at or before this moment
         :param limit: maximum number of reactions returned

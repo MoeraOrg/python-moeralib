@@ -274,8 +274,8 @@ class AvatarDescription(Structure):
     """shape of the avatar"""
     optional: bool | None = None
     """
-    if set to ``true``, the node will ignore the absence of the media file referenced in ``mediaId`` field (empty avatar
-    will be used in this case); if set to ``false`` or absent, the node will return an error, if the media file
+    if set to ``True``, the node will ignore the absence of the media file referenced in ``mediaId`` field (empty avatar
+    will be used in this case); if set to ``False`` or absent, the node will return an error, if the media file
     referenced in ``mediaId`` field is absent
     """
 
@@ -429,7 +429,7 @@ class BlockedUserFilter(Structure):
     """ID of the remote posting, where the node is blocked; ``None`` or absent, if the node is blocked globally"""
     strict: bool | None = None
     """
-    if set to ``true``, only the blockings that strictly fit the criteria are returned; otherwise global blockings are
+    if set to ``True``, only the blockings that strictly fit the criteria are returned; otherwise global blockings are
     returned even if the search is limited to a particular posting
     """
 
@@ -465,7 +465,7 @@ class CarteSet(Structure):
 
 class ClientReactionInfo(Structure):
     negative: bool
-    """``true``, if the reaction is negative, ``false``, if positive"""
+    """``True``, if the reaction is negative, ``False``, if positive"""
     emoji: int
     """reaction code, usually interpreted by clients as emoji code point"""
     created_at: Timestamp
@@ -529,7 +529,7 @@ class CredentialsChange(Structure):
 
 class CredentialsCreated(Structure):
     created: bool
-    """``true`` if the credentials are initialized already, ``false`` otherwise"""
+    """``True`` if the credentials are initialized already, ``False`` otherwise"""
 
 
 class DomainAttributes(Structure):
@@ -566,7 +566,7 @@ class FeedReference(Structure):
     published_at: Timestamp
     """story publication timestamp - the time the story is published under in the feed"""
     pinned: bool | None = None
-    """``true``, if the story is pinned (should appear before any non-pinned story in the feed), ``false`` otherwise"""
+    """``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise"""
     moment: int
     story_id: str
     """ID of the story"""
@@ -714,7 +714,7 @@ class MediaFilePreviewInfo(Structure):
     height: int
     """actual height of the preview in pixels"""
     original: bool | None = None
-    """``true`` if the preview is identical to the original media, ``false`` otherwise"""
+    """``True`` if the preview is identical to the original media, ``False`` otherwise"""
 
 
 class MediaWithDigest(Structure):
@@ -784,9 +784,9 @@ class PeopleGeneralInfo(Structure):
 
 class PluginContext(Structure):
     root_admin: bool
-    """``true``, if the client has authenticated as root admin, ``false`` otherwise"""
+    """``True``, if the client has authenticated as root admin, ``False`` otherwise"""
     admin: bool
-    """``true``, if the client has authenticated as node admin, ``false`` otherwise"""
+    """``True``, if the client has authenticated as node admin, ``False`` otherwise"""
     auth_categories: List[str]
     """
     the list of permissions granted to the client, if it has authenticated as node admin; see ``TokenInfo.permissions``
@@ -812,9 +812,9 @@ class PluginContext(Structure):
 
 class PostingFeatures(Structure):
     post: bool | None = None
-    """``true`` if the client is allowed to create postings, ``false`` otherwise"""
+    """``True`` if the client is allowed to create postings, ``False`` otherwise"""
     subject_present: bool
-    """``true`` if new postings are recommended to have a subject, ``false`` otherwise"""
+    """``True`` if new postings are recommended to have a subject, ``False`` otherwise"""
     source_formats: List[SourceFormat]
     """list of source text formats the node understands"""
     media_max_size: int
@@ -940,7 +940,7 @@ class PublicMediaFileInfo(Structure):
 
 class ReactionAttributes(Structure):
     negative: bool
-    """``true``, if the reaction is negative, ``false``, if positive"""
+    """``True``, if the reaction is negative, ``False``, if positive"""
     emoji: int
     """reaction code, usually interpreted by clients as emoji code point"""
     operations: ReactionOperations | None = None
@@ -957,7 +957,7 @@ class ReactionDescription(Structure):
     owner_avatar: AvatarDescription | None = None
     """reaction owner's avatar"""
     negative: bool
-    """``true``, if the reaction is negative, ``false``, if positive"""
+    """``True``, if the reaction is negative, ``False``, if positive"""
     emoji: int
     """reaction code, usually interpreted by clients as emoji code point"""
     signature: bytes | None = None
@@ -993,7 +993,7 @@ class ReactionInfo(Structure):
     comment_revision_id: str | None = None
     """ID of the comment revision, if relevant"""
     negative: bool | None = None
-    """``true``, if the reaction is negative, ``false``, if positive"""
+    """``True``, if the reaction is negative, ``False``, if positive"""
     emoji: int | None = None
     """reaction code, usually interpreted by clients as emoji code point"""
     moment: int | None = None
@@ -1213,24 +1213,24 @@ class SettingTypeModifiers(Structure):
     max: str | None = None
     """(``int``, ``Duration``) maximal value"""
     multiline: bool | None = None
-    """(``string``) ``true``, if the value is a multiline text"""
+    """(``string``) ``True``, if the value is a multiline text"""
     never: bool | None = None
-    """(``Duration``) ``true``, if value ``never`` is allowed"""
+    """(``Duration``) ``True``, if value ``never`` is allowed"""
     always: bool | None = None
-    """(``Duration``) ``true``, if value ``always`` is allowed"""
+    """(``Duration``) ``True``, if value ``always`` is allowed"""
     principals: List[PrincipalFlag] | None = None
     """(``Principal``) list of allowed principals"""
 
 
 class SheriffComplainDecisionText(Structure):
     reject: bool
-    """``true``, if the complaints in the group are to be rejected, ``false`` otherwise"""
+    """``True``, if the complaints in the group are to be rejected, ``False`` otherwise"""
     decision_code: SheriffOrderReason | None = None
     """the decision"""
     decision_details: str | None = None
     """detailed explanation of the decision in user-readable form"""
     anonymous: bool | None = None
-    """``true``, if the complaints' owners' names are not to be published, ``false`` otherwise"""
+    """``True``, if the complaints' owners' names are not to be published, ``False`` otherwise"""
 
 
 class SheriffComplainGroupInfo(Structure):
@@ -1278,7 +1278,7 @@ class SheriffComplainGroupInfo(Structure):
     decided_at: Timestamp | None = None
     """sheriff's decision timestamp - the real time when the decision was made"""
     anonymous: bool | None = None
-    """``true``, if the complaints' owners' names are not published, ``false`` otherwise"""
+    """``True``, if the complaints' owners' names are not published, ``False`` otherwise"""
 
 
 class SheriffComplainGroupsSliceInfo(Structure):
@@ -1311,7 +1311,7 @@ class SheriffComplainInfo(Structure):
     reason_details: str | None = None
     """detailed explanation of reason of the complaint in user-readable form"""
     anonymous_requested: bool | None = None
-    """``true``, if the complaint's owner wants his name not to be published, ``false`` otherwise"""
+    """``True``, if the complaint's owner wants his name not to be published, ``False`` otherwise"""
     created_at: Timestamp
     """complaint creation timestamp - the real time when the order was created"""
 
@@ -1352,12 +1352,12 @@ class SheriffComplainText(Structure):
     reason_details: str | None = None
     """detailed explanation of reason of the complaint in user-readable form"""
     anonymous: bool | None = None
-    """``true``, if the complaint's owner wants his name not to be published, ``false`` otherwise"""
+    """``True``, if the complaint's owner wants his name not to be published, ``False`` otherwise"""
 
 
 class SheriffOrderAttributes(Structure):
     delete: bool | None = None
-    """``true``, if the order is to cancel the previous order of this type, ``false`` otherwise"""
+    """``True``, if the order is to cancel the previous order of this type, ``False`` otherwise"""
     feed_name: str
     """name of the feed the order is related to"""
     posting_id: str | None = None
@@ -1375,7 +1375,7 @@ class SheriffOrderAttributes(Structure):
 class SheriffOrderDetails(Structure):
     id: str
     delete: bool | None = None
-    """``true``, if the order is to cancel the previous order of this type, ``false`` otherwise"""
+    """``True``, if the order is to cancel the previous order of this type, ``False`` otherwise"""
     sheriff_name: str
     """node name of the sheriff"""
     sheriff_avatar: AvatarDescription | None = None
@@ -1403,7 +1403,7 @@ class SheriffOrderDetails(Structure):
 class SheriffOrderInfo(Structure):
     id: str
     delete: bool | None = None
-    """``true``, if the order is to cancel the previous order of this type, ``false`` otherwise"""
+    """``True``, if the order is to cancel the previous order of this type, ``False`` otherwise"""
     sheriff_name: str
     """node name of the sheriff"""
     node_name: str
@@ -1458,7 +1458,7 @@ class StoryAttributes(Structure):
     publish_at: Timestamp | None = None
     """story publication timestamp - the time the story must be published under in the feed"""
     pinned: bool | None = None
-    """``true``, if the story is pinned (should appear before any non-pinned story in the feed), ``false`` otherwise"""
+    """``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise"""
     viewed: bool | None = None
     """value of the ``viewed`` flag (``None``, if the flag is not changed)"""
     read: bool | None = None
@@ -1672,7 +1672,7 @@ class TokenName(Structure):
 
 class UpdateInfo(Structure):
     important: bool | None = None
-    """``true``, if the update is important, ``false`` (the default) otherwise"""
+    """``True``, if the update is important, ``False`` (the default) otherwise"""
     description: str | None = None
     """description of the update"""
 
@@ -1718,7 +1718,7 @@ class UserListSliceInfo(Structure):
 class WhoAmI(Structure):
     node_name: str | None = None
     node_name_changing: bool | None = None
-    """``true`` if node name is about to be changed"""
+    """``True`` if node name is about to be changed"""
     full_name: str | None = None
     """node owner's full name"""
     gender: str | None = None
@@ -1744,7 +1744,7 @@ class ActivityReactionInfo(Structure):
     remote_posting_id: str
     """ID of the posting on the remote node"""
     negative: bool
-    """``true``, if the reaction is negative, ``false``, if positive"""
+    """``True``, if the reaction is negative, ``False``, if positive"""
     emoji: int
     """reaction code, usually interpreted by clients as emoji code point"""
     created_at: Timestamp
@@ -1758,7 +1758,7 @@ class BlockedByUserFilter(Structure):
     """the postings or whole nodes, where the node is blocked"""
     strict: bool | None = None
     """
-    if set to ``true``, only the blockings that strictly fit the criteria are returned; otherwise global blockings are
+    if set to ``True``, only the blockings that strictly fit the criteria are returned; otherwise global blockings are
     returned even if the search is limited to a particular posting
     """
 
@@ -1984,7 +1984,7 @@ class Features(Structure):
     ask: List[AskSubject] | None = None
     """list of requests to the node owner that are accepted by the node"""
     subscribed: bool | None = None
-    """``true``, if the node is subscribed to the client, ``false`` otherwise"""
+    """``True``, if the node is subscribed to the client, ``False`` otherwise"""
 
 
 class FeedInfo(Structure):
@@ -2019,7 +2019,7 @@ class MediaAttachment(Structure):
     remote_media: RemoteMediaInfo | None = None
     """details of the media, if it is located on another node"""
     embedded: bool
-    """``true`` if the media is used in the body of the posting/comment, ``false`` otherwise"""
+    """``True`` if the media is used in the body of the posting/comment, ``False`` otherwise"""
 
 
 class PostingInfo(Structure):
@@ -2489,7 +2489,7 @@ class PluginInfo(Structure):
     """ID of the node this plugin is connected to"""
     local: bool
     """
-    ``true`` if the plugin is enabled for a particular node only, ``false``, if it is enabled for the whole server
+    ``True`` if the plugin is enabled for a particular node only, ``False``, if it is enabled for the whole server
     """
     name: str
     """a unique plugin name"""
@@ -2518,16 +2518,16 @@ class StoryInfo(Structure):
     published_at: Timestamp
     """story publication timestamp - the time the story is published under in the feed"""
     pinned: bool | None = None
-    """``true``, if the story is pinned (should appear before any non-pinned story in the feed), ``false`` otherwise"""
+    """``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise"""
     moment: int
     viewed: bool | None = None
-    """``true``, if the story has been viewed by node owner, ``false`` otherwise"""
+    """``True``, if the story has been viewed by node owner, ``False`` otherwise"""
     read: bool | None = None
-    """``true``, if the story has been read by node owner, ``false`` otherwise"""
+    """``True``, if the story has been read by node owner, ``False`` otherwise"""
     satisfied: bool | None = None
     """
     if the story is associated with a user action (for example, it contains a form that should be submitted), this flag
-    is set to ``true``, if the action is done already, and ``false`` otherwise
+    is set to ``True``, if the action is done already, and ``False`` otherwise
     """
     summary_node_name: str | None = None
     """name of the node related to the summary of the story"""

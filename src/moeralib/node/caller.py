@@ -13,7 +13,7 @@ from ..structure import Structure
 
 
 class MoeraNodeError(Exception):
-    """Generic node API error."""
+    """Generic node error."""
 
     def __init__(self, name: str, message: str):
         """

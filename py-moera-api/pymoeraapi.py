@@ -75,7 +75,9 @@ def html_to_doc(s: str) -> str:
           .replace('<li>', '* ')
           .replace('</li>', '')
           .replace('</ul>', '')
-          .replace('``null``', '``None``'))
+          .replace('``null``', '``None``')
+          .replace('``true``', '``True``')
+          .replace('``false``', '``False``'))
     s = re.sub(r'<a [^>]*>', '', s)
     s = s.replace('</a>', '')
     return s
@@ -563,6 +565,7 @@ from ..structure import comma_separated_flags, structure_list
 
 
 class MoeraNode(Caller):
+    """Node API interface."""
 
     def __init__(self, node_url: str | None = None):
         if node_url is not None:
