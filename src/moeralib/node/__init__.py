@@ -1,2 +1,2 @@
 from .node import MoeraNode
-from .caller import NodeAuth, MoeraNodeError, MoeraNodeConnectionError, moera_root
+from .caller import NodeAuth, MoeraNodeError, MoeraNodeApiError, MoeraNodeConnectionError, moera_root

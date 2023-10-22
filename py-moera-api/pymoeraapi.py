@@ -16,6 +16,28 @@ def ind(n: int) -> str:
     return n * 4 * ' '
 
 
+def doc_wrap(s: str, indent: int) -> str:
+    s = s.strip()
+    if '\n' in s:
+        return f'\n{ind(indent)}'.join(doc_wrap(c, indent) for c in s.split('\n'))
+
+    max_length = 120 - indent * 4
+    result = ''
+    while True:
+        if len(s) <= max_length:
+            result += s
+            break
+        pos = 0
+        while True:
+            next = s.find(' ', pos + 1)
+            if next < 0 or next > max_length:
+                break
+            pos = next
+        result += s[:pos] + '\n' + ind(indent)
+        s = s[pos + 1:]
+    return result
+
+
 def comma_wrap(s: str, indent: int) -> str:
     max_length = 120 - indent * 4
     result = ''
@@ -39,6 +61,24 @@ def params_wrap(template: str, substitute: str, indent: int) -> str:
     if len(line) > 120:
         line = template % ('\n' + ind(indent) + comma_wrap(substitute, indent) + '\n' + ind(indent - 1))
     return line
+
+
+def html_to_doc(s: str) -> str:
+    s = (s.replace('<code>', '``')
+          .replace('</code>', '``')
+          .replace('<br>', '\n')
+          .replace('<i>', '*')
+          .replace('</i>', '*')
+          .replace('<b>', '**')
+          .replace('</b>', '**')
+          .replace('<ul>', '\n')
+          .replace('<li>', '* ')
+          .replace('</li>', '')
+          .replace('</ul>', '')
+          .replace('``null``', '``None``'))
+    s = re.sub(r'<a [^>]*>', '', s)
+    s = s.replace('</a>', '')
+    return s
 
 
 def read_api(ifname: str) -> Any:
@@ -118,6 +158,8 @@ def generate_operations(operations: Any, tfile: TextIO, sfile: TextIO) -> None:
     tfile.write(f'\n\nclass {operations["name"]}(Structure):\n')
     for field in operations['fields']:
         tfile.write('    %s: PrincipalValue | None = None\n' % to_snake(field['name']))
+        if 'description' in field:
+            tfile.write('    """%s"""\n' % field['description'])
 
     sfile.write('\n')
     sfile.write('{name}_SCHEMA: Any = {{\n'.format(name=to_snake(operations['name']).upper()))
@@ -200,6 +242,11 @@ class Structure:
             if field.get('array', False):
                 t = f'List[{t}]'
             tfile.write(tmpl % (to_snake(field['name']), t))
+            if 'description' in field:
+                doc = doc_wrap(html_to_doc(field["description"]), 1)
+                if len(doc) >= 110:
+                    doc = f'\n{ind(1)}{doc}\n{ind(1)}'
+                tfile.write(f'{ind(1)}"""{doc}"""\n')
 
     def generate_schema(self, sfile: TextIO) -> None:
         sfile.write('\n{name}_SCHEMA: Any = {{\n'
@@ -342,6 +389,7 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
 
             function = to_snake(request['function'])
             params = 'self'
+            param_docs = []
             call_params = f'"{function}", location, method="{request["type"]}"'
 
             tail_params = ''
@@ -365,13 +413,16 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                     flag_name = name
                     flag_py_name = py_name
                     flags = [flag['name'] for flag in param['flags']]
-                    for flag in flags:
-                        params += f', with_{flag}: bool = False'
+                    for flag in param['flags']:
+                        flag_param = f'with_{flag["name"]}'
+                        params += f', {flag_param}: bool = False'
+                        param_docs += [(flag_param, 'include ' + flag.get('description', ''))]
                 else:
                     if param.get('optional', False):
                         tail_params += f', {py_name}: {py_type} | None = None'
                     else:
                         params += f', {py_name}: {py_type}'
+                    param_docs += [(py_name, param.get('description', ''))]
             if 'in' in request:
                 inp = request['in']
                 if 'type' in inp:
@@ -380,6 +431,7 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                               .format(type=inp['type'], method=request['type'], url=request['url']))
                         exit(1)
                     params += ', file: IO, file_type: str'
+                    param_docs += [('file', ''), ('file_type', 'content-type of ``file``')]
                     call_params += f', body_file=file, body_file_type=file_type'
                 else:
                     if 'name' not in inp:
@@ -391,11 +443,23 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                     if inp.get('array', False):
                         py_type = f'List[{py_type}]'
                     params += f', {name}: {py_type}'
+                    param_docs += [(name, '')]
                     call_params += f', body={name}'
             params += tail_params
 
             if is_no_auth(request.get('auth', 'none')):
                 call_params += ', auth=False'
+
+            description = ''
+            if 'description' in request:
+                description = doc_wrap(html_to_doc(request["description"]), 2)
+            if len(param_docs) > 0:
+                description += '\n'
+                for pd in param_docs:
+                    doc = doc_wrap(f':param {pd[0]}: {html_to_doc(pd[1])}', 3)
+                    description += f'\n{ind(2)}{doc}'
+            if description != '':
+                description = f'{ind(2)}"""\n{ind(2)}{description}\n{ind(2)}"""\n'
 
             location: str = request['url']
             if len(url_params) > 0:
@@ -456,6 +520,7 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                 afile.write(params_wrap(f'\n{ind(1)}def {function}(%s) -> List[{result}]:\n', params, 2))
             else:
                 afile.write(params_wrap(f'\n{ind(1)}def {function}(%s) -> {result}:\n', params, 2))
+            afile.write(description)
             afile.write(location)
             if flag_name is not None:
                 items = ', '.join(f'"{flag}": with_{flag}' for flag in flags)
@@ -472,7 +537,7 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
 
 PREAMBLE_TYPES = '''# This file is generated
 
-from typing import List, Literal, Mapping, Sequence, TypeAlias
+from typing import List, Literal, Mapping, TypeAlias
 
 from ..structure import Structure
 
@@ -489,7 +554,7 @@ from ..structure import to_nullable_object_schema, array_schema
 
 PREAMBLE_CALLS = '''# This file is generated
 
-from typing import IO, List, Sequence, cast
+from typing import IO, List, cast
 from urllib.parse import quote_plus
 
 from . import types, schemas

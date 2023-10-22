@@ -13,22 +13,37 @@ from ..structure import Structure
 
 
 class MoeraNodeError(Exception):
+    """Generic node API error."""
 
     def __init__(self, name: str, message: str):
+        """
+        :param name: request name
+        :param message: error message
+        """
         super().__init__(name + ': Node error: ' + message)
 
 
 class MoeraNodeApiError(MoeraNodeError):
+    """Node returned an error response."""
     error_code: str
+    """Error code."""
 
     def __init__(self, name: str, result: Result):
+        """
+        :param name: request name
+        :param result: node response
+        """
         super().__init__(name, result.message if result.message is not None else '')
         self.error_code = result.error_code
 
 
 class MoeraNodeConnectionError(Exception):
+    """Error while connecting the node."""
 
     def __init__(self, message: str):
+        """
+        :param message: error message
+        """
         super().__init__('Node connection error: ' + message)
 
 
@@ -67,50 +82,80 @@ def decode_bodies(name: str, data):
 
 
 class NodeAuth(Enum):
+    """Authentication type."""
     NONE = 0
+    """No authentication."""
     PEER = 1
+    """Carte authentication."""
     ADMIN = 2
+    """Admin token authentication."""
     ROOT_ADMIN = 3
+    """Root admin secret authentication."""
 
 
 class Caller:
     root: str | None = None
+    """API endpoint URL of the node."""
     _root_secret: str | None = None
     _token: str | None = None
     _carte: str | None = None
     _auth_method: NodeAuth = NodeAuth.NONE
 
     def node_url(self, url: str) -> None:
+        """Set node URL."""
         self.root = moera_root(url)
 
     def root_secret(self, secret: str) -> None:
+        """Set root secret for authentication."""
         self._root_secret = secret
 
     def token(self, token: str) -> None:
+        """Set admin token for authentication."""
         self._token = token
 
     def carte(self, carte: str) -> None:
+        """Set carte for authentication."""
         self._carte = carte
 
     def auth_method(self, auth_method: NodeAuth) -> None:
+        """Select authentication method for the following requests."""
         self._auth_method = auth_method
 
     def no_auth(self) -> None:
+        """Switch off authentication for the following requests."""
         self.auth_method(NodeAuth.NONE)
 
     def auth(self) -> None:
+        """Select carte authentication for the following requests."""
         self.auth_method(NodeAuth.PEER)
 
     def auth_admin(self) -> None:
+        """Select admin token authentication for the following requests."""
         self.auth_method(NodeAuth.ADMIN)
 
     def auth_root_admin(self) -> None:
+        """Select root admin secret authentication for the following requests."""
         self.auth_method(NodeAuth.ROOT_ADMIN)
 
     def call(self, name: str, location: str, params: Mapping[str, str | int | None] | None = None, method: str = 'GET',
              body: Structure | Sequence[Structure] | None = None, body_file: IO | None = None,
              body_file_type: str | None = None, auth: bool = True, schema: Any = None,
              bodies: bool = False):
+        """
+        Generic method for making node API requests.
+
+        :param name: request name (for error messages)
+        :param location: request path
+        :param params: query parameters, mapping name to value, None values are skipped
+        :param method: request method (one of 'GET', 'POST', 'PUT', 'DELETE')
+        :param body: request body
+        :param body_file: file to read the request body from
+        :param body_file_type: content-type of the request body, when read from a file
+        :param auth: `True` to authenticate the request, `False` otherwise
+        :param schema: JSON schema to validate the response
+        :param bodies: `True` to decode `Body` structures in the response, `False` otherwise
+        :return: the decoded response
+        """
         response = None
         try:
             body_encoded = None
@@ -176,6 +221,12 @@ class Caller:
 
 
 def moera_root(url: str) -> str:
+    """
+    Convert partial node URL to a standardized form.
+
+    :param url: partial URL
+    :return: standard URL
+    """
     if not url.startswith('http:') and not url.startswith('https:'):
         url = 'https://' + url
     url = url.removesuffix('/').removesuffix('/api')
