@@ -563,6 +563,10 @@ from ..structure import comma_separated_flags, structure_list
 
 
 class MoeraNode(Caller):
+
+    def __init__(self, node_url: str | None = None):
+        if node_url is not None:
+            self.node_url(node_url)
 '''
 
 
