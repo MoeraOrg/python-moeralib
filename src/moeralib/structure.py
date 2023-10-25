@@ -16,8 +16,11 @@ class Structure:
                     data[attr] = b64decode(value)
                 else:
                     struct = get_structure_attribute_type(type(self), attr)
-                    if struct is not None:
-                        data[attr] = struct(value)
+                    if struct is not None and not isinstance(value, Structure):
+                        if isinstance(value, list):
+                            data[attr] = [struct(v) for v in value]
+                        else:
+                            data[attr] = struct(value)
         self.__dict__.update(data)
 
     def json(self):
