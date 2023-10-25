@@ -73,11 +73,11 @@ def decode_bodies(name: str, data):
     if data.get('posting', None) is not None:
         decoded['posting'] = decode_bodies(name, data['posting'])
     if data.get('body', None) is not None:
-        decoded['body'] = decode_body(name, data['body'], data.get('body_format', None))
-    if data.get('body_preview', None) is not None:
-        decoded['body_preview'] = decode_body(name, data['body_preview'], data.get('body_format', None))
-    if data.get('body_src', None) is not None:
-        decoded['body_src'] = decode_body(name, data['body_src'], data.get('body_src_format', None))
+        decoded['body'] = decode_body(name, data['body'], data.get('bodyFormat', None))
+    if data.get('bodyPreview', None) is not None:
+        decoded['bodyPreview'] = decode_body(name, data['bodyPreview'], data.get('bodyFormat', None))
+    if data.get('bodySrc', None) is not None:
+        decoded['bodySrc'] = decode_body(name, data['bodySrc'], data.get('bodySrcFormat', None))
     return decoded
 
 
@@ -93,12 +93,18 @@ class NodeAuth(Enum):
     """Root admin secret authentication."""
 
 
+class CarteSource:
+    def get_carte(self) -> str:
+        raise NotImplemented
+
+
 class Caller:
     root: str | None = None
     """API endpoint URL of the node."""
     _root_secret: str | None = None
     _token: str | None = None
     _carte: str | None = None
+    _carte_source: CarteSource | None = None
     _auth_method: NodeAuth = NodeAuth.NONE
 
     def node_url(self, url: str) -> None:
@@ -116,6 +122,10 @@ class Caller:
     def carte(self, carte: str) -> None:
         """Set carte for authentication."""
         self._carte = carte
+
+    def carte_source(self, carte_source: CarteSource) -> None:
+        """Set a source of cartes for authentication."""
+        self._carte_source = carte_source
 
     def auth_method(self, auth_method: NodeAuth) -> None:
         """Select authentication method for the following requests."""
@@ -173,9 +183,12 @@ class Caller:
             if auth:
                 match self._auth_method:
                     case NodeAuth.PEER:
-                        if self._carte is None:
+                        if self._carte_source is not None:
+                            bearer = 'carte:' + self._carte_source.get_carte()
+                        elif self._carte is not None:
+                            bearer = 'carte:' + self._carte
+                        else:
                             raise ValueError('Carte is not set')
-                        bearer = 'carte:' + self._carte
                     case NodeAuth.ADMIN:
                         if self._token is None:
                             raise ValueError('Token is not set')
