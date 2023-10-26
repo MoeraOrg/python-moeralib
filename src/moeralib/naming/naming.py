@@ -204,7 +204,7 @@ class MoeraNaming:
 
 def node_name_parse(node_name: str) -> Tuple[str, int]:
     """
-    Parse a node name and its name and generation parts.
+    Parse a node name and return its name and generation parts.
 
     If the node name does not include a generation, generation 0 is returned. If name syntax is invalid, ``ValueError``
     is raised.

@@ -8,10 +8,6 @@ import yaml
 from camel_converter import to_snake
 
 
-def kebab_to_snake(s: str) -> str:
-    return s.replace('-', '_')
-
-
 def ind(n: int) -> str:
     return n * 4 * ' '
 
@@ -417,7 +413,7 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                     flags = [flag['name'] for flag in param['flags']]
                     for flag in param['flags']:
                         flag_param = f'with_{flag["name"]}'
-                        params += f', {flag_param}: bool = False'
+                        tail_params += f', {flag_param}: bool = False'
                         param_docs += [(flag_param, 'include ' + flag.get('description', ''))]
                 else:
                     if param.get('optional', False):
