@@ -47,9 +47,28 @@ class MoeraNodeConnectionError(Exception):
         super().__init__('Node connection error: ' + message)
 
 
+def encode_body(decoded: Body, format: BodyFormat | SourceFormat | None) -> str:
+    if format is not None and format.lower() == "application":
+        return decoded.text
+    return json.dumps(decoded.json(), indent=None)
+
+
+def encode_bodies(data: Structure | Sequence[Structure]) -> Structure | list[Structure]:
+    if isinstance(data, Sequence):
+        return [encode_bodies(item) for item in data]
+    encoded = deepcopy(data)
+    if getattr(data, 'body', None) is not None:
+        encoded.body = encode_body(getattr(data, 'body'), getattr(data, 'body_format', None))
+    if getattr(data, 'body_preview', None) is not None:
+        encoded.body_preview = encode_body(getattr(data, 'body_preview'), getattr(data, 'body_format', None))
+    if getattr(data, 'body_src', None) is not None:
+        encoded.body_src = encode_body(getattr(data, 'body_src'), getattr(data, 'body_src_format', None))
+    return encoded
+
+
 def decode_body(name: str, encoded: str, format: BodyFormat | SourceFormat | None) -> Body:
     if format is not None and format.lower() == "application":
-        return Body({"text": ""})
+        return Body({"text": encoded})
     try:
         body = json.loads(encoded)
         validate(body, schema=schemas.BODY_SCHEMA)
@@ -150,7 +169,7 @@ class Caller:
     def call(self, name: str, location: str, params: Mapping[str, str | int | None] | None = None, method: str = 'GET',
              body: Structure | Sequence[Structure] | None = None, body_file: IO | None = None,
              body_file_type: str | None = None, auth: bool = True, schema: Any = None,
-             bodies: bool = False):
+             bodies: bool = False, src_bodies: bool = False):
         """
         Generic method for making node API requests.
 
@@ -164,12 +183,15 @@ class Caller:
         :param auth: `True` to authenticate the request, `False` otherwise
         :param schema: JSON schema to validate the response
         :param bodies: `True` to decode `Body` structures in the response, `False` otherwise
+        :param src_bodies: `True` to encode `Body` structures in the request, `False` otherwise
         :return: the decoded response
         """
         response = None
         try:
             body_encoded = None
             if body is not None:
+                if src_bodies:
+                    body = encode_bodies(body)
                 if isinstance(body, Sequence):
                     body_encoded = [b.json() for b in body]
                 else:

@@ -437,7 +437,10 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                               .format(method=request['type'], url=request['url']))
                         exit(1)
                     name = to_snake(inp['name'])
-                    py_type = 'types.' + inp['struct']
+                    struct = inp['struct']
+                    py_type = 'types.' + struct
+                    if struct in structs and structs[struct].uses_body:
+                        call_params += f', src_bodies=True'
                     if inp.get('array', False):
                         py_type = f'List[{py_type}]'
                     params += f', {name}: {py_type}'
@@ -490,7 +493,6 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
             result = 'types.Result'
             result_schema = 'schemas.RESULT_SCHEMA'
             result_array = False
-            result_body = False
             if 'out' in request:
                 out = request['out']
                 if 'type' in out:
@@ -504,15 +506,13 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                     struct = out['struct']
                     result = 'types.' + struct
                     if struct in structs and structs[struct].uses_body:
-                        result_body = True
+                        call_params += ', bodies=True'
                     if out.get('array', False):
                         result_schema = 'schemas.%s_ARRAY_SCHEMA' % to_snake(struct).upper()
                         result_array = True
                     else:
                         result_schema = 'schemas.%s_SCHEMA' % to_snake(struct).upper()
             call_params += f', schema={result_schema}'
-            if result_body:
-                call_params += ', bodies=True'
 
             if result_array:
                 afile.write(params_wrap(f'\n{ind(1)}def {function}(%s) -> List[{result}]:\n', params, 2))

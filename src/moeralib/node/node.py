@@ -260,8 +260,8 @@ class MoeraNode(Caller):
         location = "/postings/{postingId}/comments".format(postingId=quote_plus(posting_id))
         params = {"after": after, "before": before, "limit": limit}
         data = self.call(
-            "get_comments_slice", location, method="GET", params=params, schema=schemas.COMMENTS_SLICE_INFO_SCHEMA,
-            bodies=True
+            "get_comments_slice", location, method="GET", params=params, bodies=True,
+            schema=schemas.COMMENTS_SLICE_INFO_SCHEMA
         )
         return types.CommentsSliceInfo(data)
 
@@ -276,7 +276,8 @@ class MoeraNode(Caller):
         """
         location = "/postings/{postingId}/comments".format(postingId=quote_plus(posting_id))
         data = self.call(
-            "create_comment", location, method="POST", body=comment, schema=schemas.COMMENT_CREATED_SCHEMA, bodies=True
+            "create_comment", location, method="POST", src_bodies=True, body=comment, bodies=True,
+            schema=schemas.COMMENT_CREATED_SCHEMA
         )
         return types.CommentCreated(data)
 
@@ -294,7 +295,7 @@ class MoeraNode(Caller):
         include = comma_separated_flags({"source": with_source})
         params = {"include": include}
         data = self.call(
-            "get_comment", location, method="GET", params=params, schema=schemas.COMMENT_INFO_SCHEMA, bodies=True
+            "get_comment", location, method="GET", params=params, bodies=True, schema=schemas.COMMENT_INFO_SCHEMA
         )
         return types.CommentInfo(data)
 
@@ -321,7 +322,8 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call(
-            "update_comment", location, method="PUT", body=comment, schema=schemas.COMMENT_INFO_SCHEMA, bodies=True
+            "update_comment", location, method="PUT", src_bodies=True, body=comment, bodies=True,
+            schema=schemas.COMMENT_INFO_SCHEMA
         )
         return types.CommentInfo(data)
 
@@ -350,8 +352,8 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call(
-            "get_postings_attached_to_comment", location, method="GET", schema=schemas.POSTING_INFO_ARRAY_SCHEMA,
-            bodies=True
+            "get_postings_attached_to_comment", location, method="GET", bodies=True,
+            schema=schemas.POSTING_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.PostingInfo)
 
@@ -366,8 +368,8 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call(
-            "get_comment_revisions", location, method="GET", schema=schemas.COMMENT_REVISION_INFO_ARRAY_SCHEMA,
-            bodies=True
+            "get_comment_revisions", location, method="GET", bodies=True,
+            schema=schemas.COMMENT_REVISION_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.CommentRevisionInfo)
 
@@ -383,7 +385,7 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), commentId=quote_plus(comment_id), id=quote_plus(id)
         )
         data = self.call(
-            "get_comment_revision", location, method="GET", schema=schemas.COMMENT_REVISION_INFO_SCHEMA, bodies=True
+            "get_comment_revision", location, method="GET", bodies=True, schema=schemas.COMMENT_REVISION_INFO_SCHEMA
         )
         return types.CommentRevisionInfo(data)
 
@@ -601,8 +603,8 @@ class MoeraNode(Caller):
         location = "/deleted-postings".format()
         params = {"page": page, "limit": limit}
         data = self.call(
-            "get_deleted_postings", location, method="GET", params=params, schema=schemas.POSTING_INFO_ARRAY_SCHEMA,
-            bodies=True
+            "get_deleted_postings", location, method="GET", params=params, bodies=True,
+            schema=schemas.POSTING_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.PostingInfo)
 
@@ -614,7 +616,7 @@ class MoeraNode(Caller):
         """
         location = "/deleted-postings/{id}".format(id=quote_plus(id))
         data = self.call(
-            "get_deleted_posting", location, method="GET", schema=schemas.POSTING_INFO_SCHEMA, bodies=True
+            "get_deleted_posting", location, method="GET", bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
         return types.PostingInfo(data)
 
@@ -626,7 +628,7 @@ class MoeraNode(Caller):
         """
         location = "/deleted-postings/{id}/restore".format(id=quote_plus(id))
         data = self.call(
-            "restore_deleted_posting", location, method="POST", schema=schemas.POSTING_INFO_SCHEMA, bodies=True
+            "restore_deleted_posting", location, method="POST", bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
         return types.PostingInfo(data)
 
@@ -643,8 +645,8 @@ class MoeraNode(Caller):
         location = "/deleted-postings/{postingId}/revisions".format(postingId=quote_plus(posting_id))
         params = {"limit": limit}
         data = self.call(
-            "get_delete_posting_revisions", location, method="GET", params=params,
-            schema=schemas.POSTING_REVISION_INFO_ARRAY_SCHEMA, bodies=True
+            "get_delete_posting_revisions", location, method="GET", params=params, bodies=True,
+            schema=schemas.POSTING_REVISION_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.PostingRevisionInfo)
 
@@ -659,8 +661,8 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), id=quote_plus(id)
         )
         data = self.call(
-            "get_deleted_posting_revision", location, method="GET", schema=schemas.POSTING_REVISION_INFO_SCHEMA,
-            bodies=True
+            "get_deleted_posting_revision", location, method="GET", bodies=True,
+            schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
         return types.PostingRevisionInfo(data)
 
@@ -676,8 +678,8 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), id=quote_plus(id)
         )
         data = self.call(
-            "restore_deleted_posting_revision", location, method="POST", schema=schemas.POSTING_REVISION_INFO_SCHEMA,
-            bodies=True
+            "restore_deleted_posting_revision", location, method="POST", bodies=True,
+            schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
         return types.PostingRevisionInfo(data)
 
@@ -773,7 +775,7 @@ class MoeraNode(Caller):
             "page": page, "limit": limit
         }
         data = self.call(
-            "get_drafts", location, method="GET", params=params, schema=schemas.DRAFT_INFO_ARRAY_SCHEMA, bodies=True
+            "get_drafts", location, method="GET", params=params, bodies=True, schema=schemas.DRAFT_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.DraftInfo)
 
@@ -785,7 +787,8 @@ class MoeraNode(Caller):
         """
         location = "/drafts"
         data = self.call(
-            "create_draft", location, method="POST", body=draft, schema=schemas.DRAFT_INFO_SCHEMA, bodies=True
+            "create_draft", location, method="POST", src_bodies=True, body=draft, bodies=True,
+            schema=schemas.DRAFT_INFO_SCHEMA
         )
         return types.DraftInfo(data)
 
@@ -796,7 +799,7 @@ class MoeraNode(Caller):
         :param id: ID of the draft
         """
         location = "/drafts/{id}".format(id=quote_plus(id))
-        data = self.call("get_draft", location, method="GET", schema=schemas.DRAFT_INFO_SCHEMA, bodies=True)
+        data = self.call("get_draft", location, method="GET", bodies=True, schema=schemas.DRAFT_INFO_SCHEMA)
         return types.DraftInfo(data)
 
     def update_draft(self, id: str, draft: types.DraftText) -> types.DraftInfo:
@@ -808,7 +811,8 @@ class MoeraNode(Caller):
         """
         location = "/drafts/{id}".format(id=quote_plus(id))
         data = self.call(
-            "update_draft", location, method="PUT", body=draft, schema=schemas.DRAFT_INFO_SCHEMA, bodies=True
+            "update_draft", location, method="PUT", src_bodies=True, body=draft, bodies=True,
+            schema=schemas.DRAFT_INFO_SCHEMA
         )
         return types.DraftInfo(data)
 
@@ -885,7 +889,7 @@ class MoeraNode(Caller):
         location = "/feeds/{feedName}/stories".format(feedName=quote_plus(feed_name))
         params = {"after": after, "before": before, "limit": limit}
         data = self.call(
-            "get_feed_slice", location, method="GET", params=params, schema=schemas.FEED_SLICE_INFO_SCHEMA, bodies=True
+            "get_feed_slice", location, method="GET", params=params, bodies=True, schema=schemas.FEED_SLICE_INFO_SCHEMA
         )
         return types.FeedSliceInfo(data)
 
@@ -1043,8 +1047,8 @@ class MoeraNode(Caller):
         """
         location = "/media/private/{id}/parent".format(id=quote_plus(id))
         data = self.call(
-            "get_private_media_parent_entry", location, method="GET", schema=schemas.ENTRY_INFO_ARRAY_SCHEMA,
-            bodies=True
+            "get_private_media_parent_entry", location, method="GET", bodies=True,
+            schema=schemas.ENTRY_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.EntryInfo)
 
@@ -1206,7 +1210,8 @@ class MoeraNode(Caller):
         """
         location = "/postings"
         data = self.call(
-            "create_posting", location, method="POST", body=posting, schema=schemas.POSTING_INFO_SCHEMA, bodies=True
+            "create_posting", location, method="POST", src_bodies=True, body=posting, bodies=True,
+            schema=schemas.POSTING_INFO_SCHEMA
         )
         return types.PostingInfo(data)
 
@@ -1219,7 +1224,8 @@ class MoeraNode(Caller):
         """
         location = "/postings/{id}".format(id=quote_plus(id))
         data = self.call(
-            "update_posting", location, method="PUT", body=posting, schema=schemas.POSTING_INFO_SCHEMA, bodies=True
+            "update_posting", location, method="PUT", src_bodies=True, body=posting, bodies=True,
+            schema=schemas.POSTING_INFO_SCHEMA
         )
         return types.PostingInfo(data)
 
@@ -1234,7 +1240,7 @@ class MoeraNode(Caller):
         include = comma_separated_flags({"source": with_source})
         params = {"include": include}
         data = self.call(
-            "get_posting", location, method="GET", params=params, schema=schemas.POSTING_INFO_SCHEMA, bodies=True
+            "get_posting", location, method="GET", params=params, bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
         return types.PostingInfo(data)
 
@@ -1257,8 +1263,8 @@ class MoeraNode(Caller):
         """
         location = "/postings/{id}/attached".format(id=quote_plus(id))
         data = self.call(
-            "get_postings_attached_to_posting", location, method="GET", schema=schemas.POSTING_INFO_ARRAY_SCHEMA,
-            bodies=True
+            "get_postings_attached_to_posting", location, method="GET", bodies=True,
+            schema=schemas.POSTING_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.PostingInfo)
 
@@ -1273,8 +1279,8 @@ class MoeraNode(Caller):
         location = "/postings/{postingId}/revisions".format(postingId=quote_plus(posting_id))
         params = {"limit": limit}
         data = self.call(
-            "get_posting_revisions", location, method="GET", params=params,
-            schema=schemas.POSTING_REVISION_INFO_ARRAY_SCHEMA, bodies=True
+            "get_posting_revisions", location, method="GET", params=params, bodies=True,
+            schema=schemas.POSTING_REVISION_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.PostingRevisionInfo)
 
@@ -1287,7 +1293,7 @@ class MoeraNode(Caller):
         """
         location = "/postings/{postingId}/revisions/{id}".format(postingId=quote_plus(posting_id), id=quote_plus(id))
         data = self.call(
-            "get_posting_revision", location, method="GET", schema=schemas.POSTING_REVISION_INFO_SCHEMA, bodies=True
+            "get_posting_revision", location, method="GET", bodies=True, schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
         return types.PostingRevisionInfo(data)
 
@@ -1302,8 +1308,8 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), id=quote_plus(id)
         )
         data = self.call(
-            "restore_posting_revision", location, method="POST", schema=schemas.POSTING_REVISION_INFO_SCHEMA,
-            bodies=True
+            "restore_posting_revision", location, method="POST", bodies=True,
+            schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
         return types.PostingRevisionInfo(data)
 
@@ -1515,7 +1521,10 @@ class MoeraNode(Caller):
         location = "/nodes/{nodeName}/postings/{postingId}/comments".format(
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
         )
-        data = self.call("create_remote_comment", location, method="POST", body=comment, schema=schemas.RESULT_SCHEMA)
+        data = self.call(
+            "create_remote_comment", location, method="POST", src_bodies=True, body=comment,
+            schema=schemas.RESULT_SCHEMA
+        )
         return types.Result(data)
 
     def update_remote_comment(
@@ -1532,7 +1541,9 @@ class MoeraNode(Caller):
         location = "/nodes/{nodeName}/postings/{postingId}/comments/{commentId}".format(
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
-        data = self.call("update_remote_comment", location, method="PUT", body=comment, schema=schemas.RESULT_SCHEMA)
+        data = self.call(
+            "update_remote_comment", location, method="PUT", src_bodies=True, body=comment, schema=schemas.RESULT_SCHEMA
+        )
         return types.Result(data)
 
     def delete_remote_comment(self, node_name: str, posting_id: str, comment_id: str) -> types.Result:
@@ -1626,7 +1637,10 @@ class MoeraNode(Caller):
         :param posting:
         """
         location = "/nodes/{nodeName}/postings".format(nodeName=quote_plus(node_name))
-        data = self.call("create_remote_posting", location, method="POST", body=posting, schema=schemas.RESULT_SCHEMA)
+        data = self.call(
+            "create_remote_posting", location, method="POST", src_bodies=True, body=posting,
+            schema=schemas.RESULT_SCHEMA
+        )
         return types.Result(data)
 
     def update_remote_posting(
@@ -1642,7 +1656,9 @@ class MoeraNode(Caller):
         location = "/nodes/{nodeName}/postings/{postingId}".format(
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
         )
-        data = self.call("update_remote_posting", location, method="PUT", body=posting, schema=schemas.RESULT_SCHEMA)
+        data = self.call(
+            "update_remote_posting", location, method="PUT", src_bodies=True, body=posting, schema=schemas.RESULT_SCHEMA
+        )
         return types.Result(data)
 
     def delete_remote_posting(self, node_name: str, posting_id: str) -> types.Result:
@@ -1932,7 +1948,7 @@ class MoeraNode(Caller):
         :param id: ID of the story
         """
         location = "/stories/{id}".format(id=quote_plus(id))
-        data = self.call("get_story", location, method="GET", schema=schemas.STORY_INFO_SCHEMA, bodies=True)
+        data = self.call("get_story", location, method="GET", bodies=True, schema=schemas.STORY_INFO_SCHEMA)
         return types.StoryInfo(data)
 
     def update_story(self, id: str, story: types.StoryAttributes) -> types.StoryInfo:
@@ -1944,7 +1960,7 @@ class MoeraNode(Caller):
         """
         location = "/stories/{id}".format(id=quote_plus(id))
         data = self.call(
-            "update_story", location, method="PUT", body=story, schema=schemas.STORY_INFO_SCHEMA, bodies=True
+            "update_story", location, method="PUT", body=story, bodies=True, schema=schemas.STORY_INFO_SCHEMA
         )
         return types.StoryInfo(data)
 
