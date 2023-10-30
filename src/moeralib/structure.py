@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from base64 import b64decode
 from typing import Any, TypeVar, get_type_hints, get_args, Mapping, List
 
@@ -5,23 +7,28 @@ from camel_converter import dict_to_snake, to_camel
 
 
 class Structure:
-    def __init__(self, data=None) -> None:
-        if data is None:
-            return
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
+    @classmethod
+    def from_json(cls, data) -> Structure | None:
+        if data is None:
+            return None
         data = dict_to_snake(data)
         for (attr, value) in data.items():
             if value is not None:
-                if is_bytes_attribute(type(self), attr):
+                if is_bytes_attribute(cls, attr):
                     data[attr] = b64decode(value)
                 else:
-                    struct = get_structure_attribute_type(type(self), attr)
+                    struct = get_structure_attribute_type(cls, attr)
                     if struct is not None and not isinstance(value, Structure):
                         if isinstance(value, list):
-                            data[attr] = [struct(v) for v in value]
+                            data[attr] = [struct.from_json(v) for v in value]
                         else:
-                            data[attr] = struct(value)
-        self.__dict__.update(data)
+                            data[attr] = struct.from_json(value)
+        instance = cls()
+        instance.__dict__.update(data)
+        return instance
 
     def json(self):
         json = {}
@@ -71,11 +78,11 @@ def to_nullable_object_schema(schema: Any) -> Any:
 
 
 def structure_or_none(data, struct_type: type[StructType]) -> StructType | None:
-    return struct_type(data) if data is not None else None
+    return struct_type.from_json(data) if data is not None else None
 
 
 def structure_list(data, struct_type: type[StructType]) -> List[StructType]:
-    return [struct_type(item) for item in data]
+    return [struct_type.from_json(item) for item in data]
 
 
 def comma_separated_flags(flags: Mapping[str, bool]) -> str | None:

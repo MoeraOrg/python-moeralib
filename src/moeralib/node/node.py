@@ -39,7 +39,7 @@ class MoeraNode(Caller):
             "get_remote_posting_verification_status", location, method="GET",
             schema=schemas.REMOTE_POSTING_VERIFICATION_INFO_SCHEMA
         )
-        return types.RemotePostingVerificationInfo(data)
+        return types.RemotePostingVerificationInfo.from_json(data)
 
     def get_remote_reaction_verification_status(self, id: str) -> types.RemoteReactionVerificationInfo:
         """
@@ -53,7 +53,7 @@ class MoeraNode(Caller):
             "get_remote_reaction_verification_status", location, method="GET",
             schema=schemas.REMOTE_REACTION_VERIFICATION_INFO_SCHEMA
         )
-        return types.RemoteReactionVerificationInfo(data)
+        return types.RemoteReactionVerificationInfo.from_json(data)
 
     def get_avatars(self) -> List[types.AvatarInfo]:
         """
@@ -73,7 +73,7 @@ class MoeraNode(Caller):
         """
         location = "/avatars"
         data = self.call("create_avatar", location, method="POST", body=avatar, schema=schemas.AVATAR_INFO_SCHEMA)
-        return types.AvatarInfo(data)
+        return types.AvatarInfo.from_json(data)
 
     def get_avatar(self, id: str) -> types.AvatarInfo:
         """
@@ -83,7 +83,7 @@ class MoeraNode(Caller):
         """
         location = "/avatars/{id}".format(id=quote_plus(id))
         data = self.call("get_avatar", location, method="GET", auth=False, schema=schemas.AVATAR_INFO_SCHEMA)
-        return types.AvatarInfo(data)
+        return types.AvatarInfo.from_json(data)
 
     def delete_avatar(self, id: str) -> types.Result:
         """
@@ -93,7 +93,7 @@ class MoeraNode(Caller):
         """
         location = "/avatars/{id}".format(id=quote_plus(id))
         data = self.call("delete_avatar", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def reorder_avatars(self, order: types.AvatarsOrdered) -> List[types.AvatarOrdinal]:
         """
@@ -119,7 +119,7 @@ class MoeraNode(Caller):
         data = self.call(
             "block_instant", location, method="POST", body=instant, schema=schemas.BLOCKED_INSTANT_INFO_SCHEMA
         )
-        return types.BlockedInstantInfo(data)
+        return types.BlockedInstantInfo.from_json(data)
 
     def get_blocked_instant(self, id: str) -> types.BlockedInstantInfo:
         """
@@ -129,7 +129,7 @@ class MoeraNode(Caller):
         """
         location = "/blocked-instants/{id}".format(id=quote_plus(id))
         data = self.call("get_blocked_instant", location, method="GET", schema=schemas.BLOCKED_INSTANT_INFO_SCHEMA)
-        return types.BlockedInstantInfo(data)
+        return types.BlockedInstantInfo.from_json(data)
 
     def unblock_instant(self, id: str) -> types.Result:
         """
@@ -139,7 +139,7 @@ class MoeraNode(Caller):
         """
         location = "/blocked-instants/{id}".format(id=quote_plus(id))
         data = self.call("unblock_instant", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def search_blocked_instants(self, filter: types.BlockedInstantFilter) -> List[types.BlockedInstantInfo]:
         """
@@ -163,7 +163,7 @@ class MoeraNode(Caller):
         """
         location = "/people/blocked-users"
         data = self.call("block_user", location, method="POST", body=user, schema=schemas.BLOCKED_USER_INFO_SCHEMA)
-        return types.BlockedUserInfo(data)
+        return types.BlockedUserInfo.from_json(data)
 
     def get_blocked_user(self, id: str) -> types.BlockedUserInfo:
         """
@@ -173,7 +173,7 @@ class MoeraNode(Caller):
         """
         location = "/people/blocked-users/{id}".format(id=quote_plus(id))
         data = self.call("get_blocked_user", location, method="GET", schema=schemas.BLOCKED_USER_INFO_SCHEMA)
-        return types.BlockedUserInfo(data)
+        return types.BlockedUserInfo.from_json(data)
 
     def unblock_user(self, id: str) -> types.Result:
         """
@@ -183,7 +183,7 @@ class MoeraNode(Caller):
         """
         location = "/people/blocked-users/{id}".format(id=quote_plus(id))
         data = self.call("unblock_user", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def search_blocked_users(self, filter: types.BlockedUserFilter) -> List[types.BlockedUserInfo]:
         """
@@ -206,7 +206,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_blocked_users_checksums", location, method="GET", schema=schemas.BLOCKED_USERS_CHECKSUMS_SCHEMA
         )
-        return types.BlockedUsersChecksums(data)
+        return types.BlockedUsersChecksums.from_json(data)
 
     def get_blocked_by_user(self, id: str) -> types.BlockedByUserInfo:
         """
@@ -216,7 +216,7 @@ class MoeraNode(Caller):
         """
         location = "/people/blocked-by-users/{id}".format(id=quote_plus(id))
         data = self.call("get_blocked_by_user", location, method="GET", schema=schemas.BLOCKED_BY_USER_INFO_SCHEMA)
-        return types.BlockedByUserInfo(data)
+        return types.BlockedByUserInfo.from_json(data)
 
     def search_blocked_by_users(self, filter: types.BlockedByUserFilter) -> List[types.BlockedByUserInfo]:
         """
@@ -242,7 +242,7 @@ class MoeraNode(Caller):
         location = "/cartes".format()
         params = {"limit": limit}
         data = self.call("get_cartes", location, method="GET", params=params, schema=schemas.CARTE_SET_SCHEMA)
-        return types.CarteSet(data)
+        return types.CarteSet.from_json(data)
 
     def get_comments_slice(
         self, posting_id: str, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -263,7 +263,7 @@ class MoeraNode(Caller):
             "get_comments_slice", location, method="GET", params=params, bodies=True,
             schema=schemas.COMMENTS_SLICE_INFO_SCHEMA
         )
-        return types.CommentsSliceInfo(data)
+        return types.CommentsSliceInfo.from_json(data)
 
     def create_comment(self, posting_id: str, comment: types.CommentText) -> types.CommentCreated:
         """
@@ -279,7 +279,7 @@ class MoeraNode(Caller):
             "create_comment", location, method="POST", src_bodies=True, body=comment, bodies=True,
             schema=schemas.COMMENT_CREATED_SCHEMA
         )
-        return types.CommentCreated(data)
+        return types.CommentCreated.from_json(data)
 
     def get_comment(self, posting_id: str, comment_id: str, with_source: bool = False) -> types.CommentInfo:
         """
@@ -297,7 +297,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_comment", location, method="GET", params=params, bodies=True, schema=schemas.COMMENT_INFO_SCHEMA
         )
-        return types.CommentInfo(data)
+        return types.CommentInfo.from_json(data)
 
     def update_all_comments(self, posting_id: str, attributes: types.CommentMassAttributes) -> types.Result:
         """
@@ -308,7 +308,7 @@ class MoeraNode(Caller):
         """
         location = "/postings/{postingId}/comments".format(postingId=quote_plus(posting_id))
         data = self.call("update_all_comments", location, method="PUT", body=attributes, schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def update_comment(self, posting_id: str, comment_id: str, comment: types.CommentText) -> types.CommentInfo:
         """
@@ -325,7 +325,7 @@ class MoeraNode(Caller):
             "update_comment", location, method="PUT", src_bodies=True, body=comment, bodies=True,
             schema=schemas.COMMENT_INFO_SCHEMA
         )
-        return types.CommentInfo(data)
+        return types.CommentInfo.from_json(data)
 
     def delete_comment(self, posting_id: str, comment_id: str) -> types.CommentTotalInfo:
         """
@@ -339,7 +339,7 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call("delete_comment", location, method="DELETE", schema=schemas.COMMENT_TOTAL_INFO_SCHEMA)
-        return types.CommentTotalInfo(data)
+        return types.CommentTotalInfo.from_json(data)
 
     def get_postings_attached_to_comment(self, posting_id: str, comment_id: str) -> List[types.PostingInfo]:
         """
@@ -387,7 +387,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_comment_revision", location, method="GET", bodies=True, schema=schemas.COMMENT_REVISION_INFO_SCHEMA
         )
-        return types.CommentRevisionInfo(data)
+        return types.CommentRevisionInfo.from_json(data)
 
     def create_comment_reaction(
         self, posting_id: str, comment_id: str, reaction: types.ReactionDescription
@@ -408,7 +408,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_comment_reaction", location, method="POST", body=reaction, schema=schemas.REACTION_CREATED_SCHEMA
         )
-        return types.ReactionCreated(data)
+        return types.ReactionCreated.from_json(data)
 
     def update_comment_reaction(
         self, posting_id: str, comment_id: str, owner_name: str, reaction: types.ReactionOverride
@@ -427,7 +427,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_comment_reaction", location, method="PUT", body=reaction, schema=schemas.REACTION_INFO_SCHEMA
         )
-        return types.ReactionInfo(data)
+        return types.ReactionInfo.from_json(data)
 
     def get_comment_reactions_slice(
         self, posting_id: str, comment_id: str, negative: bool | None = None, emoji: int | None = None,
@@ -454,7 +454,7 @@ class MoeraNode(Caller):
             "get_comment_reactions_slice", location, method="GET", params=params,
             schema=schemas.REACTIONS_SLICE_INFO_SCHEMA
         )
-        return types.ReactionsSliceInfo(data)
+        return types.ReactionsSliceInfo.from_json(data)
 
     def get_comment_reaction(self, posting_id: str, comment_id: str, owner_name: str) -> types.ReactionInfo:
         """
@@ -469,7 +469,7 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), commentId=quote_plus(comment_id), ownerName=quote_plus(owner_name)
         )
         data = self.call("get_comment_reaction", location, method="GET", schema=schemas.REACTION_INFO_SCHEMA)
-        return types.ReactionInfo(data)
+        return types.ReactionInfo.from_json(data)
 
     def delete_all_comment_reactions(self, posting_id: str, comment_id: str) -> types.Result:
         """
@@ -482,7 +482,7 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call("delete_all_comment_reactions", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_comment_reaction(self, posting_id: str, comment_id: str, owner_name: str) -> types.ReactionTotalsInfo:
         """
@@ -498,7 +498,7 @@ class MoeraNode(Caller):
         data = self.call(
             "delete_comment_reaction", location, method="DELETE", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo(data)
+        return types.ReactionTotalsInfo.from_json(data)
 
     def get_comment_reaction_totals(self, posting_id: str, comment_id: str) -> types.ReactionTotalsInfo:
         """
@@ -513,7 +513,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_comment_reaction_totals", location, method="GET", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo(data)
+        return types.ReactionTotalsInfo.from_json(data)
 
     def get_contacts(self, query: str | None = None, limit: int | None = None) -> List[types.ContactInfo]:
         """
@@ -544,7 +544,7 @@ class MoeraNode(Caller):
         data = self.call(
             "check_credentials", location, method="GET", auth=False, schema=schemas.CREDENTIALS_CREATED_SCHEMA
         )
-        return types.CredentialsCreated(data)
+        return types.CredentialsCreated.from_json(data)
 
     def create_credentials(self, credentials: types.Credentials) -> types.Result:
         """
@@ -558,7 +558,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_credentials", location, method="POST", body=credentials, auth=False, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def update_credentials(self, credentials: types.CredentialsChange) -> types.Result:
         """
@@ -572,7 +572,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_credentials", location, method="PUT", body=credentials, auth=False, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_credentials(self) -> types.Result:
         """
@@ -580,7 +580,7 @@ class MoeraNode(Caller):
         """
         location = "/credentials"
         data = self.call("delete_credentials", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def reset_credentials(self) -> types.EmailHint:
         """
@@ -590,7 +590,7 @@ class MoeraNode(Caller):
         """
         location = "/credentials/reset"
         data = self.call("reset_credentials", location, method="POST", auth=False, schema=schemas.EMAIL_HINT_SCHEMA)
-        return types.EmailHint(data)
+        return types.EmailHint.from_json(data)
 
     def get_deleted_postings(self, page: int | None = None, limit: int | None = None) -> List[types.PostingInfo]:
         """
@@ -618,7 +618,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_deleted_posting", location, method="GET", bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo(data)
+        return types.PostingInfo.from_json(data)
 
     def restore_deleted_posting(self, id: str) -> types.PostingInfo:
         """
@@ -630,7 +630,7 @@ class MoeraNode(Caller):
         data = self.call(
             "restore_deleted_posting", location, method="POST", bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo(data)
+        return types.PostingInfo.from_json(data)
 
     def get_delete_posting_revisions(
         self, posting_id: str, limit: int | None = None
@@ -664,7 +664,7 @@ class MoeraNode(Caller):
             "get_deleted_posting_revision", location, method="GET", bodies=True,
             schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo(data)
+        return types.PostingRevisionInfo.from_json(data)
 
     def restore_deleted_posting_revision(self, posting_id: str, id: str) -> types.PostingRevisionInfo:
         """
@@ -681,7 +681,7 @@ class MoeraNode(Caller):
             "restore_deleted_posting_revision", location, method="POST", bodies=True,
             schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo(data)
+        return types.PostingRevisionInfo.from_json(data)
 
     def get_domains(self) -> List[types.DomainInfo]:
         """
@@ -700,7 +700,7 @@ class MoeraNode(Caller):
         """
         location = "/domains/{name}".format(name=quote_plus(name))
         data = self.call("get_domain", location, method="GET", schema=schemas.DOMAIN_INFO_SCHEMA)
-        return types.DomainInfo(data)
+        return types.DomainInfo.from_json(data)
 
     def create_domain(self, domain: types.DomainAttributes) -> types.DomainInfo:
         """
@@ -711,7 +711,7 @@ class MoeraNode(Caller):
         """
         location = "/domains"
         data = self.call("create_domain", location, method="POST", body=domain, schema=schemas.DOMAIN_INFO_SCHEMA)
-        return types.DomainInfo(data)
+        return types.DomainInfo.from_json(data)
 
     def update_domain(self, name: str, domain: types.DomainAttributes) -> types.DomainInfo:
         """
@@ -725,7 +725,7 @@ class MoeraNode(Caller):
         """
         location = "/domains/{name}".format(name=quote_plus(name))
         data = self.call("update_domain", location, method="PUT", body=domain, schema=schemas.DOMAIN_INFO_SCHEMA)
-        return types.DomainInfo(data)
+        return types.DomainInfo.from_json(data)
 
     def delete_domain(self, name: str) -> types.Result:
         """
@@ -736,7 +736,7 @@ class MoeraNode(Caller):
         """
         location = "/domains/{name}".format(name=quote_plus(name))
         data = self.call("delete_domain", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def is_domain_available(self, node_name: str) -> types.DomainAvailable:
         """
@@ -752,7 +752,7 @@ class MoeraNode(Caller):
             "is_domain_available", location, method="GET", auth=False, params=params,
             schema=schemas.DOMAIN_AVAILABLE_SCHEMA
         )
-        return types.DomainAvailable(data)
+        return types.DomainAvailable.from_json(data)
 
     def get_drafts(
         self, draft_type: types.DraftType, node_name: str, posting_id: str | None = None, comment_id: str | None = None,
@@ -790,7 +790,7 @@ class MoeraNode(Caller):
             "create_draft", location, method="POST", src_bodies=True, body=draft, bodies=True,
             schema=schemas.DRAFT_INFO_SCHEMA
         )
-        return types.DraftInfo(data)
+        return types.DraftInfo.from_json(data)
 
     def get_draft(self, id: str) -> types.DraftInfo:
         """
@@ -800,7 +800,7 @@ class MoeraNode(Caller):
         """
         location = "/drafts/{id}".format(id=quote_plus(id))
         data = self.call("get_draft", location, method="GET", bodies=True, schema=schemas.DRAFT_INFO_SCHEMA)
-        return types.DraftInfo(data)
+        return types.DraftInfo.from_json(data)
 
     def update_draft(self, id: str, draft: types.DraftText) -> types.DraftInfo:
         """
@@ -814,7 +814,7 @@ class MoeraNode(Caller):
             "update_draft", location, method="PUT", src_bodies=True, body=draft, bodies=True,
             schema=schemas.DRAFT_INFO_SCHEMA
         )
-        return types.DraftInfo(data)
+        return types.DraftInfo.from_json(data)
 
     def delete_draft(self, id: str) -> types.Result:
         """
@@ -824,7 +824,7 @@ class MoeraNode(Caller):
         """
         location = "/draft/{id}".format(id=quote_plus(id))
         data = self.call("delete_draft", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_features(self) -> types.Features:
         """
@@ -832,7 +832,7 @@ class MoeraNode(Caller):
         """
         location = "/features"
         data = self.call("get_features", location, method="GET", schema=schemas.FEATURES_SCHEMA)
-        return types.Features(data)
+        return types.Features.from_json(data)
 
     def get_feeds(self) -> List[types.FeedInfo]:
         """
@@ -850,7 +850,7 @@ class MoeraNode(Caller):
         """
         location = "/feeds/{feedName}".format(feedName=quote_plus(feed_name))
         data = self.call("get_feed_general", location, method="GET", schema=schemas.FEED_INFO_SCHEMA)
-        return types.FeedInfo(data)
+        return types.FeedInfo.from_json(data)
 
     def get_feed_status(self, feed_name: str) -> types.FeedStatus:
         """
@@ -860,7 +860,7 @@ class MoeraNode(Caller):
         """
         location = "/feeds/{feedName}/status".format(feedName=quote_plus(feed_name))
         data = self.call("get_feed_status", location, method="GET", schema=schemas.FEED_STATUS_SCHEMA)
-        return types.FeedStatus(data)
+        return types.FeedStatus.from_json(data)
 
     def update_feed_status(self, feed_name: str, change: types.FeedStatusChange) -> types.FeedStatus:
         """
@@ -871,7 +871,7 @@ class MoeraNode(Caller):
         """
         location = "/feeds/{feedName}/status".format(feedName=quote_plus(feed_name))
         data = self.call("update_feed_status", location, method="PUT", body=change, schema=schemas.FEED_STATUS_SCHEMA)
-        return types.FeedStatus(data)
+        return types.FeedStatus.from_json(data)
 
     def get_feed_slice(
         self, feed_name: str, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -891,7 +891,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_feed_slice", location, method="GET", params=params, bodies=True, schema=schemas.FEED_SLICE_INFO_SCHEMA
         )
-        return types.FeedSliceInfo(data)
+        return types.FeedSliceInfo.from_json(data)
 
     def get_friend_groups(self) -> List[types.FriendGroupInfo]:
         """
@@ -909,7 +909,7 @@ class MoeraNode(Caller):
         """
         location = "/people/friends/groups/{id}".format(id=quote_plus(id))
         data = self.call("get_friend_group", location, method="GET", schema=schemas.FRIEND_GROUP_INFO_SCHEMA)
-        return types.FriendGroupInfo(data)
+        return types.FriendGroupInfo.from_json(data)
 
     def create_friend_group(self, friend_group: types.FriendGroupDescription) -> types.FriendGroupInfo:
         """
@@ -921,7 +921,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_friend_group", location, method="POST", body=friend_group, schema=schemas.FRIEND_GROUP_INFO_SCHEMA
         )
-        return types.FriendGroupInfo(data)
+        return types.FriendGroupInfo.from_json(data)
 
     def update_friend_group(self, id: str, friend_group: types.FriendGroupDescription) -> types.FriendGroupInfo:
         """
@@ -934,7 +934,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_friend_group", location, method="PUT", body=friend_group, schema=schemas.FRIEND_GROUP_INFO_SCHEMA
         )
-        return types.FriendGroupInfo(data)
+        return types.FriendGroupInfo.from_json(data)
 
     def delete_friend_group(self, id: str) -> types.Result:
         """
@@ -944,7 +944,7 @@ class MoeraNode(Caller):
         """
         location = "/people/friends/groups/{id}".format(id=quote_plus(id))
         data = self.call("delete_friend_group", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_friends(self, group_id: str | None = None) -> List[types.FriendInfo]:
         """
@@ -965,7 +965,7 @@ class MoeraNode(Caller):
         """
         location = "/people/friends/{name}".format(name=quote_plus(name))
         data = self.call("get_friend", location, method="GET", schema=schemas.FRIEND_INFO_SCHEMA)
-        return types.FriendInfo(data)
+        return types.FriendInfo.from_json(data)
 
     def update_friends(self, friends: List[types.FriendDescription]) -> List[types.FriendInfo]:
         """
@@ -997,7 +997,7 @@ class MoeraNode(Caller):
         """
         location = "/people/friend-ofs/{name}".format(name=quote_plus(name))
         data = self.call("get_friend_of", location, method="GET", schema=schemas.FRIEND_OF_INFO_SCHEMA)
-        return types.FriendOfInfo(data)
+        return types.FriendOfInfo.from_json(data)
 
     def upload_private_media(self, file: IO, file_type: str) -> types.PrivateMediaFileInfo:
         """
@@ -1011,7 +1011,7 @@ class MoeraNode(Caller):
             "upload_private_media", location, method="POST", body_file=file, body_file_type=file_type,
             schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PrivateMediaFileInfo(data)
+        return types.PrivateMediaFileInfo.from_json(data)
 
     def get_private_media(self, id: str, width: int | None = None, download: bool | None = None) -> IO:
         """
@@ -1037,7 +1037,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_private_media_info", location, method="GET", schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PrivateMediaFileInfo(data)
+        return types.PrivateMediaFileInfo.from_json(data)
 
     def get_private_media_parent_entry(self, id: str) -> List[types.EntryInfo]:
         """
@@ -1064,7 +1064,7 @@ class MoeraNode(Caller):
             "upload_public_media", location, method="POST", body_file=file, body_file_type=file_type,
             schema=schemas.PUBLIC_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PublicMediaFileInfo(data)
+        return types.PublicMediaFileInfo.from_json(data)
 
     def get_public_media(self, id: str, width: int | None = None, download: bool | None = None) -> IO:
         """
@@ -1090,7 +1090,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_public_media_info", location, method="GET", auth=False, schema=schemas.PUBLIC_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PublicMediaFileInfo(data)
+        return types.PublicMediaFileInfo.from_json(data)
 
     def get_node_name(self) -> types.NodeNameInfo:
         """
@@ -1099,7 +1099,7 @@ class MoeraNode(Caller):
         """
         location = "/node-name"
         data = self.call("get_node_name", location, method="GET", schema=schemas.NODE_NAME_INFO_SCHEMA)
-        return types.NodeNameInfo(data)
+        return types.NodeNameInfo.from_json(data)
 
     def create_node_name(self, name_to_register: types.NameToRegister) -> types.RegisteredNameSecret:
         """
@@ -1115,7 +1115,7 @@ class MoeraNode(Caller):
             "create_node_name", location, method="POST", body=name_to_register,
             schema=schemas.REGISTERED_NAME_SECRET_SCHEMA
         )
-        return types.RegisteredNameSecret(data)
+        return types.RegisteredNameSecret.from_json(data)
 
     def update_node_name(self, secret: types.RegisteredNameSecret) -> types.Result:
         """
@@ -1127,7 +1127,7 @@ class MoeraNode(Caller):
         """
         location = "/node-name"
         data = self.call("update_node_name", location, method="PUT", body=secret, schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_node_name(self) -> types.Result:
         """
@@ -1136,7 +1136,7 @@ class MoeraNode(Caller):
         """
         location = "/node-name"
         data = self.call("delete_node_name", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def send_notification(self, packet: types.NotificationPacket) -> types.Result:
         """
@@ -1150,7 +1150,7 @@ class MoeraNode(Caller):
         data = self.call(
             "send_notification", location, method="POST", body=packet, auth=False, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_people_general(self) -> types.PeopleGeneralInfo:
         """
@@ -1158,7 +1158,7 @@ class MoeraNode(Caller):
         """
         location = "/people"
         data = self.call("get_people_general", location, method="GET", schema=schemas.PEOPLE_GENERAL_INFO_SCHEMA)
-        return types.PeopleGeneralInfo(data)
+        return types.PeopleGeneralInfo.from_json(data)
 
     def register_plugin(self, plugin: types.PluginDescription) -> types.PluginInfo:
         """
@@ -1169,7 +1169,7 @@ class MoeraNode(Caller):
         """
         location = "/plugins"
         data = self.call("register_plugin", location, method="POST", body=plugin, schema=schemas.PLUGIN_INFO_SCHEMA)
-        return types.PluginInfo(data)
+        return types.PluginInfo.from_json(data)
 
     def get_plugins(self) -> List[types.PluginInfo]:
         """
@@ -1187,7 +1187,7 @@ class MoeraNode(Caller):
         """
         location = "/plugins/{pluginName}".format(pluginName=quote_plus(plugin_name))
         data = self.call("get_plugin", location, method="GET", schema=schemas.PLUGIN_INFO_SCHEMA)
-        return types.PluginInfo(data)
+        return types.PluginInfo.from_json(data)
 
     def unregister_plugin(self, plugin_name: str) -> types.Result:
         """
@@ -1197,7 +1197,7 @@ class MoeraNode(Caller):
         """
         location = "/plugins/{pluginName}".format(pluginName=quote_plus(plugin_name))
         data = self.call("unregister_plugin", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def create_posting(self, posting: types.PostingText) -> types.PostingInfo:
         """
@@ -1213,7 +1213,7 @@ class MoeraNode(Caller):
             "create_posting", location, method="POST", src_bodies=True, body=posting, bodies=True,
             schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo(data)
+        return types.PostingInfo.from_json(data)
 
     def update_posting(self, id: str, posting: types.PostingText) -> types.PostingInfo:
         """
@@ -1227,7 +1227,7 @@ class MoeraNode(Caller):
             "update_posting", location, method="PUT", src_bodies=True, body=posting, bodies=True,
             schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo(data)
+        return types.PostingInfo.from_json(data)
 
     def get_posting(self, id: str, with_source: bool = False) -> types.PostingInfo:
         """
@@ -1242,7 +1242,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_posting", location, method="GET", params=params, bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo(data)
+        return types.PostingInfo.from_json(data)
 
     def delete_posting(self, id: str) -> types.Result:
         """
@@ -1253,7 +1253,7 @@ class MoeraNode(Caller):
         """
         location = "/postings/{id}".format(id=quote_plus(id))
         data = self.call("delete_posting", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_postings_attached_to_posting(self, id: str) -> List[types.PostingInfo]:
         """
@@ -1295,7 +1295,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_posting_revision", location, method="GET", bodies=True, schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo(data)
+        return types.PostingRevisionInfo.from_json(data)
 
     def restore_posting_revision(self, posting_id: str, id: str) -> types.PostingRevisionInfo:
         """
@@ -1311,7 +1311,7 @@ class MoeraNode(Caller):
             "restore_posting_revision", location, method="POST", bodies=True,
             schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo(data)
+        return types.PostingRevisionInfo.from_json(data)
 
     def create_posting_reaction(self, posting_id: str, reaction: types.ReactionDescription) -> types.ReactionCreated:
         """
@@ -1327,7 +1327,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_posting_reaction", location, method="POST", body=reaction, schema=schemas.REACTION_CREATED_SCHEMA
         )
-        return types.ReactionCreated(data)
+        return types.ReactionCreated.from_json(data)
 
     def get_posting_reactions_slice(
         self, posting_id: str, negative: bool | None = None, emoji: int | None = None, before: int | None = None,
@@ -1351,7 +1351,7 @@ class MoeraNode(Caller):
             "get_posting_reactions_slice", location, method="GET", params=params,
             schema=schemas.REACTIONS_SLICE_INFO_SCHEMA
         )
-        return types.ReactionsSliceInfo(data)
+        return types.ReactionsSliceInfo.from_json(data)
 
     def update_posting_reaction(
         self, posting_id: str, owner_name: str, reaction: types.ReactionOverride
@@ -1369,7 +1369,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_posting_reaction", location, method="PUT", body=reaction, schema=schemas.REACTION_INFO_SCHEMA
         )
-        return types.ReactionInfo(data)
+        return types.ReactionInfo.from_json(data)
 
     def get_posting_reaction(self, posting_id: str, owner_name: str) -> types.ReactionInfo:
         """
@@ -1383,7 +1383,7 @@ class MoeraNode(Caller):
             postingId=quote_plus(posting_id), ownerName=quote_plus(owner_name)
         )
         data = self.call("get_posting_reaction", location, method="GET", schema=schemas.REACTION_INFO_SCHEMA)
-        return types.ReactionInfo(data)
+        return types.ReactionInfo.from_json(data)
 
     def delete_all_posting_reactions(self, posting_id: str) -> types.Result:
         """
@@ -1393,7 +1393,7 @@ class MoeraNode(Caller):
         """
         location = "/postings/{postingId}/reactions".format(postingId=quote_plus(posting_id))
         data = self.call("delete_all_posting_reactions", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_posting_reaction(self, posting_id: str, owner_name: str) -> types.ReactionTotalsInfo:
         """
@@ -1408,7 +1408,7 @@ class MoeraNode(Caller):
         data = self.call(
             "delete_posting_reaction", location, method="DELETE", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo(data)
+        return types.ReactionTotalsInfo.from_json(data)
 
     def search_posting_reactions(self, filter: types.ReactionsFilter) -> List[types.ReactionInfo]:
         """
@@ -1433,7 +1433,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_posting_reaction_totals", location, method="GET", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo(data)
+        return types.ReactionTotalsInfo.from_json(data)
 
     def search_posting_reaction_totals(self, filter: types.ReactionTotalsFilter) -> List[types.ReactionTotalsInfo]:
         """
@@ -1459,7 +1459,7 @@ class MoeraNode(Caller):
         include = comma_separated_flags({"source": with_source})
         params = {"include": include}
         data = self.call("get_profile", location, method="GET", params=params, schema=schemas.PROFILE_INFO_SCHEMA)
-        return types.ProfileInfo(data)
+        return types.ProfileInfo.from_json(data)
 
     def update_profile(self, profile: types.ProfileAttributes) -> types.ProfileInfo:
         """
@@ -1470,7 +1470,7 @@ class MoeraNode(Caller):
         """
         location = "/profile"
         data = self.call("update_profile", location, method="PUT", body=profile, schema=schemas.PROFILE_INFO_SCHEMA)
-        return types.ProfileInfo(data)
+        return types.ProfileInfo.from_json(data)
 
     def proxy_media(self, url: str) -> IO:
         """
@@ -1495,7 +1495,7 @@ class MoeraNode(Caller):
         data = self.call(
             "proxy_link_preview", location, method="GET", params=params, schema=schemas.LINK_PREVIEW_INFO_SCHEMA
         )
-        return types.LinkPreviewInfo(data)
+        return types.LinkPreviewInfo.from_json(data)
 
     def ask_remote_node(self, node_name: str, details: types.AskDescription) -> types.Result:
         """
@@ -1506,7 +1506,7 @@ class MoeraNode(Caller):
         """
         location = "/nodes/{nodeName}/ask".format(nodeName=quote_plus(node_name))
         data = self.call("ask_remote_node", location, method="POST", body=details, schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def create_remote_comment(
         self, node_name: str, posting_id: str, comment: types.CommentSourceText
@@ -1525,7 +1525,7 @@ class MoeraNode(Caller):
             "create_remote_comment", location, method="POST", src_bodies=True, body=comment,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def update_remote_comment(
         self, node_name: str, posting_id: str, comment_id: str, comment: types.CommentSourceText
@@ -1542,9 +1542,10 @@ class MoeraNode(Caller):
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call(
-            "update_remote_comment", location, method="PUT", src_bodies=True, body=comment, schema=schemas.RESULT_SCHEMA
+            "update_remote_comment", location, method="PUT", src_bodies=True, body=comment,
+            schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_remote_comment(self, node_name: str, posting_id: str, comment_id: str) -> types.Result:
         """
@@ -1558,7 +1559,7 @@ class MoeraNode(Caller):
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call("delete_remote_comment", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def verify_remote_comment(self, node_name: str, posting_id: str, comment_id: str) -> types.AsyncOperationCreated:
         """
@@ -1574,7 +1575,7 @@ class MoeraNode(Caller):
         data = self.call(
             "verify_remote_comment", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated(data)
+        return types.AsyncOperationCreated.from_json(data)
 
     def create_remote_comment_reaction(
         self, node_name: str, posting_id: str, comment_id: str, reaction: types.ReactionAttributes
@@ -1593,7 +1594,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_remote_comment_reaction", location, method="POST", body=reaction, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_remote_comment_reaction(self, node_name: str, posting_id: str, comment_id: str) -> types.Result:
         """
@@ -1607,7 +1608,7 @@ class MoeraNode(Caller):
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
         )
         data = self.call("delete_remote_comment_reaction", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def verify_remote_comment_reaction(
         self, node_name: str, posting_id: str, comment_id: str, owner_name: str
@@ -1627,7 +1628,7 @@ class MoeraNode(Caller):
         data = self.call(
             "verify_remote_comment_reaction", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated(data)
+        return types.AsyncOperationCreated.from_json(data)
 
     def create_remote_posting(self, node_name: str, posting: types.PostingSourceText) -> types.Result:
         """
@@ -1641,7 +1642,7 @@ class MoeraNode(Caller):
             "create_remote_posting", location, method="POST", src_bodies=True, body=posting,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def update_remote_posting(
         self, node_name: str, posting_id: str, posting: types.PostingSourceText
@@ -1657,9 +1658,10 @@ class MoeraNode(Caller):
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
         )
         data = self.call(
-            "update_remote_posting", location, method="PUT", src_bodies=True, body=posting, schema=schemas.RESULT_SCHEMA
+            "update_remote_posting", location, method="PUT", src_bodies=True, body=posting,
+            schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_remote_posting(self, node_name: str, posting_id: str) -> types.Result:
         """
@@ -1672,7 +1674,7 @@ class MoeraNode(Caller):
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
         )
         data = self.call("delete_remote_posting", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def verify_remote_posting(self, node_name: str, id: str) -> types.AsyncOperationCreated:
         """
@@ -1685,7 +1687,7 @@ class MoeraNode(Caller):
         data = self.call(
             "verify_remote_posting", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated(data)
+        return types.AsyncOperationCreated.from_json(data)
 
     def verify_remote_posting_revision(
         self, node_name: str, id: str, revision_id: str
@@ -1703,7 +1705,7 @@ class MoeraNode(Caller):
         data = self.call(
             "verify_remote_posting_revision", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated(data)
+        return types.AsyncOperationCreated.from_json(data)
 
     def create_remote_posting_reaction(
         self, node_name: str, posting_id: str, reaction: types.ReactionAttributes
@@ -1721,7 +1723,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_remote_posting_reaction", location, method="POST", body=reaction, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def delete_remote_posting_reaction(self, node_name: str, posting_id: str) -> types.Result:
         """
@@ -1734,7 +1736,7 @@ class MoeraNode(Caller):
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
         )
         data = self.call("delete_remote_posting_reaction", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def verify_remote_posting_reaction(
         self, node_name: str, posting_id: str, owner_name: str
@@ -1752,7 +1754,7 @@ class MoeraNode(Caller):
         data = self.call(
             "verify_remote_posting_reaction", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated(data)
+        return types.AsyncOperationCreated.from_json(data)
 
     def create_remote_sheriff_order(
         self, node_name: str, sheriff_order: types.SheriffOrderAttributes
@@ -1767,7 +1769,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_remote_sheriff_order", location, method="POST", body=sheriff_order, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_remote_sheriff_order(self, node_name: str, id: str) -> types.SheriffOrderInfo:
         """
@@ -1780,7 +1782,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_remote_sheriff_order", location, method="GET", auth=False, schema=schemas.SHERIFF_ORDER_INFO_SCHEMA
         )
-        return types.SheriffOrderInfo(data)
+        return types.SheriffOrderInfo.from_json(data)
 
     def update_settings(self, settings: List[types.SettingInfo]) -> types.Result:
         """
@@ -1795,7 +1797,7 @@ class MoeraNode(Caller):
         """
         location = "/settings"
         data = self.call("update_settings", location, method="PUT", body=settings, schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_client_settings(self, prefix: str | None = None) -> List[types.SettingInfo]:
         """
@@ -1848,7 +1850,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_node_settings_metadata", location, method="PUT", body=metadata, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_sheriff_complaint_groups_slice(
         self, after: int | None = None, before: int | None = None, limit: int | None = None,
@@ -1871,7 +1873,7 @@ class MoeraNode(Caller):
             "get_sheriff_complaint_groups_slice", location, method="GET", auth=False, params=params,
             schema=schemas.SHERIFF_COMPLAIN_GROUPS_SLICE_INFO_SCHEMA
         )
-        return types.SheriffComplainGroupsSliceInfo(data)
+        return types.SheriffComplainGroupsSliceInfo.from_json(data)
 
     def get_sheriff_complaint_group(self, id: str) -> types.SheriffComplainGroupInfo:
         """
@@ -1884,7 +1886,7 @@ class MoeraNode(Caller):
             "get_sheriff_complaint_group", location, method="GET", auth=False,
             schema=schemas.SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA
         )
-        return types.SheriffComplainGroupInfo(data)
+        return types.SheriffComplainGroupInfo.from_json(data)
 
     def get_sheriff_complaints_by_group(self, id: str) -> List[types.SheriffComplainInfo]:
         """
@@ -1913,7 +1915,7 @@ class MoeraNode(Caller):
             "update_sheriff_complaint_group", location, method="PUT", body=decision,
             schema=schemas.SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA
         )
-        return types.SheriffComplainGroupInfo(data)
+        return types.SheriffComplainGroupInfo.from_json(data)
 
     def create_sheriff_complaint(self, complaint: types.SheriffComplainText) -> types.SheriffComplainInfo:
         """
@@ -1926,7 +1928,7 @@ class MoeraNode(Caller):
             "create_sheriff_complaint", location, method="POST", body=complaint,
             schema=schemas.SHERIFF_COMPLAIN_INFO_SCHEMA
         )
-        return types.SheriffComplainInfo(data)
+        return types.SheriffComplainInfo.from_json(data)
 
     def create_sheriff_order(self, sheriff_order: types.SheriffOrderDetails) -> types.Result:
         """
@@ -1939,7 +1941,7 @@ class MoeraNode(Caller):
             "create_sheriff_order", location, method="POST", body=sheriff_order, auth=False,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_story(self, id: str) -> types.StoryInfo:
         """
@@ -1949,7 +1951,7 @@ class MoeraNode(Caller):
         """
         location = "/stories/{id}".format(id=quote_plus(id))
         data = self.call("get_story", location, method="GET", bodies=True, schema=schemas.STORY_INFO_SCHEMA)
-        return types.StoryInfo(data)
+        return types.StoryInfo.from_json(data)
 
     def update_story(self, id: str, story: types.StoryAttributes) -> types.StoryInfo:
         """
@@ -1962,7 +1964,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_story", location, method="PUT", body=story, bodies=True, schema=schemas.STORY_INFO_SCHEMA
         )
-        return types.StoryInfo(data)
+        return types.StoryInfo.from_json(data)
 
     def get_subscribers(
         self, node_name: str | None = None, type: types.SubscriptionType | None = None, feed_name: str | None = None,
@@ -1993,7 +1995,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_subscriber", location, method="POST", body=subscriber, schema=schemas.SUBSCRIBER_INFO_SCHEMA
         )
-        return types.SubscriberInfo(data)
+        return types.SubscriberInfo.from_json(data)
 
     def get_subscriber(self, id: str) -> types.SubscriberInfo:
         """
@@ -2003,7 +2005,7 @@ class MoeraNode(Caller):
         """
         location = "/people/subscribers/{id}".format(id=quote_plus(id))
         data = self.call("get_subscriber", location, method="GET", schema=schemas.SUBSCRIBER_INFO_SCHEMA)
-        return types.SubscriberInfo(data)
+        return types.SubscriberInfo.from_json(data)
 
     def update_subscriber(self, id: str, subscriber: types.SubscriberOverride) -> types.SubscriberInfo:
         """
@@ -2016,7 +2018,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_subscriber", location, method="PUT", body=subscriber, schema=schemas.SUBSCRIBER_INFO_SCHEMA
         )
-        return types.SubscriberInfo(data)
+        return types.SubscriberInfo.from_json(data)
 
     def delete_subscriber(self, id: str) -> types.ContactInfo:
         """
@@ -2026,7 +2028,7 @@ class MoeraNode(Caller):
         """
         location = "/people/subscribers/{id}".format(id=quote_plus(id))
         data = self.call("delete_subscriber", location, method="DELETE", schema=schemas.CONTACT_INFO_SCHEMA)
-        return types.ContactInfo(data)
+        return types.ContactInfo.from_json(data)
 
     def get_subscriptions(
         self, node_name: str | None = None, type: types.SubscriptionType | None = None
@@ -2054,7 +2056,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_subscription", location, method="POST", body=subscription, schema=schemas.SUBSCRIPTION_INFO_SCHEMA
         )
-        return types.SubscriptionInfo(data)
+        return types.SubscriptionInfo.from_json(data)
 
     def update_subscription(self, id: str, subscription: types.SubscriptionOverride) -> types.SubscriptionInfo:
         """
@@ -2067,7 +2069,7 @@ class MoeraNode(Caller):
         data = self.call(
             "update_subscription", location, method="PUT", body=subscription, schema=schemas.SUBSCRIPTION_INFO_SCHEMA
         )
-        return types.SubscriptionInfo(data)
+        return types.SubscriptionInfo.from_json(data)
 
     def delete_subscription(self, id: str) -> types.ContactInfo:
         """
@@ -2077,7 +2079,7 @@ class MoeraNode(Caller):
         """
         location = "/people/subscriptions/{id}".format(id=quote_plus(id))
         data = self.call("delete_subscription", location, method="DELETE", schema=schemas.CONTACT_INFO_SCHEMA)
-        return types.ContactInfo(data)
+        return types.ContactInfo.from_json(data)
 
     def search_subscriptions(self, filter: types.SubscriptionFilter) -> List[types.SubscriptionInfo]:
         """
@@ -2109,7 +2111,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_token", location, method="POST", body=token, auth=False, schema=schemas.TOKEN_INFO_SCHEMA
         )
-        return types.TokenInfo(data)
+        return types.TokenInfo.from_json(data)
 
     def get_token_info(self, id: str) -> types.TokenInfo:
         """
@@ -2119,7 +2121,7 @@ class MoeraNode(Caller):
         """
         location = "/tokens/{id}".format(id=quote_plus(id))
         data = self.call("get_token_info", location, method="GET", schema=schemas.TOKEN_INFO_SCHEMA)
-        return types.TokenInfo(data)
+        return types.TokenInfo.from_json(data)
 
     def update_token(self, id: str, token: types.TokenName) -> types.TokenInfo:
         """
@@ -2130,7 +2132,7 @@ class MoeraNode(Caller):
         """
         location = "/tokens/{id}".format(id=quote_plus(id))
         data = self.call("update_token", location, method="PUT", body=token, schema=schemas.TOKEN_INFO_SCHEMA)
-        return types.TokenInfo(data)
+        return types.TokenInfo.from_json(data)
 
     def delete_token(self, id: str) -> types.Result:
         """
@@ -2140,7 +2142,7 @@ class MoeraNode(Caller):
         """
         location = "/tokens/{id}".format(id=quote_plus(id))
         data = self.call("delete_token", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def get_user_list_general(self, name: str) -> types.UserListInfo:
         """
@@ -2152,7 +2154,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_user_list_general", location, method="GET", auth=False, schema=schemas.USER_LIST_INFO_SCHEMA
         )
-        return types.UserListInfo(data)
+        return types.UserListInfo.from_json(data)
 
     def get_user_list_slice(
         self, name: str, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -2173,7 +2175,7 @@ class MoeraNode(Caller):
             "get_user_list_slice", location, method="GET", auth=False, params=params,
             schema=schemas.USER_LIST_SLICE_INFO_SCHEMA
         )
-        return types.UserListSliceInfo(data)
+        return types.UserListSliceInfo.from_json(data)
 
     def get_user_list_item(self, name: str, node_name: str) -> types.UserListItemInfo:
         """
@@ -2186,7 +2188,7 @@ class MoeraNode(Caller):
         data = self.call(
             "get_user_list_item", location, method="GET", auth=False, schema=schemas.USER_LIST_ITEM_INFO_SCHEMA
         )
-        return types.UserListItemInfo(data)
+        return types.UserListItemInfo.from_json(data)
 
     def create_user_list_item(self, name: str, item: types.UserListItemAttributes) -> types.UserListItemInfo:
         """
@@ -2199,7 +2201,7 @@ class MoeraNode(Caller):
         data = self.call(
             "create_user_list_item", location, method="POST", body=item, schema=schemas.USER_LIST_ITEM_INFO_SCHEMA
         )
-        return types.UserListItemInfo(data)
+        return types.UserListItemInfo.from_json(data)
 
     def delete_user_list_item(self, name: str, node_name: str) -> types.Result:
         """
@@ -2210,7 +2212,7 @@ class MoeraNode(Caller):
         """
         location = "/user-lists/{name}/items/{nodeName}".format(name=quote_plus(name), nodeName=quote_plus(node_name))
         data = self.call("delete_user_list_item", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result(data)
+        return types.Result.from_json(data)
 
     def who_am_i(self) -> types.WhoAmI:
         """
@@ -2218,4 +2220,4 @@ class MoeraNode(Caller):
         """
         location = "/whoami"
         data = self.call("who_am_i", location, method="GET", auth=False, schema=schemas.WHO_AM_I_SCHEMA)
-        return types.WhoAmI(data)
+        return types.WhoAmI.from_json(data)

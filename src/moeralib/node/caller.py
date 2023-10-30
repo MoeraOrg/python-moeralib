@@ -68,11 +68,11 @@ def encode_bodies(data: Structure | Sequence[Structure]) -> Structure | list[Str
 
 def decode_body(name: str, encoded: str, format: BodyFormat | SourceFormat | None) -> Body:
     if format is not None and format.lower() == "application":
-        return Body({"text": encoded})
+        return Body(text=encoded)
     try:
         body = json.loads(encoded)
         validate(body, schema=schemas.BODY_SCHEMA)
-        return Body(body)
+        return Body.from_json(body)
     except json.JSONDecodeError as e:
         raise MoeraNodeError(name, 'Invalid body encoding') from e
     except ValidationError as e:
@@ -238,7 +238,7 @@ class Caller:
             response = r.json()
             if r.status_code not in [200, 201]:
                 validate(response, schema=schemas.RESULT_SCHEMA)
-                raise MoeraNodeApiError(name, Result(response))
+                raise MoeraNodeApiError(name, Result.from_json(response))
             if schema is not None and schema != "blob":
                 validate(response, schema=schema)
 

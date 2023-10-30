@@ -38,13 +38,13 @@ def comma_wrap(s: str, indent: int) -> str:
     max_length = 120 - indent * 4
     result = ''
     while True:
-        if len(s) <= max_length:
+        if len(s) < max_length:
             result += s
             break
         pos = 0
         while True:
             next = s.find(', ', pos + 1)
-            if next < 0 or next > max_length:
+            if next < 0 or next >= max_length:
                 break
             pos = next
         result += s[:pos] + ',\n' + ind(indent)
@@ -524,13 +524,13 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                 items = ', '.join(f'"{flag}": with_{flag}' for flag in flags)
                 afile.write(f'{ind(2)}{flag_py_name} = comma_separated_flags({{{items}}})\n')
             afile.write(query_params)
-            afile.write(params_wrap(f"{ind(2)}data = self.call(%s)\n", call_params, 3))
+            afile.write(params_wrap(f'{ind(2)}data = self.call(%s)\n', call_params, 3))
             if result == 'IO':
                 afile.write(f"{ind(2)}return cast(IO, data)\n")
             elif result_array:
                 afile.write(f"{ind(2)}return structure_list(data, {result})\n")
             else:
-                afile.write(f"{ind(2)}return {result}(data)\n")
+                afile.write(f"{ind(2)}return {result}.from_json(data)\n")
 
 
 PREAMBLE_TYPES = '''# This file is generated
