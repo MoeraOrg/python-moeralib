@@ -155,9 +155,19 @@ def schema_map_string_int(sfile: TextIO, indent: int, nullable: bool = False) ->
 def generate_operations(operations: Any, tfile: TextIO, sfile: TextIO) -> None:
     tfile.write(f'\n\nclass {operations["name"]}(Structure):\n')
     for field in operations['fields']:
-        tfile.write('    %s: PrincipalValue | None = None\n' % to_snake(field['name']))
+        py_name = to_snake(field['name'])
+        tfile.write('    %s: PrincipalValue | None = None\n' % py_name)
         if 'description' in field:
             tfile.write('    """%s"""\n' % field['description'])
+        if 'default' in field:
+            tfile.write('\n    @property\n')
+            tfile.write('    def %s_or_default(self) -> PrincipalValue:\n' % py_name)
+            doc = doc_wrap(
+                field['description'] + ' (this property always returns default value instead of ``None``)', 2)
+            if len(doc) >= 110:
+                doc = f'\n{ind(2)}{doc}\n{ind(2)}'
+            tfile.write('        """%s"""\n' % doc)
+            tfile.write('        return getattr(self, "%s", "%s")\n\n' % (py_name, field['default']))
 
     sfile.write('\n')
     sfile.write('{name}_SCHEMA: Any = {{\n'.format(name=to_snake(operations['name']).upper()))
