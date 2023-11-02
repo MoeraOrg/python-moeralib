@@ -52,15 +52,27 @@ def is_bytes_attribute(struct_type: type[StructType], attr: str) -> bool:
     return attr in hints and (hints[attr] == bytes or bytes in get_args(hints[attr]))
 
 
+def is_structure(type_hint: Any) -> bool:
+    return isinstance(type_hint, type) and issubclass(type_hint, Structure)
+
+
+def is_list_generic(type_hint: Any) -> bool:
+    return hasattr(type_hint, '__origin__') and type_hint.__origin__ == list
+
+
 def get_structure_attribute_type(struct_type: type[StructType], attr: str) -> type[Structure] | None:
     hints = get_type_hints(struct_type)
     if attr not in hints:
         return None
-    if isinstance(hints[attr], type) and issubclass(hints[attr], Structure):
+    if is_structure(hints[attr]):
         return hints[attr]
     for hint in get_args(hints[attr]):
-        if isinstance(hint, type) and issubclass(hint, Structure):
+        if is_structure(hint):
             return hint
+        if is_list_generic(hint):
+            for list_hint in get_args(hint):
+                if is_structure(list_hint):
+                    return list_hint
     return None
 
 

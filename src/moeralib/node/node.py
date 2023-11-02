@@ -23,7 +23,7 @@ class MoeraNode(Caller):
         """
         location = "/activity/reactions/search"
         data = self.call(
-            "search_activity_reactions", location, method="GET", body=filter,
+            "search_activity_reactions", location, method="POST", body=filter,
             schema=schemas.ACTIVITY_REACTION_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.ActivityReactionInfo)
@@ -66,8 +66,8 @@ class MoeraNode(Caller):
     def create_avatar(self, avatar: types.AvatarAttributes) -> types.AvatarInfo:
         """
         Create a new avatar from a public media file that exists on the node. New public media file is created for the
-        avatar. If avatar's ordinal is not provided in the input, the avatar is assigned an ordinal that is greater than
-        ordinals of all existing avatars.
+        avatar. If avatar's ordinal is not provided in the input, the avatar is assigned an ordinal that is greater
+        than ordinals of all existing avatars.
 
         :param avatar:
         """
@@ -97,8 +97,8 @@ class MoeraNode(Caller):
 
     def reorder_avatars(self, order: types.AvatarsOrdered) -> List[types.AvatarOrdinal]:
         """
-        Reorder avatars. Every avatar mentioned in the input is assigned an ordinal in ascending order as they appear in
-        the input. Ordinals of avatars not mentioned in the input are not touched.
+        Reorder avatars. Every avatar mentioned in the input is assigned an ordinal in ascending order as they appear
+        in the input. Ordinals of avatars not mentioned in the input are not touched.
 
         :param order:
         """
@@ -199,8 +199,8 @@ class MoeraNode(Caller):
 
     def get_blocked_users_checksums(self) -> types.BlockedUsersChecksums:
         """
-        Get checksums of the information about the blocked users. This request may be used to quickly detect the changes
-        in the blocked users list to update the cache on the client side.
+        Get checksums of the information about the blocked users. This request may be used to quickly detect the
+        changes in the blocked users list to update the cache on the client side.
         """
         location = "/people/blocked-users/checksums"
         data = self.call(
@@ -395,8 +395,8 @@ class MoeraNode(Caller):
         """
         Add a reaction to the given comment. The reaction owner must authenticate in some way. Only one reaction is
         allowed from each owner to a particular comment. If a reaction from the same owner to this comment already
-        exists, it is overwritten. If the reaction is not signed, the reaction will be kept for a limited period of time
-        and then erased (the previous reaction of the same owner will be restored, if any).
+        exists, it is overwritten. If the reaction is not signed, the reaction will be kept for a limited period of
+        time and then erased (the previous reaction of the same owner will be restored, if any).
 
         :param posting_id: ID of the posting
         :param comment_id: ID of the comment
@@ -435,9 +435,9 @@ class MoeraNode(Caller):
     ) -> types.ReactionsSliceInfo:
         """
         Get a slice of the list of reactions to the given comment, optionally filtered by reaction type, delimited by
-        ``before`` moment and the given ``limit``. If ``before`` is not provided, the latest reactions are returned. The
-        node may decide to return less reactions than the given ``limit``. The reactions are always sorted by moment,
-        descending.
+        ``before`` moment and the given ``limit``. If ``before`` is not provided, the latest reactions are returned.
+        The node may decide to return less reactions than the given ``limit``. The reactions are always sorted by
+        moment, descending.
 
         :param posting_id: ID of the posting
         :param comment_id: ID of the comment
@@ -693,8 +693,8 @@ class MoeraNode(Caller):
 
     def get_domain(self, name: str) -> types.DomainInfo:
         """
-        Get information about the domain with the given hostname. If domain registration for this server is public, this
-        request does not require authentication.
+        Get information about the domain with the given hostname. If domain registration for this server is public,
+        this request does not require authentication.
 
         :param name: domain name
         """
@@ -877,9 +877,9 @@ class MoeraNode(Caller):
         self, feed_name: str, after: int | None = None, before: int | None = None, limit: int | None = None
     ) -> types.FeedSliceInfo:
         """
-        Get a slice of the feed, delimited by ``before`` or ``after`` moments (but not both) and the given ``limit``. If
-        neither ``before`` nor ``after`` are provided, the latest stories are returned. The node may decide to return
-        less stories than the given ``limit``. The stories are always sorted by moment, descending.
+        Get a slice of the feed, delimited by ``before`` or ``after`` moments (but not both) and the given ``limit``.
+        If neither ``before`` nor ``after`` are provided, the latest stories are returned. The node may decide to
+        return less stories than the given ``limit``. The stories are always sorted by moment, descending.
 
         :param feed_name: name of the feed
         :param after: filter stories posted strongly after this moment
@@ -969,9 +969,9 @@ class MoeraNode(Caller):
 
     def update_friends(self, friends: List[types.FriendDescription]) -> List[types.FriendInfo]:
         """
-        Update the friendship status of the nodes passed in the input. If some of the nodes passed in the input is not a
-        member of some of the groups of friends listed for it, the node is added to them. If it is a member of some of
-        the groups of friends that are not listed for it, the node is removed from them.
+        Update the friendship status of the nodes passed in the input. If some of the nodes passed in the input is not
+        a member of some of the groups of friends listed for it, the node is added to them. If it is a member of some
+        of the groups of friends that are not listed for it, the node is removed from them.
 
         :param friends:
         """
@@ -1162,8 +1162,8 @@ class MoeraNode(Caller):
 
     def register_plugin(self, plugin: types.PluginDescription) -> types.PluginInfo:
         """
-        Register the plugin. If the plugin authenticates as root admin, the plugin is registered at the server level. If
-        the plugin authenticates as node admin, the plugin is registered at the node level.
+        Register the plugin. If the plugin authenticates as root admin, the plugin is registered at the server level.
+        If the plugin authenticates as node admin, the plugin is registered at the node level.
 
         :param plugin:
         """
@@ -1201,10 +1201,10 @@ class MoeraNode(Caller):
 
     def create_posting(self, posting: types.PostingText) -> types.PostingInfo:
         """
-        Create a new posting from the text given and publish it in the given feeds (if any). The heading and the preview
-        of the posting are created automatically, if needed. The posting owner must authenticate in some way. If the
-        posting is not signed, it will be kept for a limited period of time and then erased. If authenticated as admin,
-        the posting is signed by the node.
+        Create a new posting from the text given and publish it in the given feeds (if any). The heading and the
+        preview of the posting are created automatically, if needed. The posting owner must authenticate in some way.
+        If the posting is not signed, it will be kept for a limited period of time and then erased. If authenticated as
+        admin, the posting is signed by the node.
 
         :param posting:
         """
@@ -1270,8 +1270,8 @@ class MoeraNode(Caller):
 
     def get_posting_revisions(self, posting_id: str, limit: int | None = None) -> List[types.PostingRevisionInfo]:
         """
-        Get all revisions of the posting, but not more than ``limit``. The node may decide to return less revisions than
-        the given ``limit``.
+        Get all revisions of the posting, but not more than ``limit``. The node may decide to return less revisions
+        than the given ``limit``.
 
         :param posting_id: ID of the posting
         :param limit: maximum number of revisions returned
@@ -1317,8 +1317,8 @@ class MoeraNode(Caller):
         """
         Add a reaction to the given posting. The reaction owner must authenticate in some way. Only one reaction is
         allowed from each owner to a particular posting. If a reaction from the same owner to this posting already
-        exists, it is overwritten. If the reaction is not signed, the reaction will be kept for a limited period of time
-        and then erased (the previous reaction of the same owner will be restored, if any).
+        exists, it is overwritten. If the reaction is not signed, the reaction will be kept for a limited period of
+        time and then erased (the previous reaction of the same owner will be restored, if any).
 
         :param posting_id: ID of the posting
         :param reaction:
@@ -1335,9 +1335,9 @@ class MoeraNode(Caller):
     ) -> types.ReactionsSliceInfo:
         """
         Get a slice of the list of reactions to the given posting, optionally filtered by reaction type, delimited by
-        ``before`` moment and the given ``limit``. If ``before`` is not provided, the latest reactions are returned. The
-        node may decide to return less reactions than the given ``limit``. The reactions are always sorted by moment,
-        descending.
+        ``before`` moment and the given ``limit``. If ``before`` is not provided, the latest reactions are returned.
+        The node may decide to return less reactions than the given ``limit``. The reactions are always sorted by
+        moment, descending.
 
         :param posting_id: ID of the posting
         :param negative: ``True``, to filter negative reactions, ``False``, to filter positive ones
@@ -1463,8 +1463,8 @@ class MoeraNode(Caller):
 
     def update_profile(self, profile: types.ProfileAttributes) -> types.ProfileInfo:
         """
-        Update the profile. Fields that are not set in the request body are left intact. Fields that are set to an empty
-        value are reset to their defaults.
+        Update the profile. Fields that are not set in the request body are left intact. Fields that are set to an
+        empty value are reset to their defaults.
 
         :param profile:
         """
@@ -2089,7 +2089,7 @@ class MoeraNode(Caller):
         """
         location = "/people/subscriptions/search"
         data = self.call(
-            "search_subscriptions", location, method="GET", body=filter, schema=schemas.SUBSCRIPTION_INFO_ARRAY_SCHEMA
+            "search_subscriptions", location, method="POST", body=filter, schema=schemas.SUBSCRIPTION_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.SubscriptionInfo)
 

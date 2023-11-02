@@ -70,48 +70,44 @@ class CommentOperations(Structure):
     @property
     def view_or_default(self) -> PrincipalValue:
         """view the comment (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
     edit: PrincipalValue | None = None
     """edit the comment"""
 
     @property
     def edit_or_default(self) -> PrincipalValue:
         """edit the comment (this property always returns default value instead of ``None``)"""
-        return getattr(self, "edit", "owner")
-
+        return self.edit if self.edit is not None else "owner"
     delete: PrincipalValue | None = None
     """delete the comment"""
 
     @property
     def delete_or_default(self) -> PrincipalValue:
         """delete the comment (this property always returns default value instead of ``None``)"""
-        return getattr(self, "delete", "private")
-
+        return self.delete if self.delete is not None else "private"
     view_reactions: PrincipalValue | None = None
     """view the comment's reactions"""
 
     @property
     def view_reactions_or_default(self) -> PrincipalValue:
         """view the comment's reactions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_reactions", "public")
-
+        return self.view_reactions if self.view_reactions is not None else "public"
     view_negative_reactions: PrincipalValue | None = None
     """view the comment's negative reactions"""
 
     @property
     def view_negative_reactions_or_default(self) -> PrincipalValue:
         """view the comment's negative reactions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_negative_reactions", "public")
-
+        return self.view_negative_reactions if self.view_negative_reactions is not None else "public"
     view_reaction_totals: PrincipalValue | None = None
     """view the number of the comment's reactions"""
 
     @property
     def view_reaction_totals_or_default(self) -> PrincipalValue:
-        """view the number of the comment's reactions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_reaction_totals", "public")
-
+        """
+        view the number of the comment's reactions (this property always returns default value instead of ``None``)
+        """
+        return self.view_reaction_totals if self.view_reaction_totals is not None else "public"
     view_negative_reaction_totals: PrincipalValue | None = None
     """view the number of the comment's negative reactions"""
 
@@ -121,8 +117,7 @@ class CommentOperations(Structure):
         view the number of the comment's negative reactions (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "view_negative_reaction_totals", "public")
-
+        return self.view_negative_reaction_totals if self.view_negative_reaction_totals is not None else "public"
     view_reaction_ratios: PrincipalValue | None = None
     """view the relative number of different types of the comment's reactions"""
 
@@ -132,8 +127,7 @@ class CommentOperations(Structure):
         view the relative number of different types of the comment's reactions (this property always returns default
         value instead of ``None``)
         """
-        return getattr(self, "view_reaction_ratios", "public")
-
+        return self.view_reaction_ratios if self.view_reaction_ratios is not None else "public"
     view_negative_reaction_ratios: PrincipalValue | None = None
     """view the relative number of different types of the comment's negative reactions"""
 
@@ -143,24 +137,21 @@ class CommentOperations(Structure):
         view the relative number of different types of the comment's negative reactions (this property always returns
         default value instead of ``None``)
         """
-        return getattr(self, "view_negative_reaction_ratios", "public")
-
+        return self.view_negative_reaction_ratios if self.view_negative_reaction_ratios is not None else "public"
     add_reaction: PrincipalValue | None = None
     """add a reaction to the comment"""
 
     @property
     def add_reaction_or_default(self) -> PrincipalValue:
         """add a reaction to the comment (this property always returns default value instead of ``None``)"""
-        return getattr(self, "add_reaction", "signed")
-
+        return self.add_reaction if self.add_reaction is not None else "signed"
     add_negative_reaction: PrincipalValue | None = None
     """add a negative reaction to the comment"""
 
     @property
     def add_negative_reaction_or_default(self) -> PrincipalValue:
         """add a negative reaction to the comment (this property always returns default value instead of ``None``)"""
-        return getattr(self, "add_negative_reaction", "signed")
-
+        return self.add_negative_reaction if self.add_negative_reaction is not None else "signed"
 
 
 class ContactOperations(Structure):
@@ -170,24 +161,21 @@ class ContactOperations(Structure):
     @property
     def view_feed_subscriber_or_default(self) -> PrincipalValue:
         """see the subscriber information (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_feed_subscriber", "public")
-
+        return self.view_feed_subscriber if self.view_feed_subscriber is not None else "public"
     view_feed_subscription: PrincipalValue | None = None
     """see the subscription information"""
 
     @property
     def view_feed_subscription_or_default(self) -> PrincipalValue:
         """see the subscription information (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_feed_subscription", "public")
-
+        return self.view_feed_subscription if self.view_feed_subscription is not None else "public"
     view_friend: PrincipalValue | None = None
     """see the friend information"""
 
     @property
     def view_friend_or_default(self) -> PrincipalValue:
         """see the friend information (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_friend", "public")
-
+        return self.view_friend if self.view_friend is not None else "public"
     view_friend_of: PrincipalValue | None = None
     """see the friend-of information (this operation can be modified by admin only)"""
 
@@ -197,8 +185,7 @@ class ContactOperations(Structure):
         see the friend-of information (this operation can be modified by admin only) (this property always returns
         default value instead of ``None``)
         """
-        return getattr(self, "view_friend_of", "public")
-
+        return self.view_friend_of if self.view_friend_of is not None else "public"
     view_block: PrincipalValue | None = None
     """see the blocking information (this operation can be modified by admin only)"""
 
@@ -208,8 +195,7 @@ class ContactOperations(Structure):
         see the blocking information (this operation can be modified by admin only) (this property always returns
         default value instead of ``None``)
         """
-        return getattr(self, "view_block", "public")
-
+        return self.view_block if self.view_block is not None else "public"
     view_block_by: PrincipalValue | None = None
     """see the blocked-by information (this operation can be modified by admin only)"""
 
@@ -219,8 +205,7 @@ class ContactOperations(Structure):
         see the blocked-by information (this operation can be modified by admin only) (this property always returns
         default value instead of ``None``)
         """
-        return getattr(self, "view_block_by", "public")
-
+        return self.view_block_by if self.view_block_by is not None else "public"
 
 
 class FeedOperations(Structure):
@@ -230,8 +215,7 @@ class FeedOperations(Structure):
     @property
     def add_or_default(self) -> PrincipalValue:
         """add stories to the feed (this property always returns default value instead of ``None``)"""
-        return getattr(self, "add", "None")
-
+        return self.add if self.add is not None else "None"
 
 
 class FriendOperations(Structure):
@@ -244,8 +228,7 @@ class FriendOperations(Structure):
         view the membership of the node in the group of friends (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
 
 
 class FriendGroupOperations(Structure):
@@ -255,22 +238,20 @@ class FriendGroupOperations(Structure):
     @property
     def view_or_default(self) -> PrincipalValue:
         """view the group of friends (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
 
 
 class NodeNameOperations(Structure):
     manage: PrincipalValue | None = None
-    """any modification of the node name, prolonging it etc"""
+    """any modification of the node name, prolonging it etc."""
 
     @property
     def manage_or_default(self) -> PrincipalValue:
         """
-        any modification of the node name, prolonging it etc (this property always returns default value instead of
+        any modification of the node name, prolonging it etc. (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "manage", "None")
-
+        return self.manage if self.manage is not None else "None"
 
 
 class PeopleOperations(Structure):
@@ -280,24 +261,21 @@ class PeopleOperations(Structure):
     @property
     def view_subscribers_or_default(self) -> PrincipalValue:
         """view the list of subscribers (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_subscribers", "public")
-
+        return self.view_subscribers if self.view_subscribers is not None else "public"
     view_subscriptions: PrincipalValue | None = None
     """view the list of subscriptions"""
 
     @property
     def view_subscriptions_or_default(self) -> PrincipalValue:
         """view the list of subscriptions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_subscriptions", "public")
-
+        return self.view_subscriptions if self.view_subscriptions is not None else "public"
     view_friends: PrincipalValue | None = None
     """view the list of friends"""
 
     @property
     def view_friends_or_default(self) -> PrincipalValue:
         """view the list of friends (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_friends", "public")
-
+        return self.view_friends if self.view_friends is not None else "public"
     view_friend_ofs: PrincipalValue | None = None
     """view the list of those who added this node to friends"""
 
@@ -307,48 +285,44 @@ class PeopleOperations(Structure):
         view the list of those who added this node to friends (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "view_friend_ofs", "public")
-
+        return self.view_friend_ofs if self.view_friend_ofs is not None else "public"
     view_blocked: PrincipalValue | None = None
     """view the list of blocked nodes"""
 
     @property
     def view_blocked_or_default(self) -> PrincipalValue:
         """view the list of blocked nodes (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_blocked", "public")
-
+        return self.view_blocked if self.view_blocked is not None else "public"
     view_blocked_by: PrincipalValue | None = None
     """view the list of those who blocked this node"""
 
     @property
     def view_blocked_by_or_default(self) -> PrincipalValue:
-        """view the list of those who blocked this node (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_blocked_by", "admin")
-
+        """
+        view the list of those who blocked this node (this property always returns default value instead of ``None``)
+        """
+        return self.view_blocked_by if self.view_blocked_by is not None else "admin"
     view_subscribers_total: PrincipalValue | None = None
     """view the number of subscribers"""
 
     @property
     def view_subscribers_total_or_default(self) -> PrincipalValue:
         """view the number of subscribers (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_subscribers_total", "public")
-
+        return self.view_subscribers_total if self.view_subscribers_total is not None else "public"
     view_subscriptions_total: PrincipalValue | None = None
     """view the number of subscriptions"""
 
     @property
     def view_subscriptions_total_or_default(self) -> PrincipalValue:
         """view the number of subscriptions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_subscriptions_total", "public")
-
+        return self.view_subscriptions_total if self.view_subscriptions_total is not None else "public"
     view_friends_total: PrincipalValue | None = None
     """view the number of friends"""
 
     @property
     def view_friends_total_or_default(self) -> PrincipalValue:
         """view the number of friends (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_friends_total", "public")
-
+        return self.view_friends_total if self.view_friends_total is not None else "public"
     view_friend_ofs_total: PrincipalValue | None = None
     """view the number of those who added this node to friends"""
 
@@ -358,8 +332,7 @@ class PeopleOperations(Structure):
         view the number of those who added this node to friends (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "view_friend_ofs_total", "public")
-
+        return self.view_friend_ofs_total if self.view_friend_ofs_total is not None else "public"
 
 
 class PostingOperations(Structure):
@@ -369,40 +342,35 @@ class PostingOperations(Structure):
     @property
     def view_or_default(self) -> PrincipalValue:
         """view the posting (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
     edit: PrincipalValue | None = None
     """edit the posting"""
 
     @property
     def edit_or_default(self) -> PrincipalValue:
         """edit the posting (this property always returns default value instead of ``None``)"""
-        return getattr(self, "edit", "owner")
-
+        return self.edit if self.edit is not None else "owner"
     delete: PrincipalValue | None = None
     """delete the posting"""
 
     @property
     def delete_or_default(self) -> PrincipalValue:
         """delete the posting (this property always returns default value instead of ``None``)"""
-        return getattr(self, "delete", "private")
-
+        return self.delete if self.delete is not None else "private"
     view_comments: PrincipalValue | None = None
     """view the posting's comments"""
 
     @property
     def view_comments_or_default(self) -> PrincipalValue:
         """view the posting's comments (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_comments", "public")
-
+        return self.view_comments if self.view_comments is not None else "public"
     add_comment: PrincipalValue | None = None
     """add a comment to the posting"""
 
     @property
     def add_comment_or_default(self) -> PrincipalValue:
         """add a comment to the posting (this property always returns default value instead of ``None``)"""
-        return getattr(self, "add_comment", "signed")
-
+        return self.add_comment if self.add_comment is not None else "signed"
     override_comment: PrincipalValue | None = None
     """override the permissions of the posting's comments"""
 
@@ -412,32 +380,30 @@ class PostingOperations(Structure):
         override the permissions of the posting's comments (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "override_comment", "owner")
-
+        return self.override_comment if self.override_comment is not None else "owner"
     view_reactions: PrincipalValue | None = None
     """view the posting's reactions"""
 
     @property
     def view_reactions_or_default(self) -> PrincipalValue:
         """view the posting's reactions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_reactions", "public")
-
+        return self.view_reactions if self.view_reactions is not None else "public"
     view_negative_reactions: PrincipalValue | None = None
     """view the posting's negative reactions"""
 
     @property
     def view_negative_reactions_or_default(self) -> PrincipalValue:
         """view the posting's negative reactions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_negative_reactions", "public")
-
+        return self.view_negative_reactions if self.view_negative_reactions is not None else "public"
     view_reaction_totals: PrincipalValue | None = None
     """view the number of the posting's reactions"""
 
     @property
     def view_reaction_totals_or_default(self) -> PrincipalValue:
-        """view the number of the posting's reactions (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_reaction_totals", "public")
-
+        """
+        view the number of the posting's reactions (this property always returns default value instead of ``None``)
+        """
+        return self.view_reaction_totals if self.view_reaction_totals is not None else "public"
     view_negative_reaction_totals: PrincipalValue | None = None
     """view the number of the posting's negative reactions"""
 
@@ -447,8 +413,7 @@ class PostingOperations(Structure):
         view the number of the posting's negative reactions (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "view_negative_reaction_totals", "public")
-
+        return self.view_negative_reaction_totals if self.view_negative_reaction_totals is not None else "public"
     view_reaction_ratios: PrincipalValue | None = None
     """view the relative number of different types of the posting's reactions"""
 
@@ -458,8 +423,7 @@ class PostingOperations(Structure):
         view the relative number of different types of the posting's reactions (this property always returns default
         value instead of ``None``)
         """
-        return getattr(self, "view_reaction_ratios", "public")
-
+        return self.view_reaction_ratios if self.view_reaction_ratios is not None else "public"
     view_negative_reaction_ratios: PrincipalValue | None = None
     """view the relative number of different types of the posting's negative reactions"""
 
@@ -469,24 +433,21 @@ class PostingOperations(Structure):
         view the relative number of different types of the posting's negative reactions (this property always returns
         default value instead of ``None``)
         """
-        return getattr(self, "view_negative_reaction_ratios", "public")
-
+        return self.view_negative_reaction_ratios if self.view_negative_reaction_ratios is not None else "public"
     add_reaction: PrincipalValue | None = None
     """add a reaction to the posting"""
 
     @property
     def add_reaction_or_default(self) -> PrincipalValue:
         """add a reaction to the posting (this property always returns default value instead of ``None``)"""
-        return getattr(self, "add_reaction", "signed")
-
+        return self.add_reaction if self.add_reaction is not None else "signed"
     add_negative_reaction: PrincipalValue | None = None
     """add a negative reaction to the posting"""
 
     @property
     def add_negative_reaction_or_default(self) -> PrincipalValue:
         """add a negative reaction to the posting (this property always returns default value instead of ``None``)"""
-        return getattr(self, "add_negative_reaction", "signed")
-
+        return self.add_negative_reaction if self.add_negative_reaction is not None else "signed"
     override_reaction: PrincipalValue | None = None
     """override the permissions of the posting's reactions"""
 
@@ -496,8 +457,7 @@ class PostingOperations(Structure):
         override the permissions of the posting's reactions (this property always returns default value instead of
         ``None``)
         """
-        return getattr(self, "override_reaction", "owner")
-
+        return self.override_reaction if self.override_reaction is not None else "owner"
     override_comment_reaction: PrincipalValue | None = None
     """override the permissions of the posting's comment's reactions"""
 
@@ -507,8 +467,7 @@ class PostingOperations(Structure):
         override the permissions of the posting's comment's reactions (this property always returns default value
         instead of ``None``)
         """
-        return getattr(self, "override_comment_reaction", "owner")
-
+        return self.override_comment_reaction if self.override_comment_reaction is not None else "owner"
 
 
 class PrivateMediaFileOperations(Structure):
@@ -518,8 +477,7 @@ class PrivateMediaFileOperations(Structure):
     @property
     def view_or_default(self) -> PrincipalValue:
         """view the media file (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
 
 
 class ProfileOperations(Structure):
@@ -529,16 +487,14 @@ class ProfileOperations(Structure):
     @property
     def edit_or_default(self) -> PrincipalValue:
         """change the profile (this property always returns default value instead of ``None``)"""
-        return getattr(self, "edit", "None")
-
+        return self.edit if self.edit is not None else "None"
     view_email: PrincipalValue | None = None
     """view the e-mail address in the profile"""
 
     @property
     def view_email_or_default(self) -> PrincipalValue:
         """view the e-mail address in the profile (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view_email", "None")
-
+        return self.view_email if self.view_email is not None else "None"
 
 
 class ReactionOperations(Structure):
@@ -548,16 +504,14 @@ class ReactionOperations(Structure):
     @property
     def view_or_default(self) -> PrincipalValue:
         """view the reaction (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
     delete: PrincipalValue | None = None
     """delete the reaction"""
 
     @property
     def delete_or_default(self) -> PrincipalValue:
         """delete the reaction (this property always returns default value instead of ``None``)"""
-        return getattr(self, "delete", "private")
-
+        return self.delete if self.delete is not None else "private"
 
 
 class StoryOperations(Structure):
@@ -567,16 +521,14 @@ class StoryOperations(Structure):
     @property
     def edit_or_default(self) -> PrincipalValue:
         """update the story (this property always returns default value instead of ``None``)"""
-        return getattr(self, "edit", "admin")
-
+        return self.edit if self.edit is not None else "admin"
     delete: PrincipalValue | None = None
     """delete the story"""
 
     @property
     def delete_or_default(self) -> PrincipalValue:
         """delete the story (this property always returns default value instead of ``None``)"""
-        return getattr(self, "delete", "admin")
-
+        return self.delete if self.delete is not None else "admin"
 
 
 class SubscriberOperations(Structure):
@@ -586,8 +538,7 @@ class SubscriberOperations(Structure):
     @property
     def view_or_default(self) -> PrincipalValue:
         """see the subscriber (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
     delete: PrincipalValue | None = None
     """delete the subscriber (this operation cannot be modified or overridden)"""
 
@@ -597,8 +548,7 @@ class SubscriberOperations(Structure):
         delete the subscriber (this operation cannot be modified or overridden) (this property always returns default
         value instead of ``None``)
         """
-        return getattr(self, "delete", "private")
-
+        return self.delete if self.delete is not None else "private"
 
 
 class SubscriptionOperations(Structure):
@@ -608,8 +558,7 @@ class SubscriptionOperations(Structure):
     @property
     def view_or_default(self) -> PrincipalValue:
         """see the subscription (this property always returns default value instead of ``None``)"""
-        return getattr(self, "view", "public")
-
+        return self.view if self.view is not None else "public"
     delete: PrincipalValue | None = None
     """delete the subscription (this operation cannot be modified or overridden)"""
 
@@ -619,8 +568,7 @@ class SubscriptionOperations(Structure):
         delete the subscription (this operation cannot be modified or overridden) (this property always returns default
         value instead of ``None``)
         """
-        return getattr(self, "delete", "admin")
-
+        return self.delete if self.delete is not None else "admin"
 
 
 class AcceptedReactions(Structure):
@@ -630,7 +578,9 @@ class AcceptedReactions(Structure):
     designate hexadecimal number and ``+`` to designate a recommended reaction
     """
     negative: str
-    """comma-separated list of codes of the negative reactions that are accepted (the format is the same as above)"""
+    """
+    comma-separated list of codes of the negative reactions that are accepted (the format is the same as above)
+    """
 
 
 class AskDescription(Structure):
@@ -676,8 +626,8 @@ class AvatarDescription(Structure):
     """shape of the avatar"""
     optional: bool | None = None
     """
-    if set to ``True``, the node will ignore the absence of the media file referenced in ``mediaId`` field (empty avatar
-    will be used in this case); if set to ``False`` or absent, the node will return an error, if the media file
+    if set to ``True``, the node will ignore the absence of the media file referenced in ``mediaId`` field (empty
+    avatar will be used in this case); if set to ``False`` or absent, the node will return an error, if the media file
     referenced in ``mediaId`` field is absent
     """
 
@@ -968,7 +918,9 @@ class FeedReference(Structure):
     published_at: Timestamp
     """story publication timestamp - the time the story is published under in the feed"""
     pinned: bool | None = None
-    """``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise"""
+    """
+    ``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise
+    """
     moment: int
     story_id: str
     """ID of the story"""
@@ -1285,8 +1237,8 @@ class ProfileAttributes(Structure):
     """the source text of node owner's bio (arbitrary text)"""
     bio_src_format: SourceFormat | None = None
     """
-    format of the source text of node owner's bio, ``markdown`` by default; the list of available formats is returned in
-    ``PostingFeatures``
+    format of the source text of node owner's bio, ``markdown`` by default; the list of available formats is returned
+    in ``PostingFeatures``
     """
     avatar_id: str | None = None
     """node owner's avatar ID"""
@@ -1860,7 +1812,9 @@ class StoryAttributes(Structure):
     publish_at: Timestamp | None = None
     """story publication timestamp - the time the story must be published under in the feed"""
     pinned: bool | None = None
-    """``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise"""
+    """
+    ``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise
+    """
     viewed: bool | None = None
     """value of the ``viewed`` flag (``None``, if the flag is not changed)"""
     read: bool | None = None
@@ -2238,7 +2192,9 @@ class CommentRevisionInfo(Structure):
     body_src_hash: bytes
     """hash of the source text of the revision"""
     body_src_format: SourceFormat | None = None
-    """format of the source text of the revision, the list of available formats is returned in ``PostingFeatures``"""
+    """
+    format of the source text of the revision, the list of available formats is returned in ``PostingFeatures``
+    """
     body: Body
     """body of the revision, a string representation of a JSON structure"""
     body_format: BodyFormat | None = None
@@ -2455,7 +2411,9 @@ class PostingInfo(Structure):
     body_preview: Body | None = None
     """preview of the posting's body, a string representation of a JSON structure"""
     body_src: Body | None = None
-    """the source text of the posting, a string representation of a JSON structure, may be absent if not requested"""
+    """
+    the source text of the posting, a string representation of a JSON structure, may be absent if not requested
+    """
     body_src_hash: bytes
     """hash of the source text of the posting"""
     body_src_format: SourceFormat | None = None
@@ -2542,7 +2500,9 @@ class PostingRevisionInfo(Structure):
     body_src_hash: bytes
     """hash of the source text of the revision"""
     body_src_format: SourceFormat | None = None
-    """format of the source text of the revision, the list of available formats is returned in ``PostingFeatures``"""
+    """
+    format of the source text of the revision, the list of available formats is returned in ``PostingFeatures``
+    """
     body: Body
     """body of the revision, a string representation of a JSON structure"""
     body_format: BodyFormat | None = None
@@ -2740,7 +2700,9 @@ class CommentInfo(Structure):
     body_preview: Body | None = None
     """preview of the comment's body, a string representation of a JSON structure"""
     body_src: Body | None = None
-    """the source text of the comment, a string representation of a JSON structure, may be absent if not requested"""
+    """
+    the source text of the comment, a string representation of a JSON structure, may be absent if not requested
+    """
     body_src_hash: bytes
     """hash of the source text of the comment"""
     body_src_format: SourceFormat | None = None
@@ -2920,7 +2882,9 @@ class StoryInfo(Structure):
     published_at: Timestamp
     """story publication timestamp - the time the story is published under in the feed"""
     pinned: bool | None = None
-    """``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise"""
+    """
+    ``True``, if the story is pinned (should appear before any non-pinned story in the feed), ``False`` otherwise
+    """
     moment: int
     viewed: bool | None = None
     """``True``, if the story has been viewed by node owner, ``False`` otherwise"""

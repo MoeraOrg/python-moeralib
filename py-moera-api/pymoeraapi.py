@@ -20,13 +20,13 @@ def doc_wrap(s: str, indent: int) -> str:
     max_length = 120 - indent * 4
     result = ''
     while True:
-        if len(s) <= max_length:
+        if len(s) < max_length:
             result += s
             break
         pos = 0
         while True:
             next = s.find(' ', pos + 1)
-            if next < 0 or next > max_length:
+            if next < 0 or next >= max_length:
                 break
             pos = next
         result += s[:pos] + '\n' + ind(indent)
@@ -164,10 +164,11 @@ def generate_operations(operations: Any, tfile: TextIO, sfile: TextIO) -> None:
             tfile.write('    def %s_or_default(self) -> PrincipalValue:\n' % py_name)
             doc = doc_wrap(
                 field['description'] + ' (this property always returns default value instead of ``None``)', 2)
-            if len(doc) >= 110:
+            if len(doc) >= 107:
                 doc = f'\n{ind(2)}{doc}\n{ind(2)}'
             tfile.write('        """%s"""\n' % doc)
-            tfile.write('        return getattr(self, "%s", "%s")\n\n' % (py_name, field['default']))
+            tfile.write('        return self.%s if self.%s is not None else "%s"\n'
+                        % (py_name, py_name, field['default']))
 
     sfile.write('\n')
     sfile.write('{name}_SCHEMA: Any = {{\n'.format(name=to_snake(operations['name']).upper()))
@@ -252,7 +253,7 @@ class Structure:
             tfile.write(tmpl % (to_snake(field['name']), t))
             if 'description' in field:
                 doc = doc_wrap(html_to_doc(field["description"]), 1)
-                if len(doc) >= 110:
+                if len(doc) >= 107:
                     doc = f'\n{ind(1)}{doc}\n{ind(1)}'
                 tfile.write(f'{ind(1)}"""{doc}"""\n')
 
