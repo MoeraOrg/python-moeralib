@@ -30,6 +30,18 @@ class Structure:
         instance.__dict__.update(data)
         return instance
 
+    @staticmethod
+    def list_to_json(a_list):
+        out = []
+        for item in a_list:
+            if isinstance(item, Structure):
+                out.append(item.json())
+            elif isinstance(item, list):
+                out.append(Structure.list_to_json(item))
+            else:
+                out.append(item)
+        return out
+
     def json(self):
         json = {}
         for name, value in self.__dict__.items():
@@ -37,6 +49,8 @@ class Structure:
                 continue
             if isinstance(value, Structure):
                 value = value.json()
+            elif isinstance(value, list):
+                value = Structure.list_to_json(value)
             json[to_camel(name)] = value
         return json
 
