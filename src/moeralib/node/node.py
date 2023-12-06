@@ -822,7 +822,7 @@ class MoeraNode(Caller):
 
         :param id: ID of the draft
         """
-        location = "/draft/{id}".format(id=quote_plus(id))
+        location = "/drafts/{id}".format(id=quote_plus(id))
         data = self.call("delete_draft", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
         return types.Result.from_json(data)
 

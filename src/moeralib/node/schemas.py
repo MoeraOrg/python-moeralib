@@ -2290,7 +2290,7 @@ COMMENT_REVISION_INFO_SCHEMA: Any = {
             "type": ["integer", "null"]
         },
         "digest": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "signature": {
             "type": ["string", "null"]
@@ -2308,7 +2308,6 @@ COMMENT_REVISION_INFO_SCHEMA: Any = {
         "body",
         "heading",
         "createdAt",
-        "digest",
     ],
     "additionalProperties": False
 }
@@ -2495,7 +2494,7 @@ POSTING_INFO_SCHEMA: Any = {
             "type": ["integer", "null"]
         },
         "digest": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "signature": {
             "type": ["string", "null"]
@@ -2559,7 +2558,6 @@ POSTING_INFO_SCHEMA: Any = {
         "heading",
         "createdAt",
         "revisionCreatedAt",
-        "digest",
     ],
     "additionalProperties": False
 }
@@ -2611,7 +2609,7 @@ POSTING_REVISION_INFO_SCHEMA: Any = {
             "type": ["integer", "null"]
         },
         "digest": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "signature": {
             "type": ["string", "null"]
@@ -2628,7 +2626,6 @@ POSTING_REVISION_INFO_SCHEMA: Any = {
         "body",
         "heading",
         "createdAt",
-        "digest",
     ],
     "additionalProperties": False
 }
@@ -2789,7 +2786,7 @@ COMMENT_INFO_SCHEMA: Any = {
             "type": ["integer", "null"]
         },
         "digest": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "signature": {
             "type": ["string", "null"]
@@ -2829,7 +2826,6 @@ COMMENT_INFO_SCHEMA: Any = {
         "moment",
         "createdAt",
         "revisionCreatedAt",
-        "digest",
     ],
     "additionalProperties": False
 }

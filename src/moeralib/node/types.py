@@ -2210,7 +2210,7 @@ class CommentRevisionInfo(Structure):
     revision deletion timestamp - the time when the revision will be deleted and the previous revision will take its
     place
     """
-    digest: bytes
+    digest: bytes | None = None
     """cryptographic digest of the revision (use ``Comment`` fingerprint)"""
     signature: bytes | None = None
     """the comment's owner signature (use ``Comment`` fingerprint)"""
@@ -2448,7 +2448,7 @@ class PostingInfo(Structure):
     """
     deadline: Timestamp | None = None
     """posting purging timestamp - the time when the deleted posting will be purged from the database"""
-    digest: bytes
+    digest: bytes | None = None
     """cryptographic digest of the posting (use ``Posting`` fingerprint)"""
     signature: bytes | None = None
     """the posting's owner signature (use ``Posting`` fingerprint)"""
@@ -2521,7 +2521,7 @@ class PostingRevisionInfo(Structure):
     """original revision creation timestamp (for cached copies of remote postings only)"""
     receiver_deleted_at: Timestamp | None = None
     """original revision deletion timestamp (for cached copies of remote postings only)"""
-    digest: bytes
+    digest: bytes | None = None
     """cryptographic digest of the revision (use ``Posting`` fingerprint)"""
     signature: bytes | None = None
     """the revision's owner signature (use ``Posting`` fingerprint)"""
@@ -2728,7 +2728,7 @@ class CommentInfo(Structure):
     """creation timestamp of the current revision of the comment"""
     deadline: Timestamp | None = None
     """comment purging timestamp - the time when the deleted comment will be purged from the database"""
-    digest: bytes
+    digest: bytes | None = None
     """cryptographic digest of the comment (use ``Comment`` fingerprint)"""
     signature: bytes | None = None
     """the comment's owner signature (use ``Comment`` fingerprint)"""
