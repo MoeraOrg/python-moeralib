@@ -3038,9 +3038,6 @@ STORY_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "summaryData": to_nullable_object_schema(STORY_SUMMARY_DATA_SCHEMA),
-        "trackingId": {
-            "type": ["string", "null"]
-        },
         "posting": to_nullable_object_schema(POSTING_INFO_SCHEMA),
         "postingId": {
             "type": ["string", "null"]

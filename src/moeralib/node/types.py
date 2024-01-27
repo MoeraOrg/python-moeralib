@@ -2905,10 +2905,6 @@ class StoryInfo(Structure):
     """user-readable summary of the story - this field is **deprecated** in favor of ``summaryData``"""
     summary_data: StorySummaryData | None = None
     """details of the story; they are used by the client to build a user-readable summary of the story"""
-    tracking_id: str | None = None
-    """
-    ID (visible by node admin only) that may be used to update the story viewed/read status without authentication
-    """
     posting: PostingInfo | None = None
     """the posting this story is about"""
     posting_id: str | None = None
