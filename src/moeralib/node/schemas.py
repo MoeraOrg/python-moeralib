@@ -606,6 +606,19 @@ CREDENTIALS_CREATED_SCHEMA: Any = {
     "additionalProperties": False
 }
 
+DELETE_NODE_STATUS_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "requested": {
+            "type": "boolean"
+        },
+    },
+    "required": [
+        "requested",
+    ],
+    "additionalProperties": False
+}
+
 DOMAIN_AVAILABLE_SCHEMA: Any = {
     "type": "object",
     "properties": {

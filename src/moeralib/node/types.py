@@ -26,6 +26,8 @@ PrincipalFlag = Literal[
 
 PushContentType = Literal["story-added", "story-deleted", "feed-updated"]
 
+PushRelayType = Literal["fcm"]
+
 SettingType = Literal[
     "bool", "int", "string", "json", "Duration", "PrivateKey", "PublicKey", "Timestamp", "UUID", "Principal"
 ]
@@ -884,6 +886,16 @@ class CredentialsCreated(Structure):
     """``True`` if the credentials are initialized already, ``False`` otherwise"""
 
 
+class DeleteNodeStatus(Structure):
+    requested: bool
+    """``True`` if the request is sent, ``False`` otherwise"""
+
+
+class DeleteNodeText(Structure):
+    message: str | None = None
+    """text message for the provider"""
+
+
 class DomainAttributes(Structure):
     name: str | None = None
     """domain's hostname or ``_default_`` for the default domain"""
@@ -1290,6 +1302,15 @@ class PublicMediaFileInfo(Structure):
     """
     size: int
     """size of the media file in bytes"""
+
+
+class PushRelayClientAttributes(Structure):
+    type: PushRelayType
+    """type of the relay"""
+    client_id: str
+    """ID/token of the client"""
+    lang: str | None = None
+    """language of the messages"""
 
 
 class ReactionAttributes(Structure):

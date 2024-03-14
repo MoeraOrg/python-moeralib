@@ -1472,6 +1472,39 @@ class MoeraNode(Caller):
         data = self.call("update_profile", location, method="PUT", body=profile, schema=schemas.PROFILE_INFO_SCHEMA)
         return types.ProfileInfo.from_json(data)
 
+    def get_delete_node_request_status(self) -> types.DeleteNodeStatus:
+        """
+        Get the current status of the request to delete the node.
+        """
+        location = "/provider/delete-node"
+        data = self.call(
+            "get_delete_node_request_status", location, method="GET", schema=schemas.DELETE_NODE_STATUS_SCHEMA
+        )
+        return types.DeleteNodeStatus.from_json(data)
+
+    def send_delete_node_request(self, delete_node_text: types.DeleteNodeText) -> types.DeleteNodeStatus:
+        """
+        Send a request to the provider to delete the node.
+
+        :param delete_node_text:
+        """
+        location = "/provider/delete-node"
+        data = self.call(
+            "send_delete_node_request", location, method="POST", body=delete_node_text,
+            schema=schemas.DELETE_NODE_STATUS_SCHEMA
+        )
+        return types.DeleteNodeStatus.from_json(data)
+
+    def cancel_delete_node_request(self) -> types.DeleteNodeStatus:
+        """
+        Cancel the request to delete the node.
+        """
+        location = "/provider/delete-node"
+        data = self.call(
+            "cancel_delete_node_request", location, method="DELETE", schema=schemas.DELETE_NODE_STATUS_SCHEMA
+        )
+        return types.DeleteNodeStatus.from_json(data)
+
     def proxy_media(self, url: str) -> IO:
         """
         Open the URL passed in the parameters and pass to the client the media file returned by the server.
@@ -1496,6 +1529,18 @@ class MoeraNode(Caller):
             "proxy_link_preview", location, method="GET", params=params, schema=schemas.LINK_PREVIEW_INFO_SCHEMA
         )
         return types.LinkPreviewInfo.from_json(data)
+
+    def register_at_push_relay(self, attributes: types.PushRelayClientAttributes) -> types.Result:
+        """
+        Register a client at the push relay server to receive messages from this node. The operation is synchronous.
+
+        :param attributes:
+        """
+        location = "/push-relay"
+        data = self.call(
+            "register_at_push_relay", location, method="POST", body=attributes, schema=schemas.RESULT_SCHEMA
+        )
+        return types.Result.from_json(data)
 
     def ask_remote_node(self, node_name: str, details: types.AskDescription) -> types.Result:
         """
