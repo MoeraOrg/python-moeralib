@@ -39,7 +39,7 @@ class MoeraNaming:
     _server: str
     _call_id: int
 
-    def __init__(self, server: str = MAIN_SERVER) -> None:
+    def __init__(self, server: str = MAIN_SERVER):
         """
         :param server: the naming server URL
         """

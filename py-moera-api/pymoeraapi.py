@@ -225,7 +225,7 @@ class Structure:
     output: bool = False
     output_array: bool = False
 
-    def __init__(self, data: Any) -> None:
+    def __init__(self, data: Any):
         self.data = data
         self.depends = [field['struct'] for field in data['fields'] if 'struct' in field]
 
