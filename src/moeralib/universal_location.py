@@ -11,7 +11,7 @@ class UniversalLocation:
     """Represents location part of a universal Moera URL"""
 
     _node_name: str | None
-    _scheme: str | None
+    _scheme: str
     _authority: str | None
     _path: str | None
 
@@ -28,7 +28,7 @@ class UniversalLocation:
         :param scheme: scheme specifier of the node location (``'https'``, if set to `None` or empty)
         :param authority: authority (host name and optional port) of the node location
         :param path: virtual path at the node (``'/'``, if set to `None` or empty)
-        :param query: query component of the UR
+        :param query: query component of the URL
         :param fragment: fragment identifier of the URL
         """
         self.node_name = node_name
@@ -50,7 +50,7 @@ class UniversalLocation:
         self._node_name = shorten(node_name)
 
     @property
-    def scheme(self) -> str | None:
+    def scheme(self) -> str:
         """
         Scheme specifier of the node location
         """
@@ -198,6 +198,16 @@ def redirect_to_url(node_name: str | None, url: str | None = None) -> str:
 
 def redirect_to(node_name: str | None, root_url: str | None, path: str | None = None, query: str | None = None,
                 fragment: str | None = None) -> str:
+    """
+    Build a universal Moera URL from the node name, the Moera root URL of the node, virtual path and other components.
+
+    :param node_name: the node name
+    :param root_url: the Moera root URL of the node
+    :param path: virtual path at the node (``'/'``, if set to `None` or empty)
+    :param query: query component of the URL
+    :param fragment: fragment identifier of the URL
+    :return: the universal URL
+    """
     try:
         if root_url is not None:
             url_parts = urlparse(root_url)
