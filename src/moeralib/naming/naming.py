@@ -226,6 +226,35 @@ def node_name_parse(node_name: str) -> Tuple[str, int]:
     return name, generation
 
 
+def shorten(node_name: str | None) -> str | None:
+    """
+    Converts the node name to the compact form, omitting generation 0.
+
+    :param node_name: the node name in compact or full form
+    :return: the node name in the compact form
+    """
+    if node_name is None:
+        return None
+    (name, gen) = node_name_parse(node_name)
+    if gen == 0:
+        return name
+    else:
+        return node_name
+
+
+def expand(node_name: str | None) -> str | None:
+    """
+    Converts the node name to the full form, containing generation.
+
+    :param node_name: the node name in compact or full form
+    :return: the node name in the full form
+    """
+    if node_name is None:
+        return None
+    (name, gen) = node_name_parse(node_name)
+    return f'{name}_{gen}'
+
+
 def resolve(name: str, naming_server: str = MAIN_SERVER) -> str | None:
     """
     Shortcut function to resolve a node name and get the node URI.
