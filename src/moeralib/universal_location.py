@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from urllib.parse import urlparse, urlunparse
 
-from src.moeralib.naming.naming import shorten
+from .naming.naming import shorten
 
 REDIRECTOR = 'moera.page'
 
