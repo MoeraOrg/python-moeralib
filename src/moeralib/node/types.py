@@ -1075,6 +1075,11 @@ class LinkPreviewInfo(Structure):
 class MediaFilePreviewInfo(Structure):
     target_width: int
     """the width the preview was prepared for viewing at"""
+    direct_path: str | None = None
+    """
+    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem;
+    static images do not accept any query parameters including authentication parameters
+    """
     width: int
     """actual width of the preview in pixels"""
     height: int
@@ -1215,6 +1220,11 @@ class PrivateMediaFileInfo(Structure):
     """SHA-1 hash of the media file"""
     path: str
     """virtual location of the media file, relative to the ``/media`` virtual page"""
+    direct_path: str | None = None
+    """
+    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem;
+    static images do not accept any query parameters including authentication parameters
+    """
     mime_type: str
     """MIME type of the media"""
     width: int | None = None

@@ -924,6 +924,9 @@ MEDIA_FILE_PREVIEW_INFO_SCHEMA: Any = {
         "targetWidth": {
             "type": "integer"
         },
+        "directPath": {
+            "type": ["string", "null"]
+        },
         "width": {
             "type": "integer"
         },
@@ -1078,6 +1081,9 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         },
         "path": {
             "type": "string"
+        },
+        "directPath": {
+            "type": ["string", "null"]
         },
         "mimeType": {
             "type": "string"
