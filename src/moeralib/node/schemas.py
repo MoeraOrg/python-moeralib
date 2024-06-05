@@ -1531,7 +1531,7 @@ SETTING_TYPE_MODIFIERS_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA: Any = {
+SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
         "id": {
@@ -1615,7 +1615,7 @@ SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-SHERIFF_COMPLAIN_GROUPS_SLICE_INFO_SCHEMA: Any = {
+SHERIFF_COMPLAINT_GROUPS_SLICE_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
         "before": {
@@ -1626,7 +1626,7 @@ SHERIFF_COMPLAIN_GROUPS_SLICE_INFO_SCHEMA: Any = {
         },
         "groups": {
             "type": "array",
-            "items": SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA
+            "items": SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA
         },
         "total": {
             "type": "integer"
@@ -1649,7 +1649,7 @@ SHERIFF_COMPLAIN_GROUPS_SLICE_INFO_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-SHERIFF_COMPLAIN_INFO_SCHEMA: Any = {
+SHERIFF_COMPLAINT_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
         "id": {
@@ -1664,7 +1664,7 @@ SHERIFF_COMPLAIN_INFO_SCHEMA: Any = {
         "ownerGender": {
             "type": ["string", "null"]
         },
-        "group": to_nullable_object_schema(SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA),
+        "group": to_nullable_object_schema(SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA),
         "reasonCode": {
             "type": "string"
         },
@@ -1687,7 +1687,7 @@ SHERIFF_COMPLAIN_INFO_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-SHERIFF_COMPLAIN_INFO_ARRAY_SCHEMA = array_schema(SHERIFF_COMPLAIN_INFO_SCHEMA)
+SHERIFF_COMPLAINT_INFO_ARRAY_SCHEMA = array_schema(SHERIFF_COMPLAINT_INFO_SCHEMA)
 
 SHERIFF_ORDER_INFO_SCHEMA: Any = {
     "type": "object",
@@ -1764,7 +1764,7 @@ SHERIFF_ORDER_INFO_SCHEMA: Any = {
         "signatureVersion": {
             "type": "integer"
         },
-        "complainGroupId": {
+        "complaintGroupId": {
             "type": ["string", "null"]
         },
     },
@@ -1886,7 +1886,7 @@ STORY_SUMMARY_SHERIFF_SCHEMA: Any = {
         "orderId": {
             "type": ["string", "null"]
         },
-        "complainId": {
+        "complaintId": {
             "type": ["string", "null"]
         },
     },
@@ -2130,6 +2130,9 @@ WHO_AM_I_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
+        "frozen": {
+            "type": ["boolean", "null"]
+        },
     },
     "additionalProperties": False
 }

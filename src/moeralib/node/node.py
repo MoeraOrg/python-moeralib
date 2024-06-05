@@ -1899,8 +1899,8 @@ class MoeraNode(Caller):
 
     def get_sheriff_complaint_groups_slice(
         self, after: int | None = None, before: int | None = None, limit: int | None = None,
-        status: types.SheriffComplainStatus | None = None
-    ) -> types.SheriffComplainGroupsSliceInfo:
+        status: types.SheriffComplaintStatus | None = None
+    ) -> types.SheriffComplaintGroupsSliceInfo:
         """
         Get a slice of the list of groups of complaints, optionally filtered by status, delimited by ``before`` or
         ``after`` moment and the given ``limit``. If neither ``before`` nor ``after`` are provided, the latest groups
@@ -1912,68 +1912,68 @@ class MoeraNode(Caller):
         :param limit: maximum number of groups returned
         :param status: filter groups by status
         """
-        location = "/sheriff/complains/groups".format()
+        location = "/sheriff/complaints/groups".format()
         params = {"after": after, "before": before, "limit": limit, "status": status}
         data = self.call(
             "get_sheriff_complaint_groups_slice", location, method="GET", auth=False, params=params,
-            schema=schemas.SHERIFF_COMPLAIN_GROUPS_SLICE_INFO_SCHEMA
+            schema=schemas.SHERIFF_COMPLAINT_GROUPS_SLICE_INFO_SCHEMA
         )
-        return types.SheriffComplainGroupsSliceInfo.from_json(data)
+        return types.SheriffComplaintGroupsSliceInfo.from_json(data)
 
-    def get_sheriff_complaint_group(self, id: str) -> types.SheriffComplainGroupInfo:
+    def get_sheriff_complaint_group(self, id: str) -> types.SheriffComplaintGroupInfo:
         """
         Get details of the given group of complaints.
 
         :param id: ID of the group of complaints
         """
-        location = "/sheriff/complains/groups/{id}".format(id=quote_plus(id))
+        location = "/sheriff/complaints/groups/{id}".format(id=quote_plus(id))
         data = self.call(
             "get_sheriff_complaint_group", location, method="GET", auth=False,
-            schema=schemas.SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA
+            schema=schemas.SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA
         )
-        return types.SheriffComplainGroupInfo.from_json(data)
+        return types.SheriffComplaintGroupInfo.from_json(data)
 
-    def get_sheriff_complaints_by_group(self, id: str) -> List[types.SheriffComplainInfo]:
+    def get_sheriff_complaints_by_group(self, id: str) -> List[types.SheriffComplaintInfo]:
         """
         Get complaints included into the given group of complaints.
 
         :param id: ID of the group of complaints
         """
-        location = "/sheriff/complains/groups/{id}/complains".format(id=quote_plus(id))
+        location = "/sheriff/complaints/groups/{id}/complaints".format(id=quote_plus(id))
         data = self.call(
             "get_sheriff_complaints_by_group", location, method="GET", auth=False,
-            schema=schemas.SHERIFF_COMPLAIN_INFO_ARRAY_SCHEMA
+            schema=schemas.SHERIFF_COMPLAINT_INFO_ARRAY_SCHEMA
         )
-        return structure_list(data, types.SheriffComplainInfo)
+        return structure_list(data, types.SheriffComplaintInfo)
 
     def update_sheriff_complaint_group(
-        self, id: str, decision: types.SheriffComplainDecisionText
-    ) -> types.SheriffComplainGroupInfo:
+        self, id: str, decision: types.SheriffComplaintDecisionText
+    ) -> types.SheriffComplaintGroupInfo:
         """
         Make decision on the given group of complaints.
 
         :param id: ID of the group of complaints
         :param decision:
         """
-        location = "/sheriff/complains/groups/{id}".format(id=quote_plus(id))
+        location = "/sheriff/complaints/groups/{id}".format(id=quote_plus(id))
         data = self.call(
             "update_sheriff_complaint_group", location, method="PUT", body=decision,
-            schema=schemas.SHERIFF_COMPLAIN_GROUP_INFO_SCHEMA
+            schema=schemas.SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA
         )
-        return types.SheriffComplainGroupInfo.from_json(data)
+        return types.SheriffComplaintGroupInfo.from_json(data)
 
-    def create_sheriff_complaint(self, complaint: types.SheriffComplainText) -> types.SheriffComplainInfo:
+    def create_sheriff_complaint(self, complaint: types.SheriffComplaintText) -> types.SheriffComplaintInfo:
         """
         Send a complaint to the sheriff.
 
         :param complaint:
         """
-        location = "/sheriff/complains"
+        location = "/sheriff/complaints"
         data = self.call(
             "create_sheriff_complaint", location, method="POST", body=complaint,
-            schema=schemas.SHERIFF_COMPLAIN_INFO_SCHEMA
+            schema=schemas.SHERIFF_COMPLAINT_INFO_SCHEMA
         )
-        return types.SheriffComplainInfo.from_json(data)
+        return types.SheriffComplaintInfo.from_json(data)
 
     def create_sheriff_order(self, sheriff_order: types.SheriffOrderDetails) -> types.Result:
         """

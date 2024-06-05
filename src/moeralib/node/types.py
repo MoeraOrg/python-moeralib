@@ -32,7 +32,7 @@ SettingType = Literal[
     "bool", "int", "string", "json", "Duration", "PrivateKey", "PublicKey", "Timestamp", "UUID", "Principal"
 ]
 
-SheriffComplainStatus = Literal[
+SheriffComplaintStatus = Literal[
     "posted", "prepared", "prepare-failed", "not-found", "invalid-target", "not-original", "not-sheriff", "approved",
     "rejected"
 ]
@@ -49,12 +49,12 @@ StoryType = Literal[
     "asked-to-friend", "asked-to-subscribe", "blocked-user", "blocked-user-in-posting", "comment-added",
     "comment-media-reaction-added-negative", "comment-media-reaction-added-positive", "comment-media-reaction-failed",
     "comment-post-task-failed", "comment-reaction-added-negative", "comment-reaction-added-positive",
-    "comment-reaction-task-failed", "comment-update-task-failed", "friend-added", "friend-deleted",
+    "comment-reaction-task-failed", "comment-update-task-failed", "defrosting", "friend-added", "friend-deleted",
     "friend-group-deleted", "mention-comment", "mention-posting", "posting-added",
     "posting-media-reaction-added-negative", "posting-media-reaction-added-positive", "posting-media-reaction-failed",
     "posting-post-task-failed", "posting-reaction-task-failed", "posting-subscribe-task-failed",
     "posting-update-task-failed", "posting-updated", "reaction-added-negative", "reaction-added-positive",
-    "remote-comment-added", "reply-comment", "sheriff-complain-added", "sheriff-complain-decided", "sheriff-marked",
+    "remote-comment-added", "reply-comment", "sheriff-complaint-added", "sheriff-complaint-decided", "sheriff-marked",
     "sheriff-unmarked", "subscriber-added", "subscriber-deleted", "unblocked-user", "unblocked-user-in-posting"
 ]
 
@@ -1607,7 +1607,7 @@ class SettingTypeModifiers(Structure):
     """(``Principal``) list of allowed principals"""
 
 
-class SheriffComplainDecisionText(Structure):
+class SheriffComplaintDecisionText(Structure):
     reject: bool
     """``True``, if the complaints in the group are to be rejected, ``False`` otherwise"""
     decision_code: SheriffOrderReason | None = None
@@ -1618,7 +1618,7 @@ class SheriffComplainDecisionText(Structure):
     """``True``, if the complaints' owners' names are not to be published, ``False`` otherwise"""
 
 
-class SheriffComplainGroupInfo(Structure):
+class SheriffComplaintGroupInfo(Structure):
     id: str
     remote_node_name: str
     """name of the node the complaints are related to"""
@@ -1654,7 +1654,7 @@ class SheriffComplainGroupInfo(Structure):
     """the group of complaints creation timestamp - the real time when the group was created"""
     moment: int
     """moment of the group of complaints"""
-    status: SheriffComplainStatus
+    status: SheriffComplaintStatus
     """status of the group of complaints"""
     decision_code: SheriffOrderReason | None = None
     """sheriff's decision"""
@@ -1666,12 +1666,12 @@ class SheriffComplainGroupInfo(Structure):
     """``True``, if the complaints' owners' names are not published, ``False`` otherwise"""
 
 
-class SheriffComplainGroupsSliceInfo(Structure):
+class SheriffComplaintGroupsSliceInfo(Structure):
     before: int
     """the slice contains all groups before this moment, inclusive. May be the far future."""
     after: int
     """the slice contains all groups after this moment, exclusive. May be the far past."""
-    groups: List[SheriffComplainGroupInfo]
+    groups: List[SheriffComplaintGroupInfo]
     """the groups"""
     total: int
     """total number of groups"""
@@ -1681,7 +1681,7 @@ class SheriffComplainGroupsSliceInfo(Structure):
     """number of groups after this slice till the far future"""
 
 
-class SheriffComplainInfo(Structure):
+class SheriffComplaintInfo(Structure):
     id: str
     owner_name: str
     """complaint owner's node name"""
@@ -1689,8 +1689,8 @@ class SheriffComplainInfo(Structure):
     """complaint owner's full name"""
     owner_gender: str | None = None
     """complaint owner's gender"""
-    group: SheriffComplainGroupInfo | None = None
-    """the group of complains this complaint belongs to"""
+    group: SheriffComplaintGroupInfo | None = None
+    """the group of complaints this complaint belongs to"""
     reason_code: SheriffOrderReason
     """reason of the complaint"""
     reason_details: str | None = None
@@ -1701,7 +1701,7 @@ class SheriffComplainInfo(Structure):
     """complaint creation timestamp - the real time when the order was created"""
 
 
-class SheriffComplainText(Structure):
+class SheriffComplaintText(Structure):
     owner_full_name: str | None = None
     """complaint owner's full name"""
     owner_gender: str | None = None
@@ -1833,7 +1833,7 @@ class SheriffOrderInfo(Structure):
     """the sheriff's signature (use ``SheriffOrder`` fingerprint)"""
     signature_version: int
     """signature version (i.e. fingerprint version)"""
-    complain_group_id: str | None = None
+    complaint_group_id: str | None = None
     """ID of the groups of complaints that were the cause of the order"""
 
 
@@ -1908,7 +1908,7 @@ class StorySummarySheriff(Structure):
     """name of the sheriff"""
     order_id: str | None = None
     """ID of the sheriff's order"""
-    complain_id: str | None = None
+    complaint_id: str | None = None
     """ID of the complaint, if any"""
 
 
@@ -2114,6 +2114,8 @@ class WhoAmI(Structure):
     """node title"""
     avatar: AvatarImage | None = None
     """node owner's avatar"""
+    frozen: bool | None = None
+    """``True`` if the node is frozen due to inactivity, ``False`` (the default) otherwise"""
 
 
 class ActivityReactionFilter(Structure):
