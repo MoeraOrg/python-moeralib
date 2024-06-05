@@ -1,10 +1,10 @@
 from typing import Any, cast, Sequence, Tuple
 
 import requests
-from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
 from . import schemas, types
+from ..pruning_validator import validate
 from ..structure import structure_or_none, structure_list
 
 MAIN_SERVER = 'https://naming.moera.org/moera-naming'

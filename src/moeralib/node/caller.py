@@ -4,11 +4,11 @@ from enum import Enum
 from typing import Any, IO, Mapping, Sequence
 
 import requests
-from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
 from . import schemas
 from .types import Result, BodyFormat, SourceFormat, Body
+from ..pruning_validator import validate
 from ..structure import Structure
 
 
