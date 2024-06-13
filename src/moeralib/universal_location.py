@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import quote, unquote, urlparse, urlunparse
 
 from .naming.naming import shorten
 
@@ -100,7 +100,7 @@ class UniversalLocation:
         """
         loc = '/@'
         if self._node_name is not None:
-            loc += self._node_name
+            loc += quote(self._node_name, safe='')
         loc += '/'
         if self._authority is not None:
             if self._scheme is not None and self._scheme.lower() != 'https':
@@ -139,7 +139,7 @@ def parse(url: str | None) -> UniversalLocation:
 
     node_name = None
     if len(dirs[0]) > 1:
-        node_name = dirs[0][1:]
+        node_name = unquote(dirs[0][1:])
 
     scheme = None
     authority = None
