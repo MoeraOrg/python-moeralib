@@ -129,11 +129,7 @@ def parse(url: str | None) -> UniversalLocation:
 
     url_parts = urlparse(url)
 
-    path = url_parts.path
-    if path.startswith('/'):
-        path = path[1:]
-    if path.endswith('/'):
-        path = path[:-1]
+    path = url_parts.path.removeprefix('/').removesuffix('/')
     if path == '':
         return UniversalLocation()
 
