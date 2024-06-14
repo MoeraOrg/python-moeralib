@@ -1,4 +1,4 @@
-from typing import Any, cast, Sequence, Tuple
+from typing import Any, cast, Sequence, Tuple, Mapping
 
 import requests
 from jsonschema.exceptions import ValidationError
@@ -22,6 +22,20 @@ class MoeraNamingError(Exception):
         :param message: error message
         """
         super().__init__(method + ': Naming server error: ' + message)
+
+
+class MoeraNamingApiError(MoeraNamingError):
+    """Naming server returned an error response."""
+    error_code: int
+    """Error code."""
+
+    def __init__(self, name: str, response: Mapping[str, Any]):
+        """
+        :param name: request name
+        :param response: server response
+        """
+        super().__init__(name, response.get('message') if response.get('message') is not None else '')
+        self.error_code = response.get('code', -1)
 
 
 class MoeraNamingConnectionError(Exception):
@@ -69,8 +83,8 @@ class MoeraNaming:
 
             response = r.json()
             if r.status_code not in [200, 201] or 'error' in response:
-                if 'error' in response and 'message' in response['error']:
-                    raise MoeraNamingError(method, response['error']['message'])
+                if 'error' in response:
+                    raise MoeraNamingApiError(method, response['error'])
                 else:
                     raise MoeraNamingError(method, 'Invalid server response: ' + repr(response))
             if 'result' not in response:
