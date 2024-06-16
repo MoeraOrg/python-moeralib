@@ -8,7 +8,7 @@ REDIRECTOR = 'moera.page'
 
 
 class UniversalLocation:
-    """Represents location part of a universal Moera URL"""
+    """Represents location part of a universal Moera URL."""
 
     _node_name: str | None
     _scheme: str
@@ -16,10 +16,10 @@ class UniversalLocation:
     _path: str | None
 
     query: str | None
-    """Query component of the URL"""
+    """Query component of the URL."""
 
     fragment: str | None
-    """Fragment identifier of the URL"""
+    """Fragment identifier of the URL."""
 
     def __init__(self, node_name: str | None = None, scheme: str | None = None, authority: str | None = None,
                  path: str | None = None, query: str | None = None, fragment: str | None = None):
@@ -28,8 +28,8 @@ class UniversalLocation:
         :param scheme: scheme specifier of the node location (``'https'``, if set to `None` or empty)
         :param authority: authority (host name and optional port) of the node location
         :param path: virtual path at the node (``'/'``, if set to `None` or empty)
-        :param query: query component of the URL
-        :param fragment: fragment identifier of the URL
+        :param query: query component of the URL (without ``?``)
+        :param fragment: fragment identifier of the URL (without ``#``)
         """
         self.node_name = node_name
         self.scheme = scheme
@@ -41,7 +41,7 @@ class UniversalLocation:
     @property
     def node_name(self) -> str | None:
         """
-        The node name
+        The node name.
         """
         return self._node_name
 
@@ -52,7 +52,7 @@ class UniversalLocation:
     @property
     def scheme(self) -> str:
         """
-        Scheme specifier of the node location
+        Scheme specifier of the node location.
         """
         return self._scheme
 
@@ -66,7 +66,7 @@ class UniversalLocation:
     @property
     def authority(self) -> str | None:
         """
-        Authority (host name and optional port) of the node location
+        Authority (host name and optional port) of the node location.
         """
         return self._authority
 
@@ -80,7 +80,7 @@ class UniversalLocation:
     @property
     def path(self) -> str | None:
         """
-        Virtual path at the node
+        Virtual path at the node.
         """
         return self._path
 
@@ -96,7 +96,7 @@ class UniversalLocation:
     @property
     def location(self) -> str:
         """
-        Universal Moera location (without query and fragment)
+        Universal Moera location (without query and fragment).
         """
         loc = '/@'
         if self._node_name is not None:
@@ -120,7 +120,8 @@ class UniversalLocation:
 
 def parse(url: str | None) -> UniversalLocation:
     """
-    Parse the location part (including query and fragment) of a universal URL
+    Parse the location part (including query and fragment) of a universal URL.
+
     :param url: the URL to be parsed
     :return: the parsed location
     """

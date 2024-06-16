@@ -1585,13 +1585,9 @@ class SettingTypeModifiers(Structure):
     format: str | None = None
     """
     preferred format of displaying the value
+    (``int``)
     
-    *
-    ``int``:
-    
-    
-    *
-    ``size`` - data size in bytes/kilobytes/megabytes etc.
+    * ``size`` - data size in bytes/kilobytes/megabytes etc.
     """
     min: str | None = None
     """(``int``, ``Duration``) minimal value"""
@@ -1959,11 +1955,11 @@ class SubscriptionDescription(Structure):
     type: SubscriptionType
     """subscription type"""
     feed_name: str | None = None
-    """feed name on this node that receives notifications"""
+    """the name of the feed on this node that receives notifications"""
     remote_node_name: str
-    """name of the node this node is subscribed to"""
+    """the name of the node this node is subscribed to"""
     remote_feed_name: str | None = None
-    """feed name on the remote node, if the subscription type requires one"""
+    """the name of the feed on the remote node, if the subscription type requires one"""
     remote_posting_id: str | None = None
     """posting ID on the remote node, if the subscription type requires one"""
     reason: SubscriptionReason | None = None
@@ -2252,7 +2248,7 @@ class CommentRevisionInfo(Structure):
     client_reaction: ClientReactionInfo | None = None
     """details of the existing reaction (if any) of the client's owner"""
     reactions: ReactionTotalsInfo | None = None
-    """reactions summary of the revision"""
+    """summary of reactions to the revision"""
 
 
 class CommentSourceText(Structure):
@@ -2406,7 +2402,7 @@ class FriendDescription(Structure):
 
 class MediaAttachment(Structure):
     media: PrivateMediaFileInfo | None = None
-    """details of the attached media, may be absent, if the media is not located on the node"""
+    """details of the attached media, may be absent if the media is not located on the node"""
     remote_media: RemoteMediaInfo | None = None
     """details of the media, if it is located on another node"""
     embedded: bool
@@ -2655,7 +2651,7 @@ class SettingDescriptor(Structure):
     modifiers: SettingTypeModifiers | None = None
     """
     additional modifiers that may help to choose a proper UI component for the setting value and to validate the input;
-    meaning of the modifiers depend on the setting type
+    the meaning of the modifiers depends on the setting type
     """
 
 
@@ -2673,7 +2669,7 @@ class SettingMetaInfo(Structure):
     modifiers: SettingTypeModifiers | None = None
     """
     additional modifiers that may help to choose a proper UI component for the setting value and to validate the input;
-    meaning of the modifiers depend on the setting type
+    the meaning of the modifiers depends on the setting type
     """
 
 
@@ -2786,7 +2782,7 @@ class CommentInfo(Structure):
     senior_reaction: ClientReactionInfo | None = None
     """details of the existing reaction (if any) of the posting's owner ("senior") to the comment"""
     reactions: ReactionTotalsInfo | None = None
-    """reactions summary of the comment"""
+    """summary of reactions to the comment"""
 
 
 class CommentsSliceInfo(Structure):
@@ -2869,7 +2865,7 @@ class PluginDescription(Structure):
     title: str | None = None
     """user-readable title of the plugin"""
     description: str | None = None
-    """user-readable description of purpose of the plugin"""
+    """user-readable description of the purpose of the plugin"""
     location: str | None = None
     """URL of the plugin; used by the node to call the plugin API"""
     accepted_events: List[str] | None = None
@@ -2893,7 +2889,7 @@ class PluginInfo(Structure):
     title: str | None = None
     """user-readable title of the plugin"""
     description: str | None = None
-    """user-readable description of purpose of the plugin"""
+    """user-readable description of the purpose of the plugin"""
     location: str | None = None
     """URL of the plugin; used by the node to call the plugin API"""
     accepted_events: List[str] | None = None
@@ -2926,7 +2922,7 @@ class StoryInfo(Structure):
     satisfied: bool | None = None
     """
     if the story is associated with a user action (for example, it contains a form that should be submitted), this flag
-    is set to ``True``, if the action is done already, and ``False`` otherwise
+    is set to ``True`` if the action is done already, and ``False`` otherwise
     """
     summary_node_name: str | None = None
     """name of the node related to the summary of the story"""

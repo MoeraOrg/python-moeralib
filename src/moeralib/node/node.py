@@ -30,7 +30,7 @@ class MoeraNode(Caller):
 
     def get_remote_posting_verification_status(self, id: str) -> types.RemotePostingVerificationInfo:
         """
-        Get status of the asynchronous operation that performs verification of a remote posting signature.
+        Get the status of the asynchronous operation that performs verification of a remote posting signature.
 
         :param id: asynchronous operation ID
         """
@@ -43,8 +43,8 @@ class MoeraNode(Caller):
 
     def get_remote_reaction_verification_status(self, id: str) -> types.RemoteReactionVerificationInfo:
         """
-        Get status of the asynchronous operation that performs verification of the signature of a reaction to a remote
-        posting.
+        Get the status of the asynchronous operation that performs verification of the signature of a reaction to a
+        remote posting.
 
         :param id: asynchronous operation ID
         """
@@ -65,9 +65,9 @@ class MoeraNode(Caller):
 
     def create_avatar(self, avatar: types.AvatarAttributes) -> types.AvatarInfo:
         """
-        Create a new avatar from a public media file that exists on the node. New public media file is created for the
-        avatar. If avatar's ordinal is not provided in the input, the avatar is assigned an ordinal that is greater
-        than ordinals of all existing avatars.
+        Create a new avatar from a public media file that exists on the node. A new public media file is created for
+        the avatar. If the avatar's ordinal is not provided in the input, the avatar is assigned an ordinal that is
+        greater than ordinals of all existing avatars.
 
         :param avatar:
         """
@@ -220,7 +220,7 @@ class MoeraNode(Caller):
 
     def search_blocked_by_users(self, filter: types.BlockedByUserFilter) -> List[types.BlockedByUserInfo]:
         """
-        Search nodes, that blocked this node, by the given criteria.
+        Search nodes that blocked this node, by the given criteria.
 
         :param filter:
         """
@@ -234,7 +234,7 @@ class MoeraNode(Caller):
     def get_cartes(self, limit: int | None = None) -> types.CarteSet:
         """
         Get a set of cartes that correspond to successive periods of time. Two sequences of cartes are returned: one
-        with all permissions and another with `view-media` permission only. The node may decide to return less cartes
+        with all permissions and another with `view-media` permission only. The node may decide to return fewer cartes
         than the given ``limit``.
 
         :param limit: maximum number of sequential cartes returned
@@ -250,7 +250,7 @@ class MoeraNode(Caller):
         """
         Get a slice of the list of comments, delimited by ``before`` or ``after`` moments (but not both) and the given
         ``limit``. If neither ``before`` nor ``after`` are provided, the latest comments are returned. The node may
-        decide to return less comments than the given ``limit``. The stories are always sorted by moment, ascending.
+        decide to return fewer comments than the given ``limit``. The stories are always sorted by moment, ascending.
 
         :param posting_id: ID of the posting
         :param after: filter comments posted strongly after this moment
@@ -269,7 +269,7 @@ class MoeraNode(Caller):
         """
         Create a comment from the given text and add it to the given posting. The comment owner must authenticate in
         some way. If the comment is not signed, it will be kept for a limited period of time and then erased. If
-        authenticated as admin, the comment is signed by the node.
+        authenticated as admin, the node signs the comment.
 
         :param posting_id: ID of the posting
         :param comment:
@@ -436,7 +436,7 @@ class MoeraNode(Caller):
         """
         Get a slice of the list of reactions to the given comment, optionally filtered by reaction type, delimited by
         ``before`` moment and the given ``limit``. If ``before`` is not provided, the latest reactions are returned.
-        The node may decide to return less reactions than the given ``limit``. The reactions are always sorted by
+        The node may decide to return fewer reactions than the given ``limit``. The reactions are always sorted by
         moment, descending.
 
         :param posting_id: ID of the posting
@@ -459,7 +459,7 @@ class MoeraNode(Caller):
     def get_comment_reaction(self, posting_id: str, comment_id: str, owner_name: str) -> types.ReactionInfo:
         """
         Get the detailed information about the reaction of the given owner to the given comment. If no reaction with
-        such owner exist, an empty structure with just ``commentId`` is returned.
+        such an owner exists, an empty structure with just ``commentId`` is returned.
 
         :param posting_id: ID of the posting
         :param comment_id: ID of the comment
@@ -502,7 +502,7 @@ class MoeraNode(Caller):
 
     def get_comment_reaction_totals(self, posting_id: str, comment_id: str) -> types.ReactionTotalsInfo:
         """
-        Get summary of reactions to the comment given.
+        Get a summary of reactions to the comment given.
 
         :param posting_id: ID of the posting
         :param comment_id: ID of the comment
@@ -517,11 +517,11 @@ class MoeraNode(Caller):
 
     def get_contacts(self, query: str | None = None, limit: int | None = None) -> List[types.ContactInfo]:
         """
-        Search for contacts matching the search ``query``. Every space-delimited word in the query must
-        case-insensitively match a beginning of the contact's node name or a beginning of any space-delimited word in
-        the contact's full name. The order of words is not significant.
+        Search for contacts matching the search ``query``. Every space-delimited word in the query must match
+        case-insensitively a beginning of the contact's node name or a beginning of any space-delimited word in the
+        contact's full name. The order of words is not significant.
         
-        The node may decide to return less contacts than the given ``limit``.
+        The node may decide to return fewer contacts than the given ``limit``.
         
         The contacts are sorted by their *closeness* to the node, which is calculated from the number of reactions and
         comments and their age.
@@ -548,7 +548,7 @@ class MoeraNode(Caller):
 
     def create_credentials(self, credentials: types.Credentials) -> types.Result:
         """
-        Initialize credentials, if they are not set yet. Note that this operation can be executed without
+        Initialize credentials if they are not set yet. Note that this operation can be executed without
         authentication, so this should be done as soon as possible after the node installation. Sign in is not allowed
         until the credentials are set.
 
@@ -585,8 +585,8 @@ class MoeraNode(Caller):
     def reset_credentials(self) -> types.EmailHint:
         """
         The node generates credentials reset token that is sent to the node admin by E-mail or using any other way that
-        is defined for credentials recovery. This token then may be used to change the credentials without knowing the
-        password.
+        is defined for recovery of credentials. This token then may be used to change the credentials without knowing
+        the password.
         """
         location = "/credentials/reset"
         data = self.call("reset_credentials", location, method="POST", auth=False, schema=schemas.EMAIL_HINT_SCHEMA)
@@ -594,7 +594,7 @@ class MoeraNode(Caller):
 
     def get_deleted_postings(self, page: int | None = None, limit: int | None = None) -> List[types.PostingInfo]:
         """
-        Get the list of deleted postings, page by page. The node may decide to use smaller page size than the given
+        Get the list of deleted postings, page by page. The node may decide to use a smaller page size than the given
         ``limit``. The postings are always sorted by the deletion timestamp, descending.
 
         :param page: page number, 0 by default
@@ -636,7 +636,7 @@ class MoeraNode(Caller):
         self, posting_id: str, limit: int | None = None
     ) -> List[types.PostingRevisionInfo]:
         """
-        Get all revisions of the deleted posting, but not more than ``limit``. The node may decide to return less
+        Get all revisions of the deleted posting, but not more than ``limit``. The node may decide to return fewer
         revisions than the given ``limit``.
 
         :param posting_id: ID of the posting
@@ -740,9 +740,9 @@ class MoeraNode(Caller):
 
     def is_domain_available(self, node_name: str) -> types.DomainAvailable:
         """
-        Get an available domain name that is recommended for the given node name. The domain name is usually chosen to
-        be close to the node name in English transcription. If domain registration for this server is not public, this
-        request is not accessible.
+        Get an available domain name recommended for the given node name. The domain name is usually chosen to be close
+        to the node name in English transcription. If domain registration for this server is not public, this request
+        is not accessible.
 
         :param node_name: node name
         """
@@ -759,7 +759,7 @@ class MoeraNode(Caller):
         page: int | None = None, limit: int | None = None
     ) -> List[types.DraftInfo]:
         """
-        Get the list of drafts, page by page, filtered by the given criteria. The node may decide to use smaller page
+        Get the list of drafts, page by page, filtered by the given criteria. The node may decide to use a smaller page
         size than the given ``limit``. The drafts are always sorted by the creation timestamp, descending.
 
         :param draft_type: type of the drafts
@@ -854,7 +854,7 @@ class MoeraNode(Caller):
 
     def get_feed_status(self, feed_name: str) -> types.FeedStatus:
         """
-        Get information about total number and number of non-read and non-viewed stories in the feed.
+        Get information about the total number and number of non-read and non-viewed stories in the feed.
 
         :param feed_name: name of the feed
         """
@@ -879,7 +879,7 @@ class MoeraNode(Caller):
         """
         Get a slice of the feed, delimited by ``before`` or ``after`` moments (but not both) and the given ``limit``.
         If neither ``before`` nor ``after`` are provided, the latest stories are returned. The node may decide to
-        return less stories than the given ``limit``. The stories are always sorted by moment, descending.
+        return fewer stories than the given ``limit``. The stories are always sorted by moment, descending.
 
         :param feed_name: name of the feed
         :param after: filter stories posted strongly after this moment
@@ -969,9 +969,9 @@ class MoeraNode(Caller):
 
     def update_friends(self, friends: List[types.FriendDescription]) -> List[types.FriendInfo]:
         """
-        Update the friendship status of the nodes passed in the input. If some of the nodes passed in the input is not
-        a member of some of the groups of friends listed for it, the node is added to them. If it is a member of some
-        of the groups of friends that are not listed for it, the node is removed from them.
+        Update the friendship status of the nodes passed in the input. If some node passed in the input is not a member
+        of some of the groups of friends listed for it, the node is added to them. If it is a member of some groups of
+        friends that are not listed for it, the node is removed from them.
 
         :param friends:
         """
@@ -1054,7 +1054,7 @@ class MoeraNode(Caller):
 
     def upload_public_media(self, file: IO, file_type: str) -> types.PublicMediaFileInfo:
         """
-        Upload a new media file. Content of the file is passed in the request body
+        Upload a new media file. The content of the file is passed in the request body
 
         :param file:
         :param file_type: content-type of ``file``
@@ -1094,8 +1094,7 @@ class MoeraNode(Caller):
 
     def get_node_name(self) -> types.NodeNameInfo:
         """
-        Get the name of the node. Admin user receives also the current status of the latest operation with the node
-        name.
+        Get the name of the node. Admin user receives the current status of the latest operation with the node name.
         """
         location = "/node-name"
         data = self.call("get_node_name", location, method="GET", schema=schemas.NODE_NAME_INFO_SCHEMA)
@@ -1105,8 +1104,8 @@ class MoeraNode(Caller):
         """
         Register a new name for the node. The corresponding signing key is generated automatically and stored at the
         node. The updating key is generated and returned in the encoded form and in the form of mnemonic (a sequence of
-        English words) that need to be written down and stored securely to be able to perform further operations with
-        the name.
+        English words). The words need to be written down and stored securely to be able to perform further operations
+        with the name.
 
         :param name_to_register:
         """
@@ -1140,7 +1139,7 @@ class MoeraNode(Caller):
 
     def send_notification(self, packet: types.NotificationPacket) -> types.Result:
         """
-        Accept a notification packet from other node. Notification packets older than 10 minutes are ignored. The
+        Accept a notification packet from another node. Notification packets older than 10 minutes are ignored. The
         sending node should update the packet timestamp and the signature and send the packet again. This mechanism
         prevents attackers from recording and resending old signed packets.
 
@@ -1204,7 +1203,7 @@ class MoeraNode(Caller):
         Create a new posting from the text given and publish it in the given feeds (if any). The heading and the
         preview of the posting are created automatically, if needed. The posting owner must authenticate in some way.
         If the posting is not signed, it will be kept for a limited period of time and then erased. If authenticated as
-        admin, the posting is signed by the node.
+        admin, the node signs the posting.
 
         :param posting:
         """
@@ -1270,7 +1269,7 @@ class MoeraNode(Caller):
 
     def get_posting_revisions(self, posting_id: str, limit: int | None = None) -> List[types.PostingRevisionInfo]:
         """
-        Get all revisions of the posting, but not more than ``limit``. The node may decide to return less revisions
+        Get all revisions of the posting, but not more than ``limit``. The node may decide to return fewer revisions
         than the given ``limit``.
 
         :param posting_id: ID of the posting
@@ -1374,7 +1373,7 @@ class MoeraNode(Caller):
     def get_posting_reaction(self, posting_id: str, owner_name: str) -> types.ReactionInfo:
         """
         Get the detailed information about the reaction of the given owner to the given posting. If no reaction with
-        such owner exist, an empty structure with just ``postingId`` is returned.
+        such an owner exists, an empty structure with just ``postingId`` is returned.
 
         :param posting_id: ID of the posting
         :param owner_name: reaction owner node name
@@ -1425,7 +1424,7 @@ class MoeraNode(Caller):
 
     def get_posting_reaction_totals(self, posting_id: str) -> types.ReactionTotalsInfo:
         """
-        Get summary of reactions to the posting given.
+        Get a summary of reactions to the posting given.
 
         :param posting_id: ID of the posting
         """
@@ -1832,8 +1831,8 @@ class MoeraNode(Caller):
     def update_settings(self, settings: List[types.SettingInfo]) -> types.Result:
         """
         Update the given settings. If the input contains node settings, they are validated and the first validation
-        error is returned, if any. The update is always performed as whole - if there is an error saving any one of the
-        settings in the input, none of them are updated.
+        error is returned, if any. The update is always performed as a whole - if there is an error saving any one of
+        the settings in the input, none of them are updated.
         
         If one of the settings to be updated is privileged, *root secret* authentication is required. If one of the
         settings to be updated is non-privileged, *admin* authentication is required.
@@ -1902,7 +1901,7 @@ class MoeraNode(Caller):
         status: types.SheriffComplaintStatus | None = None
     ) -> types.SheriffComplaintGroupsSliceInfo:
         """
-        Get a slice of the list of groups of complaints, optionally filtered by status, delimited by ``before`` or
+        Get a slice of the list of groups of complaints, optionally filtered by status, delimited by the ``before`` or
         ``after`` moment and the given ``limit``. If neither ``before`` nor ``after`` are provided, the latest groups
         are returned. The node may decide to return less groups than the given ``limit``. The groups are always sorted
         by moment, descending.
@@ -1935,7 +1934,7 @@ class MoeraNode(Caller):
 
     def get_sheriff_complaints_by_group(self, id: str) -> List[types.SheriffComplaintInfo]:
         """
-        Get complaints included into the given group of complaints.
+        Get complaints included in the given group of complaints.
 
         :param id: ID of the group of complaints
         """
@@ -1950,7 +1949,7 @@ class MoeraNode(Caller):
         self, id: str, decision: types.SheriffComplaintDecisionText
     ) -> types.SheriffComplaintGroupInfo:
         """
-        Make decision on the given group of complaints.
+        Make a decision on the given group of complaints.
 
         :param id: ID of the group of complaints
         :param decision:
@@ -2205,9 +2204,9 @@ class MoeraNode(Caller):
         self, name: str, after: int | None = None, before: int | None = None, limit: int | None = None
     ) -> types.UserListSliceInfo:
         """
-        Get a slice of the user list, delimited by ``before`` or ``after`` moment and the given ``limit``. If neither
-        ``before`` nor ``after`` are provided, the latest items are returned. The node may decide to return less items
-        than the given ``limit``. The items are always sorted by moment, descending.
+        Get a slice of the user list, delimited by the ``before`` or ``after`` moment and the given ``limit``. If
+        neither ``before`` nor ``after`` are provided, the latest items are returned. The node may decide to return
+        fewer items than the given ``limit``. The items are always sorted by moment, descending.
 
         :param name: the name of the list
         :param after: filter items created strongly after this moment

@@ -175,7 +175,7 @@ class Caller:
 
         :param name: request name (for error messages)
         :param location: request path
-        :param params: query parameters, mapping name to value, None values are skipped
+        :param params: query parameters, mapping name to value, ``None`` values are skipped
         :param method: request method (one of 'GET', 'POST', 'PUT', 'DELETE')
         :param body: request body
         :param body_file: file to read the request body from

@@ -22,7 +22,6 @@ class MoeraCarteSource(CarteSource):
 
     def __init__(self, node: MoeraNode):
         """
-
         :param node: node to get cartes from
         """
         self._node = node

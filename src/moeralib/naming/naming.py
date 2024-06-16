@@ -31,7 +31,7 @@ class MoeraNamingApiError(MoeraNamingError):
 
     def __init__(self, name: str, response: Mapping[str, Any]):
         """
-        :param name: request name
+        :param method: API method name
         :param response: server response
         """
         super().__init__(name, response.get('message') if response.get('message') is not None else '')
@@ -110,17 +110,17 @@ class MoeraNaming:
 
         :param name: the name to be registered/updated
         :param generation: the name generation to be registered/updated
-        :param updating_key: the public key for verifying signatures of further updates of the name. May be ``None``,
+        :param updating_key: the public key for verifying signatures of further updates of the name. May be ``None``
             if the current generation of the name is updated – the current key is preserved in this case.
         :param node_uri: URI of the REST API endpoint of the node to which the name is assigned. May be ``None`` -
             the current URI is preserved in this case.
         :param signing_key: the public key of the name owner. May be ``None`` – the current key is preserved in this
             case.
-        :param valid_from: the moment in time the owner's key is valid from. May be ``None``, if ``signing_key`` is also
+        :param valid_from: the moment in time the owner's key is valid from. May be ``None`` if ``signing_key`` is also
             ``None``.
         :param previous_digest: the unique identifier as reported by a naming server of the current state of the name.
             Used to detect the situations when the name was changed by someone else between sending the request and
-            processing it. May be ``None``, if the name was never registered before.
+            processing it. May be ``None`` if the name was never registered before.
         :param signature: the signature, if required, ``None`` otherwise
         :return: identifier of the operation that was created
         """
@@ -129,7 +129,7 @@ class MoeraNaming:
 
     def get_status(self, operation_id: str) -> types.OperationStatusInfo | None:
         """
-        Get current status of the operation.
+        Get the current status of the operation.
 
         :param operation_id:
         :return: the operation status or ``None``, if the operation ID is unknown
