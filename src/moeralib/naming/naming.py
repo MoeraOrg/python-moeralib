@@ -1,3 +1,4 @@
+from base64 import b64encode
 from typing import Any, cast, Sequence, Tuple, Mapping
 
 import requests
@@ -101,9 +102,9 @@ class MoeraNaming:
         except ValidationError as e:
             raise MoeraNamingError(method, 'Invalid server response: ' + repr(e)) from e
 
-    def put(self, name: str, generation: int, updating_key: str | None = None, node_uri: str | None = None,
-            signing_key: str | None = None, valid_from: types.Timestamp | None = None,
-            previous_digest: str | None = None, signature: str | None = None) -> str:
+    def put(self, name: str, generation: int, updating_key: bytes | None = None, node_uri: str | None = None,
+            signing_key: bytes | None = None, valid_from: types.Timestamp | None = None,
+            previous_digest: bytes | None = None, signature: bytes | None = None) -> str:
         """
         Register or update the name. See Architecture Overview for the `detailed description
         <https://moera.org/overview/naming.html>`_ of the algorithm.
@@ -124,8 +125,9 @@ class MoeraNaming:
         :param signature: the signature, if required, ``None`` otherwise
         :return: identifier of the operation that was created
         """
-        return cast(str, self.call('put', [name, generation, updating_key, node_uri, signing_key, valid_from,
-                                           previous_digest, signature]))
+        return cast(str, self.call('put', [name, generation, _encode_bytes(updating_key), node_uri,
+                                           _encode_bytes(signing_key), valid_from, _encode_bytes(previous_digest),
+                                           _encode_bytes(signature)]))
 
     def get_status(self, operation_id: str) -> types.OperationStatusInfo | None:
         """
@@ -214,6 +216,10 @@ class MoeraNaming:
         """
         return structure_list(self.call('getAllNewer', [at, page, size], schemas.REGISTERED_NAME_INFO_ARRAY_SCHEMA),
                               types.RegisteredNameInfo)
+
+
+def _encode_bytes(b: bytes | None) -> str | None:
+    return b64encode(b).decode() if b is not None else None
 
 
 def node_name_parse(node_name: str) -> Tuple[str, int]:
