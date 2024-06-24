@@ -1,6 +1,6 @@
-from typing import List, Union, Optional, Tuple, Any, Literal, Mapping
+from typing import List, Union, Optional, Tuple, Any, Literal, Mapping, cast
 
-FingerprintPrimitiveType = Union[Literal['string', 'boolean', 'number'] | 'FingerprintSchema']
+FingerprintPrimitiveType = Union[Literal['string', 'boolean', 'number', 'bytes', 'bytes[]'] | 'FingerprintSchema']
 FingerprintSchema = List[Tuple[str, FingerprintPrimitiveType]]
 Fingerprint = Mapping[str, Any]
 
@@ -48,11 +48,19 @@ class FingerprintWriter:
         for field in schema:
             self.append(fingerprint[field[0]], field[1])
 
+    def _append_list(self, list: List[Any], type: FingerprintPrimitiveType) -> None:
+        writer = FingerprintWriter()
+        for value in list:
+            writer.append(value, type)
+        self._append_bytes(writer.to_bytes())
+
     def append(self, value: Any, type: FingerprintPrimitiveType) -> None:
         if value is None:
             self._append_null()
         elif isinstance(type, list):
             self._append_fingerprint(value, type)
+        elif type.endswith('[]'):
+            self._append_list(value, cast(FingerprintPrimitiveType, type.removesuffix('[]')))
         elif type == 'string':
             self._append_string(value)
         elif type == 'boolean':

@@ -598,10 +598,95 @@ def generate_types(api: Any, outdir: str) -> None:
         generate_calls(api, structs, afile)
 
 
-if len(sys.argv) < 2 or sys.argv[1] == '':
-    print("Usage: py-moera-api <node_api.yml file path> <output directory>")
+FP_TYPES = {
+    'String': 'string',
+    'InetAddress': 'string',
+    'int': 'number',
+    'timestamp': 'number',
+    'byte': 'number',
+    'byte[]': 'bytes',
+    'boolean': 'boolean'
+}
+
+
+def generate_fingerprint_schema(schema: Any, name: str, version: int, ffile: TextIO) -> None:
+    ffile.write(f'\n\n{to_snake(name).upper()}_FINGERPRINT{version}_SCHEMA: FingerprintSchema = [\n')
+    ffile.write(f"{ind(1)}('version', 'number'),\n")
+    for field in schema['fingerprint']:
+        if 'type' in field:
+            field_type = FP_TYPES[field['type']]
+        else:
+            field_type = 'bytes'
+        if field.get('array', False):
+            field_type += '[]'
+        field_name = to_snake(field['field'])
+        ffile.write(f"{ind(1)}('{field_name}', '{field_type}'),\n")
+    ffile.write(']\n\n\n')
+
+
+PY_FP_TYPES = {
+    'String': 'str',
+    'InetAddress': 'str',
+    'int': 'int',
+    'timestamp': 'Timestamp',
+    'byte': 'int',
+    'byte[]': 'bytes',
+    'boolean': 'bool'
+}
+
+
+def generate_fingerprint_function(schema: Any, name: str, version: int, ffile: TextIO) -> None:
+    params = []
+    object_type = ''
+    for field in schema['fingerprint']:
+        field_name = to_snake(field['field'])
+        if field_name != 'object_type':
+            if 'type' in field:
+                field_type = PY_FP_TYPES[field['type']]
+            else:
+                field_type = 'bytes'
+            if field.get('array', False):
+                field_type = f'List[{field_type}]'
+            params.append(f'{field_name}: {field_type} | None')
+        else:
+            value = field['comment'].removeprefix('<code>').removesuffix('</code>')
+            object_type = f", 'object_type': '{value}'"
+    ffile.write(params_wrap(f'def create_{to_snake(name)}_fingerprint{version}(%s) -> bytes:\n', ', '.join(params), 1))
+    schema_name = to_snake(name).upper()
+    call_params = f"{{'version': {version}{object_type}}} | locals(), {schema_name}_FINGERPRINT{version}_SCHEMA"
+    ffile.write(params_wrap(f'{ind(1)}return fingerprint_bytes(%s)\n', call_params, 2))
+
+
+def generate_fingerprint(schema: Any, name: str, version: int, ffile: TextIO) -> None:
+    generate_fingerprint_schema(schema, name, version, ffile)
+    generate_fingerprint_function(schema, name, version, ffile)
+
+
+PREAMBLE_FINGERPRINTS = '''# This file is generated
+
+from typing import List
+
+from ..crypto.crypto import fingerprint_bytes
+from ..crypto.fingerprint import FingerprintSchema
+from .types import Timestamp'''
+
+
+def generate_fingerprints(fp: Any, outdir: str) -> None:
+    with open(outdir + '/fingerprints.py', 'w+') as ffile:
+        ffile.write(PREAMBLE_FINGERPRINTS)
+        for object in fp['objects']:
+            name = object['name']
+            for schema in object['versions']:
+                version = schema['version']
+                generate_fingerprint(schema, name, version, ffile)
+
+
+if len(sys.argv) < 3 or sys.argv[1] == '':
+    print("Usage: py-moera-api <node_api.yml file path> <node_api_fingerprints.yml file path> <output directory>")
     exit(1)
 
 api = read_api(sys.argv[1])
-outdir = sys.argv[2] if len(sys.argv) >= 3 else '.'
+fp = read_api(sys.argv[2])
+outdir = sys.argv[3] if len(sys.argv) >= 4 else '.'
 generate_types(api, outdir)
+generate_fingerprints(fp, outdir)
