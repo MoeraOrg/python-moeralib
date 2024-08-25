@@ -51,6 +51,20 @@ def raw_public_key(public_key: ec.EllipticCurvePublicKey) -> bytes:
     return numbers.x.to_bytes(32, 'big') + numbers.y.to_bytes(32, 'big')
 
 
+def raw_private_key(private_key: ec.EllipticCurvePrivateKey) -> bytes:
+    """
+    Convert a private key to the raw format to pass to the client.
+
+    :param private_key: the private key
+    :return: the raw private key
+    """
+    return private_key.private_numbers().private_value.to_bytes(32, 'big')
+
+
+def raw_to_private_key(raw_private_key: bytes) -> ec.EllipticCurvePrivateKey:
+    return ec.derive_private_key(int.from_bytes(raw_private_key, 'big'), ec.SECP256K1())
+
+
 def fingerprint_bytes(fingerprint: Fingerprint, schema: FingerprintSchema) -> bytes:
     """
     Encode a fingerprint in the binary form, using the given fingerprint data and schema.

@@ -88,6 +88,11 @@ def generate_enum(enum: Any, tfile: TextIO) -> None:
     values = ", ".join(f'"{item["name"]}"' for item in enum['values'])
     line = params_wrap(f'\n{enum["name"]} = Literal[%s]\n', values, 1)
     tfile.write(line)
+    if any('value' in item for item in enum['values']):
+        tfile.write(f'\n{to_snake(enum["name"]).upper()}_VALUES: Mapping[{enum["name"]}, int] = {{\n')
+        for item in enum['values']:
+            tfile.write(f'{ind(1)}"{item["name"]}": {item["value"]},\n')
+        tfile.write('}\n')
 
 
 def schema_type(sfile: TextIO, indent: int, a_type: str, struct: bool = False, nullable: bool = False,

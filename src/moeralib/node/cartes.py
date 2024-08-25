@@ -1,9 +1,15 @@
+import os
+from base64 import urlsafe_b64encode
 from time import time
 from typing import List
 
+from cryptography.hazmat.primitives.asymmetric import ec
+
 from .caller import CarteSource
+from .fingerprints import create_carte_fingerprint2
 from .node import MoeraNode
-from .types import CarteInfo, CarteAttributes, Scope
+from .types import CarteInfo, CarteAttributes, Scope, Timestamp, SCOPE_VALUES
+from ..crypto import sign_fingerprint
 
 
 class MoeraCartesError(Exception):
@@ -55,3 +61,23 @@ class MoeraCarteSource(CarteSource):
                 if c.beginning <= now:
                     return c.carte
             raise MoeraCartesError("Could not obtain a carte valid for now")
+
+
+def to_scope_mask(scope: List[Scope]) -> int:
+    mask = 0
+    for sc in scope:
+        mask |= SCOPE_VALUES[sc]
+    return mask
+
+
+def generate_carte(owner_name: str | None, signing_key: ec.EllipticCurvePrivateKey, beginning: Timestamp | None,
+                   address: str | None = None, ttl: int = 600, node_name: str | None = None,
+                   client_scope: List[Scope] | int = SCOPE_VALUES["all"], admin_scope: List[Scope] | int = 0) -> str:
+    if isinstance(client_scope, list):
+        client_scope = to_scope_mask(client_scope)
+    if isinstance(admin_scope, list):
+        client_scope = to_scope_mask(admin_scope)
+    fingerprint = create_carte_fingerprint2(owner_name, address, beginning, beginning + ttl, node_name, client_scope,
+                                            admin_scope, os.urandom(8))
+    signature = sign_fingerprint(fingerprint, signing_key)
+    return urlsafe_b64encode(fingerprint + signature).decode('ascii')
