@@ -28,6 +28,14 @@ PushContentType = Literal["story-added", "story-deleted", "feed-updated"]
 
 PushRelayType = Literal["fcm"]
 
+Scope = Literal[
+    "none", "identify", "other", "view-media", "view-content", "add-post", "update-post", "add-comment",
+    "update-comment", "react", "delete-own-content", "delete-others-content", "view-people", "block", "friend",
+    "remote-identify", "drafts", "view-feeds", "update-feeds", "name", "plugins", "view-profile", "update-profile",
+    "sheriff", "view-settings", "update-settings", "subscribe", "tokens", "user-lists", "grant", "upload-public-media",
+    "upload-private-media", "view-all", "all"
+]
+
 SettingType = Literal[
     "bool", "int", "string", "json", "Duration", "PrivateKey", "PublicKey", "Timestamp", "UUID", "Principal"
 ]
@@ -793,18 +801,36 @@ class BlockedUsersChecksums(Structure):
     """checksum of the list of users that are hidden"""
 
 
+class CarteAttributes(Structure):
+    client_scope: List[Scope] | None = None
+    """permissions to be granted to the carte; if not set, all permissions of the carte's owner are granted"""
+    admin_scope: List[Scope] | None = None
+    """
+    additional administrative permissions (of those granted to the carte's owner by the target node) to be granted to
+    the carte
+    """
+    node_name: str | None = None
+    """if set, the carte is valid for authentication on the specified node only"""
+    limit: int | None = None
+    """
+    maximum number of sequential cartes to be returned; the node may decide to return fewer cartes than the given limit
+    """
+
+
 class CarteInfo(Structure):
     carte: str
     beginning: Timestamp
     """timestamp of the beginning of the carte's life"""
     deadline: Timestamp
     """timestamp of the end of the carte's life"""
-    permissions: List[str] | None = None
+    node_name: str | None = None
+    """if set, the carte is valid for authentication on the specified node only"""
+    client_scope: List[Scope] | None = None
+    """the list of permissions granted to the carte"""
+    admin_scope: List[Scope] | None = None
     """
-    the list of permissions granted to the carte; the possible values are:
-    
-    * ``other`` - any other permission not listed below;
-    * ``view-media`` - view media files.
+    the list of additional administrative permissions (of those granted to the carte's owner by the target node)
+    granted to the carte
     """
 
 
@@ -815,6 +841,31 @@ class CarteSet(Structure):
     """the cartes"""
     created_at: Timestamp
     """cartes creation timestamp"""
+
+
+class CarteVerificationInfo(Structure):
+    valid: bool
+    """``True``, if the carte can be accepted for authentication, ``False`` otherwise"""
+    client_name: str | None = None
+    """name of the node the carte authenticates"""
+    client_scope: List[Scope] | None = None
+    """the list of permissions granted to the carte"""
+    admin_scope: List[Scope] | None = None
+    """
+    the list of additional administrative permissions (of those granted to the carte's owner by the target node)
+    granted to the carte
+    """
+    error_code: str | None = None
+    """error code"""
+    error_message: str | None = None
+    """human-readable error message"""
+
+
+class ClientCarte(Structure):
+    client_name: str | None = None
+    """the node name the client (carte owner) wants to authenticate under"""
+    carte: str
+    """the carte to verify"""
 
 
 class ClientReactionInfo(Structure):
@@ -1044,6 +1095,20 @@ class FundraiserInfo(Structure):
     """arbitrary text to be displayed"""
     href: str | None = None
     """link to the fundraiser"""
+
+
+class GrantChange(Structure):
+    scope: List[Scope]
+    """a set of permissions to be granted or revoked"""
+    revoke: bool
+    """``True`` if the permissions must be revoked, ``False`` if the permissions must be granted"""
+
+
+class GrantInfo(Structure):
+    node_name: str
+    """name of the node the permissions are granted to"""
+    scope: List[Scope]
+    """the set of administrative permissions granted to the node"""
 
 
 class LinkPreview(Structure):
@@ -2008,13 +2073,10 @@ class SubscriptionOverride(Structure):
 class TokenAttributes(Structure):
     login: str
     password: str
-    auth_category: int | None = None
+    permissions: List[Scope] | None = None
     """
-    A bit mask describing which permissions should be granted to the token. If not set, all permissions of the
-    administrator are granted. The bits have the following meaning:
-    
-    * ``other (0x0001)`` - any other permission not listed below;
-    * ``view-media (0x0002)`` - view media files.
+    a bit mask describing which permissions should be granted to the token; if not set, all permissions of the
+    administrator are granted.
     """
     name: str | None = None
     """a user-readable name of the token"""
@@ -2027,13 +2089,8 @@ class TokenInfo(Structure):
     """the token"""
     name: str | None = None
     """a user-readable name of the token"""
-    permissions: List[str] | None = None
-    """
-    The list of permissions granted to the token. The values are:
-    
-    * ``other`` - any other permission not listed below;
-    * ``view-media`` - view media files.
-    """
+    permissions: List[Scope] | None = None
+    """the list of permissions granted to the token"""
     plugin_name: str | None = None
     """a plugin the token belongs to; if set, only this plugin may use the token"""
     created_at: Timestamp
@@ -2048,9 +2105,14 @@ class TokenInfo(Structure):
     """IP address of the latest user of the token"""
 
 
-class TokenName(Structure):
+class TokenUpdate(Structure):
     name: str | None = None
     """a user-readable name of the token"""
+    permissions: List[Scope] | None = None
+    """
+    a bit mask describing which permissions should be granted to the token; if not set, the token permissions are left
+    untouched
+    """
 
 
 class UpdateInfo(Structure):

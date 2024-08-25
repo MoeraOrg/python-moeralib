@@ -473,7 +473,16 @@ CARTE_INFO_SCHEMA: Any = {
         "deadline": {
             "type": "integer"
         },
-        "permissions": {
+        "nodeName": {
+            "type": ["string", "null"]
+        },
+        "clientScope": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "adminScope": {
             "type": ["array", "null"],
             "items": {
                 "type": "string"
@@ -505,6 +514,40 @@ CARTE_SET_SCHEMA: Any = {
     "required": [
         "cartes",
         "createdAt",
+    ],
+    "additionalProperties": False
+}
+
+CARTE_VERIFICATION_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "valid": {
+            "type": "boolean"
+        },
+        "clientName": {
+            "type": ["string", "null"]
+        },
+        "clientScope": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "adminScope": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "errorCode": {
+            "type": ["string", "null"]
+        },
+        "errorMessage": {
+            "type": ["string", "null"]
+        },
+    },
+    "required": [
+        "valid",
     ],
     "additionalProperties": False
 }
@@ -873,6 +916,28 @@ FUNDRAISER_INFO_SCHEMA: Any = {
     ],
     "additionalProperties": False
 }
+
+GRANT_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "nodeName": {
+            "type": "string"
+        },
+        "scope": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+    },
+    "required": [
+        "nodeName",
+        "scope",
+    ],
+    "additionalProperties": False
+}
+
+GRANT_INFO_ARRAY_SCHEMA = array_schema(GRANT_INFO_SCHEMA)
 
 LINK_PREVIEW_SCHEMA: Any = {
     "type": "object",

@@ -17,6 +17,27 @@ def create_attachment_fingerprint0(digest: bytes | None) -> bytes:
     return fingerprint_bytes({'version': 0, 'object_type': 'ATTACHMENT'} | locals(), ATTACHMENT_FINGERPRINT0_SCHEMA)
 
 
+CARTE_FINGERPRINT2_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('owner_name', 'string'),
+    ('address', 'string'),
+    ('beginning', 'number'),
+    ('deadline', 'number'),
+    ('node_name', 'string'),
+    ('client_scope', 'number'),
+    ('admin_scope', 'number'),
+    ('salt', 'bytes'),
+]
+
+
+def create_carte_fingerprint2(
+    owner_name: str | None, address: str | None, beginning: Timestamp | None, deadline: Timestamp | None,
+    node_name: str | None, client_scope: int | None, admin_scope: int | None, salt: bytes | None
+) -> bytes:
+    return fingerprint_bytes({'version': 2, 'object_type': 'CARTE'} | locals(), CARTE_FINGERPRINT2_SCHEMA)
+
+
 CARTE_FINGERPRINT1_SCHEMA: FingerprintSchema = [
     ('version', 'number'),
     ('object_type', 'string'),

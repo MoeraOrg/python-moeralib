@@ -231,18 +231,29 @@ class MoeraNode(Caller):
         )
         return structure_list(data, types.BlockedByUserInfo)
 
-    def get_cartes(self, limit: int | None = None) -> types.CarteSet:
+    def create_cartes(self, attributes: types.CarteAttributes) -> types.CarteSet:
         """
-        Get a set of cartes that correspond to successive periods of time. Two sequences of cartes are returned: one
-        with all permissions and another with `view-media` permission only. The node may decide to return fewer cartes
-        than the given ``limit``.
+        Create a set of cartes with the given attributes. Cartes in the sequence correspond to successive periods of
+        time.
 
-        :param limit: maximum number of sequential cartes returned
+        :param attributes:
         """
-        location = "/cartes".format()
-        params = {"limit": limit}
-        data = self.call("get_cartes", location, method="GET", params=params, schema=schemas.CARTE_SET_SCHEMA)
+        location = "/cartes"
+        data = self.call("create_cartes", location, method="POST", body=attributes, schema=schemas.CARTE_SET_SCHEMA)
         return types.CarteSet.from_json(data)
+
+    def verify_carte(self, client_carte: types.ClientCarte) -> types.CarteVerificationInfo:
+        """
+        Verify if the given carte may be used for authentication on this node. Additionally, if ``clientName`` is
+        provided, it is compared to the carte owner's name.
+
+        :param client_carte:
+        """
+        location = "/cartes/verify"
+        data = self.call(
+            "verify_carte", location, method="POST", body=client_carte, schema=schemas.CARTE_VERIFICATION_INFO_SCHEMA
+        )
+        return types.CarteVerificationInfo.from_json(data)
 
     def get_comments_slice(
         self, posting_id: str, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -999,14 +1010,68 @@ class MoeraNode(Caller):
         data = self.call("get_friend_of", location, method="GET", schema=schemas.FRIEND_OF_INFO_SCHEMA)
         return types.FriendOfInfo.from_json(data)
 
-    def upload_private_media(self, file: IO, file_type: str) -> types.PrivateMediaFileInfo:
+    def get_all_grants(self) -> List[types.GrantInfo]:
         """
-        Upload a new media file. Content of the file is passed in the request body
+        Get the list of all nodes having administrative permissions on this node.
+        """
+        location = "/grants"
+        data = self.call("get_all_grants", location, method="GET", schema=schemas.GRANT_INFO_ARRAY_SCHEMA)
+        return structure_list(data, types.GrantInfo)
+
+    def get_grant(self, node_name: str) -> types.GrantInfo:
+        """
+        Get information about the administrative permissions granted to the node.
+
+        :param node_name: name of the node
+        """
+        location = "/grants/{nodeName}".format(nodeName=quote_plus(node_name))
+        data = self.call("get_grant", location, method="GET", schema=schemas.GRANT_INFO_SCHEMA)
+        return types.GrantInfo.from_json(data)
+
+    def grant_or_revoke(self, node_name: str, change: types.GrantChange) -> types.GrantInfo:
+        """
+        Grant a set of administrative permissions to the node or revoke them.
+
+        :param node_name: name of the node
+        :param change:
+        """
+        location = "/grants/{nodeName}".format(nodeName=quote_plus(node_name))
+        data = self.call("grant_or_revoke", location, method="PUT", body=change, schema=schemas.GRANT_INFO_SCHEMA)
+        return types.GrantInfo.from_json(data)
+
+    def revoke_all(self, node_name: str) -> types.Result:
+        """
+        Revoke all administrative permissions granted to the node.
+
+        :param node_name: name of the node
+        """
+        location = "/grants/{nodeName}".format(nodeName=quote_plus(node_name))
+        data = self.call("revoke_all", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def upload_admin_media(self, file: IO, file_type: str) -> types.PrivateMediaFileInfo:
+        """
+        Upload a new media file owned by the node admin. Content of the file is passed in the request body.
 
         :param file:
         :param file_type: content-type of ``file``
         """
         location = "/media/private"
+        data = self.call(
+            "upload_admin_media", location, method="POST", body_file=file, body_file_type=file_type,
+            schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
+        )
+        return types.PrivateMediaFileInfo.from_json(data)
+
+    def upload_private_media(self, client_name: str, file: IO, file_type: str) -> types.PrivateMediaFileInfo:
+        """
+        Upload a new media file owned by the given node. Content of the file is passed in the request body.
+
+        :param client_name: name of the node owning the media file
+        :param file:
+        :param file_type: content-type of ``file``
+        """
+        location = "/media/private/{clientName}".format(clientName=quote_plus(client_name))
         data = self.call(
             "upload_private_media", location, method="POST", body_file=file, body_file_type=file_type,
             schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
@@ -2167,15 +2232,16 @@ class MoeraNode(Caller):
         data = self.call("get_token_info", location, method="GET", schema=schemas.TOKEN_INFO_SCHEMA)
         return types.TokenInfo.from_json(data)
 
-    def update_token(self, id: str, token: types.TokenName) -> types.TokenInfo:
+    def update_token(self, id: str, update: types.TokenUpdate) -> types.TokenInfo:
         """
-        Update the name of the token.
+        Update the name or permissions of the token. It is not possible to grant token additional permissions with this
+        request, but the granted permissions can be revoked.
 
         :param id: ID of the token
-        :param token:
+        :param update:
         """
         location = "/tokens/{id}".format(id=quote_plus(id))
-        data = self.call("update_token", location, method="PUT", body=token, schema=schemas.TOKEN_INFO_SCHEMA)
+        data = self.call("update_token", location, method="PUT", body=update, schema=schemas.TOKEN_INFO_SCHEMA)
         return types.TokenInfo.from_json(data)
 
     def delete_token(self, id: str) -> types.Result:
