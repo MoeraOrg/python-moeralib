@@ -62,6 +62,12 @@ def raw_private_key(private_key: ec.EllipticCurvePrivateKey) -> bytes:
 
 
 def raw_to_private_key(raw_private_key: bytes) -> ec.EllipticCurvePrivateKey:
+    """
+    Restore a private key from the raw format.
+
+    :param raw_private_key: the raw private key
+    :return: the private key
+    """
     return ec.derive_private_key(int.from_bytes(raw_private_key, 'big'), ec.SECP256K1())
 
 

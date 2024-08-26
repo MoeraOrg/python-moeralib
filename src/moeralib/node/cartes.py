@@ -29,6 +29,10 @@ class MoeraCarteSource(CarteSource):
                  target_node_name: str | None = None):
         """
         :param node: node to get cartes from
+        :param client_scope: permissions to be granted to the carte; if not set, all permissions of the carte's owner
+               are granted
+        :param admin_scope: additional administrative permissions (of those granted to the carte's owner by the target
+               node) to be granted to the carte
         """
         self._node = node
         self._client_scope = client_scope if client_scope is not None else ["all"]
@@ -71,8 +75,22 @@ def to_scope_mask(scope: List[Scope]) -> int:
 
 
 def generate_carte(owner_name: str | None, signing_key: ec.EllipticCurvePrivateKey, beginning: Timestamp | None,
-                   address: str | None = None, ttl: int = 600, node_name: str | None = None,
+                   ttl: int = 600, address: str | None = None, node_name: str | None = None,
                    client_scope: List[Scope] | int = SCOPE_VALUES["all"], admin_scope: List[Scope] | int = 0) -> str:
+    """
+    Generate a carte with the given parameters and sign it with the provided private signing key.
+
+    :param owner_name: name of the node authenticating with the carte
+    :param signing_key: the private signing key to sign the carte
+    :param beginning: timestamp of the beginning of the carte's life
+    :param ttl: length of the carte's life, in seconds
+    :param address: if set, the carte is valid for authentication from the given IP address only
+    :param node_name: if set, the carte is valid for authentication on the specified node only
+    :param client_scope: list of permissions granted to the carte
+    :param admin_scope: list of additional administrative permissions (of those granted to the carte's owner by
+           the target node) granted to the carte
+    :return: the carte
+    """
     if isinstance(client_scope, list):
         client_scope = to_scope_mask(client_scope)
     if isinstance(admin_scope, list):
