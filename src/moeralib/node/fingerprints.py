@@ -187,6 +187,36 @@ def create_posting_fingerprint0(
     return fingerprint_bytes({'version': 0, 'object_type': 'POSTING'} | locals(), POSTING_FINGERPRINT0_SCHEMA)
 
 
+PUSH_RELAY_MESSAGE_FINGERPRINT0_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('signed_at', 'number'),
+]
+
+
+def create_push_relay_message_fingerprint0(signed_at: Timestamp | None) -> bytes:
+    return fingerprint_bytes(
+        {'version': 0, 'object_type': 'PUSH_RELAY_MESSAGE'} | locals(), PUSH_RELAY_MESSAGE_FINGERPRINT0_SCHEMA
+    )
+
+
+PUSH_RELAY_REGISTER_FINGERPRINT0_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('client_id', 'string'),
+    ('lang', 'string'),
+    ('signed_at', 'number'),
+]
+
+
+def create_push_relay_register_fingerprint0(
+    client_id: str | None, lang: str | None, signed_at: Timestamp | None
+) -> bytes:
+    return fingerprint_bytes(
+        {'version': 0, 'object_type': 'PUSH_RELAY_REGISTER'} | locals(), PUSH_RELAY_REGISTER_FINGERPRINT0_SCHEMA
+    )
+
+
 REACTION_FINGERPRINT0_SCHEMA: FingerprintSchema = [
     ('version', 'number'),
     ('object_type', 'string'),
