@@ -51,6 +51,18 @@ def raw_public_key(public_key: ec.EllipticCurvePublicKey) -> bytes:
     return numbers.x.to_bytes(32, 'big') + numbers.y.to_bytes(32, 'big')
 
 
+def raw_to_public_key(raw_public_key: bytes) -> ec.EllipticCurvePublicKey:
+    """
+    Restore a public key from the raw format.
+
+    :param raw_public_key: the raw public key
+    :return: the public key
+    """
+    x = int.from_bytes(raw_public_key[:32], 'big')
+    y = int.from_bytes(raw_public_key[32:], 'big')
+    return ec.EllipticCurvePublicNumbers(x, y, ec.SECP256K1()).public_key()
+
+
 def raw_private_key(private_key: ec.EllipticCurvePrivateKey) -> bytes:
     """
     Convert a private key to the raw format to pass to the client.

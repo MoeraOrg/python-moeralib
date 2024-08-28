@@ -29,10 +29,11 @@ class MoeraCarteSource(CarteSource):
                  target_node_name: str | None = None):
         """
         :param node: node to get cartes from
-        :param client_scope: permissions to be granted to the carte; if not set, all permissions of the carte's owner
+        :param client_scope: permissions to be granted to the cartes; if not set, all permissions of the cartes' owner
                are granted
-        :param admin_scope: additional administrative permissions (of those granted to the carte's owner by the target
-               node) to be granted to the carte
+        :param admin_scope: additional administrative permissions (of those granted to the cartes' owner by the target
+               node) to be granted to the cartes
+        :param target_node_name: if set, the cartes are valid for authentication on the specified node only
         """
         self._node = node
         self._client_scope = client_scope if client_scope is not None else ["all"]
