@@ -75,7 +75,7 @@ def to_scope_mask(scope: List[Scope]) -> int:
     return mask
 
 
-def generate_carte(owner_name: str | None, signing_key: ec.EllipticCurvePrivateKey, beginning: Timestamp | None,
+def generate_carte(owner_name: str | None, signing_key: ec.EllipticCurvePrivateKey, beginning: Timestamp,
                    ttl: int = 600, address: str | None = None, node_name: str | None = None,
                    client_scope: List[Scope] | int = SCOPE_VALUES["all"], admin_scope: List[Scope] | int = 0) -> str:
     """
@@ -95,7 +95,7 @@ def generate_carte(owner_name: str | None, signing_key: ec.EllipticCurvePrivateK
     if isinstance(client_scope, list):
         client_scope = to_scope_mask(client_scope)
     if isinstance(admin_scope, list):
-        client_scope = to_scope_mask(admin_scope)
+        admin_scope = to_scope_mask(admin_scope)
     fingerprint = create_carte_fingerprint2(owner_name, address, beginning, beginning + ttl, node_name, client_scope,
                                             admin_scope, os.urandom(8))
     signature = sign_fingerprint(fingerprint, signing_key)
