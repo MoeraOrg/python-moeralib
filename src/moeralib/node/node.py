@@ -1202,6 +1202,32 @@ class MoeraNode(Caller):
         data = self.call("delete_node_name", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
         return types.Result.from_json(data)
 
+    def get_stored_mnemonic(self) -> types.KeyMnemonic:
+        """
+        Get the updating key mnemonic stored on the node.
+        """
+        location = "/node-name/mnemonic"
+        data = self.call("get_stored_mnemonic", location, method="GET", schema=schemas.KEY_MNEMONIC_SCHEMA)
+        return types.KeyMnemonic.from_json(data)
+
+    def store_mnemonic(self, mnemonic: types.KeyMnemonic) -> types.Result:
+        """
+        Store the updating key mnemonic on the node.
+
+        :param mnemonic:
+        """
+        location = "/node-name/mnemonic"
+        data = self.call("store_mnemonic", location, method="POST", body=mnemonic, schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def delete_stored_mnemonic(self) -> types.Result:
+        """
+        Delete the updating key mnemonic stored on the node.
+        """
+        location = "/node-name/mnemonic"
+        data = self.call("delete_stored_mnemonic", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
     def send_notification(self, packet: types.NotificationPacket) -> types.Result:
         """
         Accept a notification packet from another node. Notification packets older than 10 minutes are ignored. The
@@ -2074,6 +2100,16 @@ class MoeraNode(Caller):
             "update_story", location, method="PUT", body=story, bodies=True, schema=schemas.STORY_INFO_SCHEMA
         )
         return types.StoryInfo.from_json(data)
+
+    def delete_story(self, id: str) -> types.Result:
+        """
+        Delete the story.
+
+        :param id: ID of the story
+        """
+        location = "/stories/{id}".format(id=quote_plus(id))
+        data = self.call("delete_story", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
 
     def get_subscribers(
         self, node_name: str | None = None, type: types.SubscriptionType | None = None, feed_name: str | None = None,

@@ -939,6 +939,22 @@ GRANT_INFO_SCHEMA: Any = {
 
 GRANT_INFO_ARRAY_SCHEMA = array_schema(GRANT_INFO_SCHEMA)
 
+KEY_MNEMONIC_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "mnemonic": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+    },
+    "required": [
+        "mnemonic",
+    ],
+    "additionalProperties": False
+}
+
 LINK_PREVIEW_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -1027,6 +1043,9 @@ NODE_NAME_INFO_SCHEMA: Any = {
         },
         "operationErrorMessage": {
             "type": ["string", "null"]
+        },
+        "storedMnemonic": {
+            "type": ["boolean", "null"]
         },
         "operations": to_nullable_object_schema(NODE_NAME_OPERATIONS_SCHEMA),
     },
@@ -1923,6 +1942,26 @@ STORY_SUMMARY_NODE_SCHEMA: Any = {
     "additionalProperties": False
 }
 
+STORY_SUMMARY_PAGE_CLICKS_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "heading": {
+            "type": ["string", "null"]
+        },
+        "href": {
+            "type": "string"
+        },
+        "clicks": {
+            "type": "integer"
+        },
+    },
+    "required": [
+        "href",
+        "clicks",
+    ],
+    "additionalProperties": False
+}
+
 STORY_SUMMARY_REACTION_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -2795,6 +2834,10 @@ STORY_SUMMARY_DATA_SCHEMA: Any = {
         "sheriff": to_nullable_object_schema(STORY_SUMMARY_SHERIFF_SCHEMA),
         "description": {
             "type": ["string", "null"]
+        },
+        "clicks": {
+            "type": ["array", "null"],
+            "items": STORY_SUMMARY_PAGE_CLICKS_SCHEMA
         },
     },
     "additionalProperties": False

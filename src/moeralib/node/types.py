@@ -73,6 +73,8 @@ SCOPE_VALUES: Mapping[Scope, int] = {
     "all": 0x3fffffff,
 }
 
+SearchEngine = Literal["google"]
+
 SettingType = Literal[
     "bool", "int", "string", "json", "Duration", "PrivateKey", "PublicKey", "Timestamp", "UUID", "Principal"
 ]
@@ -88,7 +90,7 @@ SheriffOrderReason = Literal[
     "unlawful", "defamatory", "threat", "spam", "scam", "malware", "copyright", "impersonating", "privacy", "other"
 ]
 
-SourceFormat = Literal["plain-text", "html", "markdown", "application"]
+SourceFormat = Literal["plain-text", "html", "markdown", "html/visual", "application"]
 
 StoryType = Literal[
     "asked-to-friend", "asked-to-subscribe", "blocked-user", "blocked-user-in-posting", "comment-added",
@@ -99,7 +101,8 @@ StoryType = Literal[
     "posting-media-reaction-added-negative", "posting-media-reaction-added-positive", "posting-media-reaction-failed",
     "posting-post-task-failed", "posting-reaction-task-failed", "posting-subscribe-task-failed",
     "posting-update-task-failed", "posting-updated", "reaction-added-negative", "reaction-added-positive",
-    "remote-comment-added", "reply-comment", "sheriff-complaint-added", "sheriff-complaint-decided", "sheriff-marked",
+    "reminder-avatar", "reminder-email", "reminder-full-name", "reminder-sheriff-allow", "remote-comment-added",
+    "reply-comment", "search-report", "sheriff-complaint-added", "sheriff-complaint-decided", "sheriff-marked",
     "sheriff-unmarked", "subscriber-added", "subscriber-deleted", "unblocked-user", "unblocked-user-in-posting"
 ]
 
@@ -1148,6 +1151,11 @@ class GrantInfo(Structure):
     """the set of administrative permissions granted to the node"""
 
 
+class KeyMnemonic(Structure):
+    mnemonic: List[str]
+    """the words"""
+
+
 class LinkPreview(Structure):
     site_name: str | None = None
     """name of the site"""
@@ -1234,6 +1242,8 @@ class NodeNameInfo(Structure):
     """if the operation with the node name was failed, the code of the failure"""
     operation_error_message: str | None = None
     """if the operation with the node name was failed, the human-readable description of the failure"""
+    stored_mnemonic: bool | None = None
+    """``True``, if updating key mnemonic is being stored on the node, ``False`` otherwise"""
     operations: NodeNameOperations | None = None
     """the supported operations and the corresponding principals"""
 
@@ -1988,6 +1998,15 @@ class StorySummaryNode(Structure):
     """node owner's full name"""
     owner_gender: str | None = None
     """node owner's gender"""
+
+
+class StorySummaryPageClicks(Structure):
+    heading: str | None = None
+    """page heading, ``None`` for the blog itself"""
+    href: str
+    """page URL"""
+    clicks: int
+    """number of clicks on the page"""
 
 
 class StorySummaryReaction(Structure):
@@ -2805,6 +2824,8 @@ class StorySummaryData(Structure):
     """summary of an action of a sheriff"""
     description: str | None = None
     """additional descriptive text"""
+    clicks: List[StorySummaryPageClicks] | None = None
+    """list of pages with number of clicks on each of them"""
 
 
 class CommentInfo(Structure):
