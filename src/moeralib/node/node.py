@@ -1051,7 +1051,7 @@ class MoeraNode(Caller):
 
     def upload_admin_media(self, file: IO, file_type: str) -> types.PrivateMediaFileInfo:
         """
-        Upload a new media file owned by the node admin. Content of the file is passed in the request body.
+        Upload a new media file owned by the node admin. The content of the file is passed in the request body.
 
         :param file:
         :param file_type: content-type of ``file``
@@ -1065,7 +1065,7 @@ class MoeraNode(Caller):
 
     def upload_private_media(self, client_name: str, file: IO, file_type: str) -> types.PrivateMediaFileInfo:
         """
-        Upload a new media file owned by the given node. Content of the file is passed in the request body.
+        Upload a new media file owned by the given node. The content of the file is passed in the request body.
 
         :param client_name: name of the node owning the media file
         :param file:
@@ -1426,7 +1426,7 @@ class MoeraNode(Caller):
         """
         Get a slice of the list of reactions to the given posting, optionally filtered by reaction type, delimited by
         ``before`` moment and the given ``limit``. If ``before`` is not provided, the latest reactions are returned.
-        The node may decide to return less reactions than the given ``limit``. The reactions are always sorted by
+        The node may decide to return fewer reactions than the given ``limit``. The reactions are always sorted by
         moment, descending.
 
         :param posting_id: ID of the posting
@@ -1994,7 +1994,7 @@ class MoeraNode(Caller):
         """
         Get a slice of the list of groups of complaints, optionally filtered by status, delimited by the ``before`` or
         ``after`` moment and the given ``limit``. If neither ``before`` nor ``after`` are provided, the latest groups
-        are returned. The node may decide to return less groups than the given ``limit``. The groups are always sorted
+        are returned. The node may decide to return fewer groups than the given ``limit``. The groups are always sorted
         by moment, descending.
 
         :param after: filter groups created strongly after this moment

@@ -106,7 +106,7 @@ StoryType = Literal[
     "sheriff-unmarked", "subscriber-added", "subscriber-deleted", "unblocked-user", "unblocked-user-in-posting"
 ]
 
-SubscriptionReason = Literal["user", "mention", "comment"]
+SubscriptionReason = Literal["user", "mention", "comment", "auto"]
 
 SubscriptionType = Literal["feed", "posting", "posting-comments", "profile", "user-list"]
 
@@ -202,6 +202,16 @@ class CommentOperations(Structure):
     def add_negative_reaction_or_default(self) -> PrincipalValue:
         """add a negative reaction to the comment (this property always returns default value instead of ``None``)"""
         return self.add_negative_reaction if self.add_negative_reaction is not None else "signed"
+    override_reaction: PrincipalValue | None = None
+    """override the permissions of the comment's reactions"""
+
+    @property
+    def override_reaction_or_default(self) -> PrincipalValue:
+        """
+        override the permissions of the comment's reactions (this property always returns default value instead of
+        ``None``)
+        """
+        return self.override_reaction if self.override_reaction is not None else "owner"
 
 
 class ContactOperations(Structure):
@@ -537,14 +547,14 @@ class ProfileOperations(Structure):
     @property
     def edit_or_default(self) -> PrincipalValue:
         """change the profile (this property always returns default value instead of ``None``)"""
-        return self.edit if self.edit is not None else "None"
+        return self.edit if self.edit is not None else "admin"
     view_email: PrincipalValue | None = None
     """view the e-mail address in the profile"""
 
     @property
     def view_email_or_default(self) -> PrincipalValue:
         """view the e-mail address in the profile (this property always returns default value instead of ``None``)"""
-        return self.view_email if self.view_email is not None else "None"
+        return self.view_email if self.view_email is not None else "admin"
 
 
 class ReactionOperations(Structure):
@@ -1064,6 +1074,10 @@ class FeedWithStatus(Structure):
     """number of stories in the feed that have not been viewed yet"""
     not_read: int
     """number of stories in the feed that have not been read yet"""
+    not_viewed_moment: int | None = None
+    """moment of the oldest non-viewed story"""
+    not_read_moment: int | None = None
+    """moment of the oldest non-read story"""
 
 
 class FriendGroupAssignment(Structure):
@@ -2387,6 +2401,8 @@ class CommentSourceText(Structure):
     """ID of the comment this comment is replying to"""
     operations: CommentOperations | None = None
     """the operations and the corresponding principals"""
+    reaction_operations: ReactionOperations | None = None
+    """the operations and the corresponding principals that are overridden in reactions to the comment"""
     senior_operations: CommentOperations | None = None
     """
     the operations and the corresponding principals that are overridden by the posting's owner ("senior"); only the
@@ -2465,7 +2481,7 @@ class DraftText(Structure):
     """
     media: List[RemoteMedia] | None = None
     """list of the media attached to the draft, the media may be located on another node"""
-    publish_at: int | None = None
+    publish_at: Timestamp | None = None
     """story publication timestamp - the time the story must be published under in the feed"""
     update_info: UpdateInfo | None = None
     """description of the update"""
@@ -2698,6 +2714,10 @@ class PostingSourceText(Structure):
     """the operations and the corresponding principals"""
     comment_operations: CommentOperations | None = None
     """the operations and the corresponding principals that are overridden in the posting's comments"""
+    reaction_operations: ReactionOperations | None = None
+    """the operations and the corresponding principals that are overridden in reactions to the posting"""
+    comment_reaction_operations: ReactionOperations | None = None
+    """the operations and the corresponding principals that are overridden in reactions to the posting's comments"""
 
 
 class PostingText(Structure):
@@ -2764,6 +2784,8 @@ class SettingDescriptor(Structure):
     """the setting is internal - not displayed to the user"""
     privileged: bool | None = None
     """the setting is privileged - may be changed by server owner only"""
+    encrypted: bool | None = None
+    """the setting is stored in the database in encrypted form"""
     title: str | None = None
     """human-friendly description of the setting"""
     modifiers: SettingTypeModifiers | None = None
@@ -2959,7 +2981,7 @@ class DraftInfo(Structure):
     """list of the media attached to the draft"""
     heading: str
     """heading of the draft"""
-    publish_at: int | None = None
+    publish_at: Timestamp | None = None
     """story publication timestamp - the time the story must be published under in the feed"""
     update_info: UpdateInfo | None = None
     """description of the update"""

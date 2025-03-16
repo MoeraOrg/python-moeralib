@@ -40,6 +40,9 @@ COMMENT_OPERATIONS_SCHEMA: Any = {
         "addNegativeReaction": {
             "type": ["string", "null"]
         },
+        "overrideReaction": {
+            "type": ["string", "null"]
+        },
     },
     "additionalProperties": False
 }
@@ -783,6 +786,12 @@ FEED_WITH_STATUS_SCHEMA: Any = {
         },
         "notRead": {
             "type": "integer"
+        },
+        "notViewedMoment": {
+            "type": ["integer", "null"]
+        },
+        "notReadMoment": {
+            "type": ["integer", "null"]
         },
     },
     "required": [
