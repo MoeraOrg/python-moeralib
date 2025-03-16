@@ -299,14 +299,15 @@ class Structure:
                 else:
                     assert isinstance(s_type, tuple)
                     t, array = s_type
+            constraints = field_constraints(field)
             if t is not None:
                 if array:
                     schema_array(sfile, 2, t, struct=struct, nullable=optional, default=default,
-                                 min_items=field.get('min-items'), max_items=field.get('max-items'),
-                                 min=field.get('min'), max=field.get('max'))
+                                 min_items=constraints.get('min-items'), max_items=constraints.get('max-items'),
+                                 min=constraints.get('min'), max=constraints.get('max'))
                 else:
                     schema_type(sfile, 2, t, struct=struct, nullable=optional, default=default,
-                                min=field.get('min'), max=field.get('max'))
+                                min=constraints.get('min'), max=constraints.get('max'))
             sfile.write(',\n')
         sfile.write('    },\n')
         if len(required) > 0:
@@ -326,6 +327,27 @@ class Structure:
         if self.output:
             self.generate_schema(sfile)
         self.generated = True
+
+
+def field_constraints(field: Any) -> dict:
+    if 'constraints' not in field:
+        return {}
+
+    result = {}
+    for constraint in field['constraints']:
+        if 'value' in constraint:
+            cons = constraint['value']
+            if 'min' in cons:
+                result['min'] = cons['min']
+            if 'max' in cons:
+                result['max'] = cons['max']
+        if 'items' in constraint:
+            cons = constraint['items']
+            if 'min' in cons:
+                result['min-items'] = cons['min']
+            if 'max' in cons:
+                result['max-items'] = cons['max']
+    return result
 
 
 def scan_body_usage(structs: Mapping[str, Structure]) -> None:
