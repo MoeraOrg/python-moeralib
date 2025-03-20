@@ -49,6 +49,8 @@ class MoeraNamingConnectionError(Exception):
         super().__init__('Naming server connection error: ' + message)
 
 
+CONNECTION_TIMEOUT = 10 # seconds
+
 class MoeraNaming:
     """Naming API interface."""
     _server: str
@@ -78,7 +80,8 @@ class MoeraNaming:
                     'params': params,
                     'jsonrpc': '2.0',
                     'id': self._call_id,
-                }
+                },
+                timeout=CONNECTION_TIMEOUT
             )
             self._call_id += 1
 

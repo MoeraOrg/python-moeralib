@@ -117,6 +117,19 @@ class CarteSource:
         raise NotImplemented
 
 
+FETCH_TIMEOUT = 10 # seconds
+UPDATE_TIMEOUT = 60 # seconds
+LARGE_BODY_MIN = 65536
+
+def timeout_duration(method: str, body_encoded: str | None, body_file: IO | None) -> int | None:
+    if method == "POST" or method == "PUT":
+        large_body = body_file is not None or body_encoded is not None and len(body_encoded) > LARGE_BODY_MIN
+        duration =  UPDATE_TIMEOUT if large_body else FETCH_TIMEOUT
+    else:
+        duration = FETCH_TIMEOUT
+
+    return duration
+
 class Caller:
     root: str | None = None
     """API endpoint URL of the node."""
@@ -232,7 +245,8 @@ class Caller:
                 headers=headers,
                 json=body_encoded,
                 data=body_file,
-                stream=schema == "blob"
+                stream=schema == "blob",
+                timeout=timeout_duration(method, body_encoded, body_file)
             )
 
             response = r.json()
