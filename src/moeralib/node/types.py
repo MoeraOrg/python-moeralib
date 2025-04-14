@@ -73,6 +73,8 @@ SCOPE_VALUES: Mapping[Scope, int] = {
     "all": 0x3fffffff,
 }
 
+SearchContentUpdateType = Literal["block", "friend", "profile", "subscribe", "unblock", "unfriend", "unsubscribe"]
+
 SearchEngine = Literal["google"]
 
 SettingType = Literal[
@@ -108,7 +110,7 @@ StoryType = Literal[
 
 SubscriptionReason = Literal["user", "mention", "comment", "auto"]
 
-SubscriptionType = Literal["feed", "posting", "posting-comments", "profile", "user-list"]
+SubscriptionType = Literal["feed", "posting", "posting-comments", "profile", "search", "user-list"]
 
 VerificationStatus = Literal["running", "correct", "incorrect", "error"]
 
@@ -944,9 +946,10 @@ class ContactInfo(Structure):
     full_name: str | None = None
     gender: str | None = None
     avatar: AvatarImage | None = None
-    closeness: float
+    distance: float
     """
-    closeness of the contact to the node, which is calculated from the number of reactions and comments and their age
+    social distance between the contact and the node, which depends on subscription and friendship status and the
+    number recent reactions and comments
     """
     has_feed_subscriber: bool | None = None
     """the contact is subscribed to at least one of the node's feeds"""
@@ -1689,6 +1692,32 @@ class Result(Structure):
 class SheriffMark(Structure):
     sheriff_name: str
     """name of the sheriff that added the mark"""
+
+
+class SearchNodeInfo(Structure):
+    node_name: str
+    full_name: str | None = None
+    """node owner's full name"""
+    title: str | None = None
+    """node title"""
+    avatar: AvatarImage | None = None
+    """node owner's avatar"""
+    distance: float
+    """social distance between the node and the client"""
+
+
+class SearchBlockUpdate(Structure):
+    node_name: str
+    blocked_operation: BlockedOperation
+
+
+class SearchFriendUpdate(Structure):
+    node_name: str
+
+
+class SearchSubscriptionUpdate(Structure):
+    node_name: str
+    feed_name: str
 
 
 class SettingInfo(Structure):

@@ -534,8 +534,8 @@ class MoeraNode(Caller):
         
         The node may decide to return fewer contacts than the given ``limit``.
         
-        The contacts are sorted by their *closeness* to the node, which is calculated from the number of reactions and
-        comments and their age.
+        The contacts are sorted by *social distance* from the node, which depends on their subscription and friendship
+        status and the number of recent reactions and comments.
 
         :param query: the search query
         :param limit: maximum number of contacts returned
@@ -1918,6 +1918,27 @@ class MoeraNode(Caller):
             "get_remote_sheriff_order", location, method="GET", auth=False, schema=schemas.SHERIFF_ORDER_INFO_SCHEMA
         )
         return types.SheriffOrderInfo.from_json(data)
+
+    def search_nodes(self, query: str | None = None, limit: int | None = None) -> List[types.SearchNodeInfo]:
+        """
+        Search for Moera nodes matching the search ``query``. Every space-delimited word in the query must match
+        case-insensitively a beginning of the node's name or a beginning of any non-letter-delimited word in the node's
+        full name. The order of words is not significant.
+        
+        The search engine may decide to return fewer nodes than the given ``limit``.
+        
+        The returned nodes are sorted by their relevance. The exact definition of this term is left to the search
+        engine's implementation.
+
+        :param query: the search query
+        :param limit: maximum number of nodes returned
+        """
+        location = "/search/nodes".format()
+        params = {"query": query, "limit": limit}
+        data = self.call(
+            "search_nodes", location, method="GET", params=params, schema=schemas.SEARCH_NODE_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.SearchNodeInfo)
 
     def update_settings(self, settings: List[types.SettingInfo]) -> types.Result:
         """

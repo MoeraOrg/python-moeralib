@@ -605,7 +605,7 @@ CONTACT_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
-        "closeness": {
+        "distance": {
             "type": "number"
         },
         "hasFeedSubscriber": {
@@ -632,7 +632,7 @@ CONTACT_INFO_SCHEMA: Any = {
     },
     "required": [
         "nodeName",
-        "closeness",
+        "distance",
     ],
     "additionalProperties": False
 }
@@ -1574,6 +1574,32 @@ SHERIFF_MARK_SCHEMA: Any = {
     ],
     "additionalProperties": False
 }
+
+SEARCH_NODE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "nodeName": {
+            "type": "string"
+        },
+        "fullName": {
+            "type": ["string", "null"]
+        },
+        "title": {
+            "type": ["string", "null"]
+        },
+        "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
+        "distance": {
+            "type": "number"
+        },
+    },
+    "required": [
+        "nodeName",
+        "distance",
+    ],
+    "additionalProperties": False
+}
+
+SEARCH_NODE_INFO_ARRAY_SCHEMA = array_schema(SEARCH_NODE_INFO_SCHEMA)
 
 SETTING_INFO_SCHEMA: Any = {
     "type": "object",
