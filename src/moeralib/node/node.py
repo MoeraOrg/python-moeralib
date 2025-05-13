@@ -28,6 +28,26 @@ class MoeraNode(Caller):
         )
         return structure_list(data, types.ActivityReactionInfo)
 
+    def get_remote_sheriff_orders_slice(
+        self, after: int | None = None, before: int | None = None, limit: int | None = None
+    ) -> types.SheriffOrdersSliceInfo:
+        """
+        Get a slice of the list of all orders sent by the sheriff, delimited by the ``before`` or ``after`` moment and
+        the given ``limit``. If neither ``before`` nor ``after`` are provided, the latest orders are returned. The node
+        may decide to return fewer orders than the given ``limit``. The orders are always sorted by moment, descending.
+
+        :param after: filter orders posted strongly after this moment
+        :param before: filter orders posted at or before this moment
+        :param limit: maximum number of orders returned
+        """
+        location = "/activity/sheriff/orders".format()
+        params = {"after": after, "before": before, "limit": limit}
+        data = self.call(
+            "get_remote_sheriff_orders_slice", location, method="GET", auth=False, params=params,
+            schema=schemas.SHERIFF_ORDERS_SLICE_INFO_SCHEMA
+        )
+        return types.SheriffOrdersSliceInfo.from_json(data)
+
     def get_remote_posting_verification_status(self, id: str) -> types.RemotePostingVerificationInfo:
         """
         Get the status of the asynchronous operation that performs verification of a remote posting signature.
@@ -1939,6 +1959,42 @@ class MoeraNode(Caller):
             "search_nodes", location, method="GET", params=params, schema=schemas.SEARCH_NODE_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.SearchNodeInfo)
+
+    def search_entries_by_hashtag(self, filter: types.SearchHashtagFilter) -> types.SearchHashtagSliceInfo:
+        """
+        Search for postings and comments containing the specified hashtag(s) and optionally filtered by other criteria.
+        
+        The search engine may decide to return fewer nodes than the given ``limit``.
+        
+        The returned entries are sorted by moment in descending order.
+
+        :param filter:
+        """
+        location = "/search/entries/by-hashtag"
+        data = self.call(
+            "search_entries_by_hashtag", location, method="POST", body=filter, bodies=True,
+            schema=schemas.SEARCH_HASHTAG_SLICE_INFO_SCHEMA
+        )
+        return types.SearchHashtagSliceInfo.from_json(data)
+
+    def search_entries_by_text(self, filter: types.SearchTextFilter) -> types.SearchTextPageInfo:
+        """
+        Search for postings and comments containing the specified words or text fragment, and optionally filtered by
+        other criteria.
+        
+        The search engine may decide to return fewer nodes than the given ``limit``.
+        
+        The returned entries are sorted by their relevance. The exact definition of this term is left to the search
+        engine's implementation.
+
+        :param filter:
+        """
+        location = "/search/entries/by-text"
+        data = self.call(
+            "search_entries_by_text", location, method="POST", body=filter, bodies=True,
+            schema=schemas.SEARCH_TEXT_PAGE_INFO_SCHEMA
+        )
+        return types.SearchTextPageInfo.from_json(data)
 
     def update_settings(self, settings: List[types.SettingInfo]) -> types.Result:
         """

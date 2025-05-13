@@ -73,9 +73,15 @@ SCOPE_VALUES: Mapping[Scope, int] = {
     "all": 0x3fffffff,
 }
 
-SearchContentUpdateType = Literal["block", "friend", "profile", "subscribe", "unblock", "unfriend", "unsubscribe"]
+SearchContentUpdateType = Literal[
+    "block", "comment-add", "comment-update", "comment-delete", "friend", "profile", "posting-add", "posting-update",
+    "posting-delete", "reaction-add", "reaction-delete", "reactions-delete-all", "subscribe", "unblock", "unfriend",
+    "unsubscribe"
+]
 
 SearchEngine = Literal["google"]
+
+SearchEntryType = Literal["all", "posting", "comment"]
 
 SettingType = Literal[
     "bool", "int", "string", "json", "Duration", "PrivateKey", "PublicKey", "Timestamp", "UUID", "Principal"
@@ -574,6 +580,16 @@ class ReactionOperations(Structure):
     def delete_or_default(self) -> PrincipalValue:
         """delete the reaction (this property always returns default value instead of ``None``)"""
         return self.delete if self.delete is not None else "private"
+
+
+class SearchEntryOperations(Structure):
+    view: PrincipalValue | None = None
+    """view the entry"""
+
+    @property
+    def view_or_default(self) -> PrincipalValue:
+        """view the entry (this property always returns default value instead of ``None``)"""
+        return self.view if self.view is not None else "public"
 
 
 class StoryOperations(Structure):
@@ -1694,6 +1710,55 @@ class SheriffMark(Structure):
     """name of the sheriff that added the mark"""
 
 
+class SearchBlockUpdate(Structure):
+    node_name: str
+    """name of the node being blocked/unblocked"""
+    blocked_operation: BlockedOperation
+    """the operation being blocked/unblocked"""
+
+
+class SearchCommentUpdate(Structure):
+    posting_id: str
+    """ID of the posting the comment belongs to"""
+    comment_id: str
+    """ID of the comment"""
+
+
+class SearchFriendUpdate(Structure):
+    node_name: str
+    """name of the node being added/removed from the list of friends"""
+
+
+class SearchHashtagFilter(Structure):
+    entry_type: SearchEntryType | None = None
+    """type of entries to be searched for; if omitted, all types of entries are returned"""
+    hashtags: List[str]
+    """hashtags to be searched for; at least one of these hashtags should be present in the entry returned"""
+    publisher_name: str | None = None
+    """name of the node where the entries are published"""
+    in_newsfeed: bool | None = None
+    """if ``True``, return the entries appearing in the Newsfeed of the ``publisherName`` node"""
+    owners: List[str] | None = None
+    """return only the entries owned (authored) by one of these nodes"""
+    min_image_count: int | None = None
+    """return only the entries containing at least the given number of images"""
+    max_image_count: int | None = None
+    """return only the entries containing not more than the given number of images"""
+    video_present: bool | None = None
+    """
+    if ``True``, return only the entries containing a video, if ``False``, return only the entries that do not contain
+    a video
+    """
+    sheriff_name: str | None = None
+    """filter out entries prohibited by the given sheriff"""
+    after: int | None = None
+    """return entries created strongly after this moment"""
+    before: int | None = None
+    """return entries created at or before this moment"""
+    limit: int | None = None
+    """maximum number of entries returned"""
+
+
 class SearchNodeInfo(Structure):
     node_name: str
     full_name: str | None = None
@@ -1706,18 +1771,84 @@ class SearchNodeInfo(Structure):
     """social distance between the node and the client"""
 
 
-class SearchBlockUpdate(Structure):
+class SearchPostingUpdate(Structure):
+    feed_name: str
+    """name of the feed where the posting is published"""
+    story_id: str
+    """ID of the story where the posting is published"""
+    published_at: Timestamp
+    """story publication timestamp - the time the story is published under in the feed"""
     node_name: str
-    blocked_operation: BlockedOperation
+    """name of the node where the posting is originated from"""
+    posting_id: str
+    """ID of the posting on the original node"""
 
 
-class SearchFriendUpdate(Structure):
-    node_name: str
+class SearchReactionUpdate(Structure):
+    posting_id: str
+    """ID of the posting"""
+    comment_id: str
+    """ID of the comment"""
+    owner_name: str
+    """reaction owner's name"""
+
+
+class SearchRepliedTo(Structure):
+    id: str
+    """ID of the comment"""
+    revision_id: str | None = None
+    """ID of the comment revision"""
+    name: str
+    """node name of the comment's owner"""
+    full_name: str | None = None
+    """full name of the comment's owner"""
+    avatar: AvatarImage | None = None
+    """avatar of the comment's owner"""
+    heading: str | None = None
+    """heading of the comment"""
 
 
 class SearchSubscriptionUpdate(Structure):
     node_name: str
+    """name of the node being subscribed to/unsubscribed from"""
     feed_name: str
+    """name of the feed on the remote node being subscribed to/unsubscribed from"""
+
+
+class SearchTextFilter(Structure):
+    entry_type: SearchEntryType | None = None
+    """type of entries to be searched for; if omitted, all types of entries are returned"""
+    text: str
+    """the text to be searched for"""
+    hashtags: List[str] | None = None
+    """at least one of these hashtags should be present in the entry returned"""
+    publisher_name: str | None = None
+    """name of the node where the entries are published"""
+    in_newsfeed: bool | None = None
+    """if ``True``, return the entries appearing in the Newsfeed of the ``publisherName`` node"""
+    owners: List[str] | None = None
+    """return only the entries owned (authored) by one of these nodes"""
+    replied_to: List[str] | None = None
+    """return only the comments that are replies to comments owned (authored) by one of these nodes"""
+    min_image_count: int | None = None
+    """return only the entries containing at least the given number of images"""
+    max_image_count: int | None = None
+    """return only the entries containing not more than the given number of images"""
+    video_present: bool | None = None
+    """
+    if ``True``, return only the entries containing a video, if ``False``, return only the entries that do not contain
+    a video
+    """
+    created_after: Timestamp | None = None
+    """return entries created at or after this timestamp"""
+    created_before: Timestamp | None = None
+    """return entries created at or before this timestamp"""
+    sheriff_name: str | None = None
+    """filter out entries prohibited by the given sheriff"""
+    page: int | None = None
+    """page number, 0 by default"""
+    limit: int | None = None
+    """page size (maximum number of entries returned), the default is set by the search engine"""
 
 
 class SettingInfo(Structure):
@@ -1980,12 +2111,29 @@ class SheriffOrderInfo(Structure):
     """detailed explanation of reason of the order in user-readable form"""
     created_at: Timestamp
     """order creation timestamp - the real time when the order was created"""
+    moment: int
+    """moment of the order"""
     signature: bytes
     """the sheriff's signature (use ``SheriffOrder`` fingerprint)"""
     signature_version: int
     """signature version (i.e. fingerprint version)"""
     complaint_group_id: str | None = None
     """ID of the groups of complaints that were the cause of the order"""
+
+
+class SheriffOrdersSliceInfo(Structure):
+    before: int
+    """the slice contains all orders before this moment, inclusive. May be the far future."""
+    after: int
+    """the slice contains all orders after this moment, exclusive. May be the far past."""
+    orders: List[SheriffOrderInfo]
+    """the orders"""
+    total: int
+    """total number of orders"""
+    total_in_past: int
+    """number of orders before this slice till the far past"""
+    total_in_future: int
+    """number of orders after this slice till the far future"""
 
 
 class StoryAttributes(Structure):
@@ -2800,6 +2948,55 @@ class ReactionCreated(Structure):
     """details of the reaction created"""
     totals: ReactionTotalsInfo
     """summary of reactions after the creation"""
+
+
+class SearchEntryInfo(Structure):
+    node_name: str
+    """source node of the entry"""
+    posting_id: str
+    """for posting, ID of the posting; for comment, ID of the posting the comment belongs to"""
+    comment_id: str | None = None
+    """ID of the comment"""
+    owner_name: str
+    """node name of the entry's owner"""
+    owner_full_name: str | None = None
+    """full name of the entry's owner"""
+    owner_avatar: AvatarImage | None = None
+    """avatar of the entry's owner"""
+    body_preview: Body
+    """preview of the entry's body, a string representation of a JSON structure"""
+    heading: str
+    """heading of the entry"""
+    image_count: int | None = None
+    """number of images the entry contains"""
+    video_present: bool | None = None
+    """if ``True``, the entry contains a video"""
+    replied_to: SearchRepliedTo | None = None
+    """information about the comment this comment is replying to"""
+    created_at: Timestamp
+    """entry creation timestamp - the real time when the entry was created"""
+    operations: SearchEntryOperations | None = None
+    """the supported operations and the corresponding principals"""
+    moment: int
+    """moment of the entry"""
+
+
+class SearchHashtagSliceInfo(Structure):
+    before: int
+    """the slice contains all entries before this moment, inclusive. May be the far future."""
+    after: int
+    """the slice contains all entries after this moment, exclusive. May be the far past."""
+    entries: List[SearchEntryInfo]
+    """the entries"""
+
+
+class SearchTextPageInfo(Structure):
+    page: int
+    """number of the page"""
+    total: int
+    """total number of pages"""
+    entries: List[SearchEntryInfo]
+    """the entries"""
 
 
 class SettingDescriptor(Structure):

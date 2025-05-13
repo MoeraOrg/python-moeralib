@@ -240,6 +240,16 @@ REACTION_OPERATIONS_SCHEMA: Any = {
     "additionalProperties": False
 }
 
+SEARCH_ENTRY_OPERATIONS_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "view": {
+            "type": ["string", "null"]
+        },
+    },
+    "additionalProperties": False
+}
+
 STORY_OPERATIONS_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -1601,6 +1611,33 @@ SEARCH_NODE_INFO_SCHEMA: Any = {
 
 SEARCH_NODE_INFO_ARRAY_SCHEMA = array_schema(SEARCH_NODE_INFO_SCHEMA)
 
+SEARCH_REPLIED_TO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "revisionId": {
+            "type": ["string", "null"]
+        },
+        "name": {
+            "type": "string"
+        },
+        "fullName": {
+            "type": ["string", "null"]
+        },
+        "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
+        "heading": {
+            "type": ["string", "null"]
+        },
+    },
+    "required": [
+        "id",
+        "name",
+    ],
+    "additionalProperties": False
+}
+
 SETTING_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -1877,6 +1914,9 @@ SHERIFF_ORDER_INFO_SCHEMA: Any = {
         "createdAt": {
             "type": "integer"
         },
+        "moment": {
+            "type": "integer"
+        },
         "signature": {
             "type": "string"
         },
@@ -1894,8 +1934,43 @@ SHERIFF_ORDER_INFO_SCHEMA: Any = {
         "feedName",
         "category",
         "createdAt",
+        "moment",
         "signature",
         "signatureVersion",
+    ],
+    "additionalProperties": False
+}
+
+SHERIFF_ORDERS_SLICE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "before": {
+            "type": "integer"
+        },
+        "after": {
+            "type": "integer"
+        },
+        "orders": {
+            "type": "array",
+            "items": SHERIFF_ORDER_INFO_SCHEMA
+        },
+        "total": {
+            "type": "integer"
+        },
+        "totalInPast": {
+            "type": "integer"
+        },
+        "totalInFuture": {
+            "type": "integer"
+        },
+    },
+    "required": [
+        "before",
+        "after",
+        "orders",
+        "total",
+        "totalInPast",
+        "totalInFuture",
     ],
     "additionalProperties": False
 }
@@ -2801,6 +2876,102 @@ REACTION_CREATED_SCHEMA: Any = {
     },
     "required": [
         "totals",
+    ],
+    "additionalProperties": False
+}
+
+SEARCH_ENTRY_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "nodeName": {
+            "type": "string"
+        },
+        "postingId": {
+            "type": "string"
+        },
+        "commentId": {
+            "type": ["string", "null"]
+        },
+        "ownerName": {
+            "type": "string"
+        },
+        "ownerFullName": {
+            "type": ["string", "null"]
+        },
+        "ownerAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
+        "bodyPreview": {
+            "type": "string"
+        },
+        "heading": {
+            "type": "string"
+        },
+        "imageCount": {
+            "type": ["integer", "null"]
+        },
+        "videoPresent": {
+            "type": ["boolean", "null"]
+        },
+        "repliedTo": to_nullable_object_schema(SEARCH_REPLIED_TO_SCHEMA),
+        "createdAt": {
+            "type": "integer"
+        },
+        "operations": to_nullable_object_schema(SEARCH_ENTRY_OPERATIONS_SCHEMA),
+        "moment": {
+            "type": "integer"
+        },
+    },
+    "required": [
+        "nodeName",
+        "postingId",
+        "ownerName",
+        "bodyPreview",
+        "heading",
+        "createdAt",
+        "moment",
+    ],
+    "additionalProperties": False
+}
+
+SEARCH_HASHTAG_SLICE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "before": {
+            "type": "integer"
+        },
+        "after": {
+            "type": "integer"
+        },
+        "entries": {
+            "type": "array",
+            "items": SEARCH_ENTRY_INFO_SCHEMA
+        },
+    },
+    "required": [
+        "before",
+        "after",
+        "entries",
+    ],
+    "additionalProperties": False
+}
+
+SEARCH_TEXT_PAGE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "page": {
+            "type": "integer"
+        },
+        "total": {
+            "type": "integer"
+        },
+        "entries": {
+            "type": "array",
+            "items": SEARCH_ENTRY_INFO_SCHEMA
+        },
+    },
+    "required": [
+        "page",
+        "total",
+        "entries",
     ],
     "additionalProperties": False
 }
