@@ -1759,6 +1759,17 @@ class SearchHashtagFilter(Structure):
     """maximum number of entries returned"""
 
 
+class SearchNodeFilter(Structure):
+    query: str
+    """the search query"""
+    sheriff_name: str | None = None
+    """filter out nodes prohibited by the given sheriff"""
+    page: int | None = None
+    """page number, 0 by default"""
+    limit: int | None = None
+    """page size (maximum number of entries returned), the default is set by the search engine"""
+
+
 class SearchNodeInfo(Structure):
     node_name: str
     full_name: str | None = None
@@ -1769,6 +1780,15 @@ class SearchNodeInfo(Structure):
     """node owner's avatar"""
     distance: float
     """social distance between the node and the client"""
+
+
+class SearchNodePageInfo(Structure):
+    page: int
+    """number of the page"""
+    total: int
+    """total number of nodes found (this number may be approximate)"""
+    nodes: List[SearchNodeInfo]
+    """the nodes"""
 
 
 class SearchPostingUpdate(Structure):
@@ -2965,6 +2985,8 @@ class SearchEntryInfo(Structure):
     """avatar of the entry's owner"""
     body_preview: Body
     """preview of the entry's body, a string representation of a JSON structure"""
+    body_format: BodyFormat | None = None
+    """format of the entry's body, may have any value meaningful for the client"""
     heading: str
     """heading of the entry"""
     image_count: int | None = None
@@ -2994,7 +3016,7 @@ class SearchTextPageInfo(Structure):
     page: int
     """number of the page"""
     total: int
-    """total number of pages"""
+    """total number of entries found"""
     entries: List[SearchEntryInfo]
     """the entries"""
 

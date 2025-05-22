@@ -1611,6 +1611,28 @@ SEARCH_NODE_INFO_SCHEMA: Any = {
 
 SEARCH_NODE_INFO_ARRAY_SCHEMA = array_schema(SEARCH_NODE_INFO_SCHEMA)
 
+SEARCH_NODE_PAGE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "page": {
+            "type": "integer"
+        },
+        "total": {
+            "type": "integer"
+        },
+        "nodes": {
+            "type": "array",
+            "items": SEARCH_NODE_INFO_SCHEMA
+        },
+    },
+    "required": [
+        "page",
+        "total",
+        "nodes",
+    ],
+    "additionalProperties": False
+}
+
 SEARCH_REPLIED_TO_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -2901,6 +2923,9 @@ SEARCH_ENTRY_INFO_SCHEMA: Any = {
         "ownerAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "bodyPreview": {
             "type": "string"
+        },
+        "bodyFormat": {
+            "type": ["string", "null"]
         },
         "heading": {
             "type": "string"

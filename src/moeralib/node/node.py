@@ -1939,7 +1939,7 @@ class MoeraNode(Caller):
         )
         return types.SheriffOrderInfo.from_json(data)
 
-    def search_nodes(self, query: str | None = None, limit: int | None = None) -> List[types.SearchNodeInfo]:
+    def search_nodes(self, filter: types.SearchNodeFilter) -> types.SearchNodePageInfo:
         """
         Search for Moera nodes matching the search ``query``. Every space-delimited word in the query must match
         case-insensitively a beginning of the node's name or a beginning of any non-letter-delimited word in the node's
@@ -1950,13 +1950,36 @@ class MoeraNode(Caller):
         The returned nodes are sorted by their relevance. The exact definition of this term is left to the search
         engine's implementation.
 
+        :param filter:
+        """
+        location = "/search/nodes"
+        data = self.call(
+            "search_nodes", location, method="POST", body=filter, schema=schemas.SEARCH_NODE_PAGE_INFO_SCHEMA
+        )
+        return types.SearchNodePageInfo.from_json(data)
+
+    def search_node_suggestions(
+        self, query: str | None = None, sheriff: str | None = None, limit: int | None = None
+    ) -> List[types.SearchNodeInfo]:
+        """
+        Search for Moera nodes matching the search ``query`` and return a short list of "smart suggestions" for the
+        user. Every space-delimited word in the query must match case-insensitively a beginning of the node's name or a
+        beginning of any non-letter-delimited word in the node's full name. The order of words is not significant.
+        
+        The search engine may decide to return fewer nodes than the given ``limit``.
+        
+        The returned nodes are sorted by their relevance. The exact definition of this term is left to the search
+        engine's implementation.
+
         :param query: the search query
+        :param sheriff: filter out entries prohibited by the given sheriff
         :param limit: maximum number of nodes returned
         """
-        location = "/search/nodes".format()
-        params = {"query": query, "limit": limit}
+        location = "/search/nodes/suggestions".format()
+        params = {"query": query, "sheriff": sheriff, "limit": limit}
         data = self.call(
-            "search_nodes", location, method="GET", params=params, schema=schemas.SEARCH_NODE_INFO_ARRAY_SCHEMA
+            "search_node_suggestions", location, method="GET", params=params,
+            schema=schemas.SEARCH_NODE_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.SearchNodeInfo)
 
