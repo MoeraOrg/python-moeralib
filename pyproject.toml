@@ -9,12 +9,13 @@ authors = [
     {name = "Shmuel Leib Melamud", email = "balu@moera.org"},
 ]
 description = "Library to interact with Moera decentralized social network"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["Moera", "library", "naming", "node", "API"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules"
