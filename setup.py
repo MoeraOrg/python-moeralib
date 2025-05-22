@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='moeralib',
-    version='0.16.6',
+    version='0.16.8',
     install_requires=[
         "requests>=2.32.0",
         'camel-converter',
