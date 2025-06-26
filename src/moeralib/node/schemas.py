@@ -1203,6 +1203,9 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "size": {
             "type": "integer"
         },
+        "textContent": {
+            "type": ["string", "null"]
+        },
         "postingId": {
             "type": ["string", "null"]
         },
@@ -1412,6 +1415,53 @@ REACTION_TOTALS_INFO_SCHEMA: Any = {
 
 REACTION_TOTALS_INFO_ARRAY_SCHEMA = array_schema(REACTION_TOTALS_INFO_SCHEMA)
 
+RECOMMENDED_POSTING_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "nodeName": {
+            "type": "string"
+        },
+        "postingId": {
+            "type": "string"
+        },
+        "ownerName": {
+            "type": "string"
+        },
+        "ownerFullName": {
+            "type": ["string", "null"]
+        },
+        "ownerAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
+        "heading": {
+            "type": "string"
+        },
+        "totalPositiveReactions": {
+            "type": "integer"
+        },
+        "lastDayPositiveReactions": {
+            "type": "integer"
+        },
+        "totalComments": {
+            "type": "integer"
+        },
+        "lastDayComments": {
+            "type": "integer"
+        },
+    },
+    "required": [
+        "nodeName",
+        "postingId",
+        "ownerName",
+        "heading",
+        "totalPositiveReactions",
+        "lastDayPositiveReactions",
+        "totalComments",
+        "lastDayComments",
+    ],
+    "additionalProperties": False
+}
+
+RECOMMENDED_POSTING_INFO_ARRAY_SCHEMA = array_schema(RECOMMENDED_POSTING_INFO_SCHEMA)
+
 REGISTERED_NAME_SECRET_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -1585,6 +1635,25 @@ SHERIFF_MARK_SCHEMA: Any = {
     "additionalProperties": False
 }
 
+SEARCH_HISTORY_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "query": {
+            "type": "string"
+        },
+        "createdAt": {
+            "type": "integer"
+        },
+    },
+    "required": [
+        "query",
+        "createdAt",
+    ],
+    "additionalProperties": False
+}
+
+SEARCH_HISTORY_INFO_ARRAY_SCHEMA = array_schema(SEARCH_HISTORY_INFO_SCHEMA)
+
 SEARCH_NODE_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -1678,34 +1747,20 @@ SETTING_INFO_SCHEMA: Any = {
 
 SETTING_INFO_ARRAY_SCHEMA = array_schema(SETTING_INFO_SCHEMA)
 
-SETTING_TYPE_MODIFIERS_SCHEMA: Any = {
+SETTING_VALUE_CHOICE_SCHEMA: Any = {
     "type": "object",
     "properties": {
-        "format": {
-            "type": ["string", "null"]
+        "title": {
+            "type": "string"
         },
-        "min": {
-            "type": ["string", "null"]
-        },
-        "max": {
-            "type": ["string", "null"]
-        },
-        "multiline": {
-            "type": ["boolean", "null"]
-        },
-        "never": {
-            "type": ["boolean", "null"]
-        },
-        "always": {
-            "type": ["boolean", "null"]
-        },
-        "principals": {
-            "type": ["array", "null"],
-            "items": {
-                "type": "string"
-            }
+        "value": {
+            "type": "string"
         },
     },
+    "required": [
+        "title",
+        "value",
+    ],
     "additionalProperties": False
 }
 
@@ -2538,6 +2593,9 @@ COMMENT_REVISION_INFO_SCHEMA: Any = {
         "heading": {
             "type": "string"
         },
+        "description": {
+            "type": ["string", "null"]
+        },
         "createdAt": {
             "type": "integer"
         },
@@ -2723,6 +2781,9 @@ POSTING_INFO_SCHEMA: Any = {
         "heading": {
             "type": "string"
         },
+        "description": {
+            "type": ["string", "null"]
+        },
         "updateInfo": to_nullable_object_schema(UPDATE_INFO_SCHEMA),
         "createdAt": {
             "type": "integer"
@@ -2805,6 +2866,9 @@ POSTING_INFO_SCHEMA: Any = {
         "totalComments": {
             "type": ["integer", "null"]
         },
+        "recommended": {
+            "type": ["boolean", "null"]
+        },
     },
     "required": [
         "id",
@@ -2852,6 +2916,9 @@ POSTING_REVISION_INFO_SCHEMA: Any = {
         },
         "heading": {
             "type": "string"
+        },
+        "description": {
+            "type": ["string", "null"]
         },
         "updateInfo": to_nullable_object_schema(UPDATE_INFO_SCHEMA),
         "createdAt": {
@@ -2936,6 +3003,10 @@ SEARCH_ENTRY_INFO_SCHEMA: Any = {
         "videoPresent": {
             "type": ["boolean", "null"]
         },
+        "mediaPreview": to_nullable_object_schema(PUBLIC_MEDIA_FILE_INFO_SCHEMA),
+        "mediaPreviewId": {
+            "type": ["string", "null"]
+        },
         "repliedTo": to_nullable_object_schema(SEARCH_REPLIED_TO_SCHEMA),
         "createdAt": {
             "type": "integer"
@@ -3001,35 +3072,40 @@ SEARCH_TEXT_PAGE_INFO_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-SETTING_META_INFO_SCHEMA: Any = {
+SETTING_TYPE_MODIFIERS_SCHEMA: Any = {
     "type": "object",
     "properties": {
-        "name": {
-            "type": "string"
-        },
-        "type": {
-            "type": "string"
-        },
-        "defaultValue": {
+        "format": {
             "type": ["string", "null"]
         },
-        "privileged": {
+        "min": {
+            "type": ["string", "null"]
+        },
+        "max": {
+            "type": ["string", "null"]
+        },
+        "multiline": {
             "type": ["boolean", "null"]
         },
-        "title": {
-            "type": "string"
+        "never": {
+            "type": ["boolean", "null"]
         },
-        "modifiers": to_nullable_object_schema(SETTING_TYPE_MODIFIERS_SCHEMA),
+        "always": {
+            "type": ["boolean", "null"]
+        },
+        "items": {
+            "type": ["array", "null"],
+            "items": SETTING_VALUE_CHOICE_SCHEMA
+        },
+        "principals": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
+        },
     },
-    "required": [
-        "name",
-        "type",
-        "title",
-    ],
     "additionalProperties": False
 }
-
-SETTING_META_INFO_ARRAY_SCHEMA = array_schema(SETTING_META_INFO_SCHEMA)
 
 STORY_SUMMARY_DATA_SCHEMA: Any = {
     "type": "object",
@@ -3126,6 +3202,9 @@ COMMENT_INFO_SCHEMA: Any = {
         },
         "heading": {
             "type": "string"
+        },
+        "description": {
+            "type": ["string", "null"]
         },
         "repliedTo": to_nullable_object_schema(REPLIED_TO_SCHEMA),
         "moment": {
@@ -3310,50 +3389,35 @@ ENTRY_INFO_SCHEMA: Any = {
 
 ENTRY_INFO_ARRAY_SCHEMA = array_schema(ENTRY_INFO_SCHEMA)
 
-PLUGIN_INFO_SCHEMA: Any = {
+SETTING_META_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
-        "nodeId": {
-            "type": "string"
-        },
-        "local": {
-            "type": "boolean"
-        },
         "name": {
             "type": "string"
         },
+        "type": {
+            "type": "string"
+        },
+        "defaultValue": {
+            "type": ["string", "null"]
+        },
+        "privileged": {
+            "type": ["boolean", "null"]
+        },
         "title": {
-            "type": ["string", "null"]
+            "type": "string"
         },
-        "description": {
-            "type": ["string", "null"]
-        },
-        "location": {
-            "type": ["string", "null"]
-        },
-        "acceptedEvents": {
-            "type": ["array", "null"],
-            "items": {
-                "type": "string"
-            }
-        },
-        "settings": {
-            "type": ["array", "null"],
-            "items": SETTING_META_INFO_SCHEMA
-        },
-        "tokenId": {
-            "type": ["string", "null"]
-        },
+        "modifiers": to_nullable_object_schema(SETTING_TYPE_MODIFIERS_SCHEMA),
     },
     "required": [
-        "nodeId",
-        "local",
         "name",
+        "type",
+        "title",
     ],
     "additionalProperties": False
 }
 
-PLUGIN_INFO_ARRAY_SCHEMA = array_schema(PLUGIN_INFO_SCHEMA)
+SETTING_META_INFO_ARRAY_SCHEMA = array_schema(SETTING_META_INFO_SCHEMA)
 
 STORY_INFO_SCHEMA: Any = {
     "type": "object",
@@ -3479,6 +3543,51 @@ FEED_SLICE_INFO_SCHEMA: Any = {
     ],
     "additionalProperties": False
 }
+
+PLUGIN_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "nodeId": {
+            "type": "string"
+        },
+        "local": {
+            "type": "boolean"
+        },
+        "name": {
+            "type": "string"
+        },
+        "title": {
+            "type": ["string", "null"]
+        },
+        "description": {
+            "type": ["string", "null"]
+        },
+        "location": {
+            "type": ["string", "null"]
+        },
+        "acceptedEvents": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "settings": {
+            "type": ["array", "null"],
+            "items": SETTING_META_INFO_SCHEMA
+        },
+        "tokenId": {
+            "type": ["string", "null"]
+        },
+    },
+    "required": [
+        "nodeId",
+        "local",
+        "name",
+    ],
+    "additionalProperties": False
+}
+
+PLUGIN_INFO_ARRAY_SCHEMA = array_schema(PLUGIN_INFO_SCHEMA)
 
 PUSH_CONTENT_SCHEMA: Any = {
     "type": "object",

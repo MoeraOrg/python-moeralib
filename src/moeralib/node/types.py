@@ -74,7 +74,8 @@ SCOPE_VALUES: Mapping[Scope, int] = {
 }
 
 SearchContentUpdateType = Literal[
-    "block", "comment-add", "comment-update", "comment-delete", "friend", "profile", "posting-add", "posting-update",
+    "block", "comment-add", "comment-update", "comment-update-heading", "comment-update-media-text", "comment-delete",
+    "friend", "profile", "posting-add", "posting-update", "posting-update-heading", "posting-update-media-text",
     "posting-delete", "reaction-add", "reaction-delete", "reactions-delete-all", "subscribe", "unblock", "unfriend",
     "unsubscribe"
 ]
@@ -1383,6 +1384,8 @@ class PrivateMediaFileInfo(Structure):
     """
     size: int
     """size of the media file in bytes"""
+    text_content: str | None = None
+    """the text contained in the image, if any"""
     posting_id: str | None = None
     """ID of the posting linked to the media"""
     previews: List[MediaFilePreviewInfo] | None = None
@@ -1603,6 +1606,29 @@ class ReactionOverride(Structure):
     """
 
 
+class RecommendedPostingInfo(Structure):
+    node_name: str
+    """name of the node"""
+    posting_id: str
+    """ID of the posting on the node"""
+    owner_name: str
+    """node name of the posting's owner"""
+    owner_full_name: str | None = None
+    """full name of the posting's owner"""
+    owner_avatar: AvatarImage | None = None
+    """avatar of the posting's owner"""
+    heading: str
+    """heading of the posting"""
+    total_positive_reactions: int
+    """total number of positive reactions to the posting"""
+    last_day_positive_reactions: int
+    """number of positive reactions added to the posting in the previous 24 hours"""
+    total_comments: int
+    """total number of comments to the posting"""
+    last_day_comments: int
+    """number of comments added to the posting in the previous 24 hours"""
+
+
 class RegisteredNameSecret(Structure):
     name: str
     mnemonic: List[str] | None = None
@@ -1717,6 +1743,26 @@ class SearchBlockUpdate(Structure):
     """the operation being blocked/unblocked"""
 
 
+class SearchCommentHeadingUpdate(Structure):
+    posting_id: str
+    """ID of the posting"""
+    comment_id: str
+    """ID of the comment"""
+    heading: str
+    """heading of the posting"""
+
+
+class SearchCommentMediaTextUpdate(Structure):
+    posting_id: str
+    """ID of the posting"""
+    comment_id: str
+    """ID of the comment"""
+    media_id: str
+    """ID of the media"""
+    text_content: str
+    """text content of the media"""
+
+
 class SearchCommentUpdate(Structure):
     posting_id: str
     """ID of the posting the comment belongs to"""
@@ -1759,6 +1805,18 @@ class SearchHashtagFilter(Structure):
     """maximum number of entries returned"""
 
 
+class SearchHistoryInfo(Structure):
+    query: str
+    """the search query"""
+    created_at: Timestamp
+    """creation timestamp of the record in the search history"""
+
+
+class SearchHistoryText(Structure):
+    query: str
+    """the search query"""
+
+
 class SearchNodeFilter(Structure):
     query: str
     """the search query"""
@@ -1789,6 +1847,22 @@ class SearchNodePageInfo(Structure):
     """total number of nodes found (this number may be approximate)"""
     nodes: List[SearchNodeInfo]
     """the nodes"""
+
+
+class SearchPostingHeadingUpdate(Structure):
+    posting_id: str
+    """ID of the posting"""
+    heading: str
+    """heading of the posting"""
+
+
+class SearchPostingMediaTextUpdate(Structure):
+    posting_id: str
+    """ID of the posting"""
+    media_id: str
+    """ID of the media"""
+    text_content: str
+    """text content of the media"""
 
 
 class SearchPostingUpdate(Structure):
@@ -1887,26 +1961,11 @@ class SettingMetaAttributes(Structure):
     """the setting should be privileged (if absent or ``None``, the built-in value of the flag will be used)"""
 
 
-class SettingTypeModifiers(Structure):
-    format: str | None = None
-    """
-    preferred format of displaying the value
-    (``int``)
-    
-    * ``size`` - data size in bytes/kilobytes/megabytes etc.
-    """
-    min: str | None = None
-    """(``int``, ``Duration``) minimal value"""
-    max: str | None = None
-    """(``int``, ``Duration``) maximal value"""
-    multiline: bool | None = None
-    """(``string``) ``True``, if the value is a multiline text"""
-    never: bool | None = None
-    """(``Duration``) ``True``, if value ``never`` is allowed"""
-    always: bool | None = None
-    """(``Duration``) ``True``, if value ``always`` is allowed"""
-    principals: List[PrincipalFlag] | None = None
-    """(``Principal``) list of allowed principals"""
+class SettingValueChoice(Structure):
+    title: str
+    """human-friendly description of the value"""
+    value: str
+    """the value"""
 
 
 class SheriffComplaintDecisionText(Structure):
@@ -2559,6 +2618,11 @@ class CommentRevisionInfo(Structure):
     """format of the body of the revision, may have any value meaningful for the client"""
     heading: str
     """heading of the revision"""
+    description: str | None = None
+    """
+    in addition to ``heading``, gives a more detailed description of the revision that can be used for search engines
+    and link previews
+    """
     created_at: Timestamp
     """revision creation timestamp - the real time when the revision was created"""
     deleted_at: Timestamp | None = None
@@ -2786,6 +2850,11 @@ class PostingInfo(Structure):
     """list of the media attached to the posting"""
     heading: str
     """heading of the posting"""
+    description: str | None = None
+    """
+    in addition to ``heading``, gives a more detailed description of the posting that can be used for search engines
+    and link previews
+    """
     update_info: UpdateInfo | None = None
     """description of the latest update"""
     created_at: Timestamp
@@ -2849,6 +2918,11 @@ class PostingInfo(Structure):
     """details of the sources the posting was received from (for cached copies of remote postings only)"""
     total_comments: int | None = None
     """total number of comments to the posting"""
+    recommended: bool | None = None
+    """
+    ``True``, if the posting was recommended by a recommendation service (for cached copies of remote postings only),
+    ``False`` otherwise
+    """
 
 
 class PostingRevisionInfo(Structure):
@@ -2871,6 +2945,11 @@ class PostingRevisionInfo(Structure):
     """list of the media attached to the revision"""
     heading: str
     """heading of the revision"""
+    description: str | None = None
+    """
+    in addition to ``heading``, gives a more detailed description of the revision that can be used for search engines
+    and link previews
+    """
     update_info: UpdateInfo | None = None
     """description of the latest update"""
     created_at: Timestamp
@@ -2993,6 +3072,10 @@ class SearchEntryInfo(Structure):
     """number of images the entry contains"""
     video_present: bool | None = None
     """if ``True``, the entry contains a video"""
+    media_preview: PublicMediaFileInfo | None = None
+    """preview of the media attached to the entry, if any"""
+    media_preview_id: str | None = None
+    """ID of the media attached to the entry that was chosen for the preview"""
     replied_to: SearchRepliedTo | None = None
     """information about the comment this comment is replying to"""
     created_at: Timestamp
@@ -3021,44 +3104,29 @@ class SearchTextPageInfo(Structure):
     """the entries"""
 
 
-class SettingDescriptor(Structure):
-    name: str
-    """name of the setting"""
-    type: SettingType
-    """type of the setting"""
-    default_value: str | None = None
-    """default value of the setting"""
-    internal: bool | None = None
-    """the setting is internal - not displayed to the user"""
-    privileged: bool | None = None
-    """the setting is privileged - may be changed by server owner only"""
-    encrypted: bool | None = None
-    """the setting is stored in the database in encrypted form"""
-    title: str | None = None
-    """human-friendly description of the setting"""
-    modifiers: SettingTypeModifiers | None = None
+class SettingTypeModifiers(Structure):
+    format: str | None = None
     """
-    additional modifiers that may help to choose a proper UI component for the setting value and to validate the input;
-    the meaning of the modifiers depends on the setting type
+    preferred format of displaying the value
+    (``int``, ``string``)
+    
+    * ``size`` - data size in bytes/kilobytes/megabytes etc.;
+    * ``select`` - selection of a value from the provided list.
     """
-
-
-class SettingMetaInfo(Structure):
-    name: str
-    """name of the setting"""
-    type: SettingType
-    """type of the setting"""
-    default_value: str | None = None
-    """default value of the setting"""
-    privileged: bool | None = None
-    """the setting is privileged - may be changed by server owner only"""
-    title: str
-    """human-friendly description of the setting"""
-    modifiers: SettingTypeModifiers | None = None
-    """
-    additional modifiers that may help to choose a proper UI component for the setting value and to validate the input;
-    the meaning of the modifiers depends on the setting type
-    """
+    min: str | None = None
+    """(``int``, ``Duration``) minimal value"""
+    max: str | None = None
+    """(``int``, ``Duration``) maximal value"""
+    multiline: bool | None = None
+    """(``string``) ``True``, if the value is a multiline text"""
+    never: bool | None = None
+    """(``Duration``) ``True``, if value ``never`` is allowed"""
+    always: bool | None = None
+    """(``Duration``) ``True``, if value ``always`` is allowed"""
+    items: List[SettingValueChoice] | None = None
+    """(``string``) list of selection items"""
+    principals: List[PrincipalFlag] | None = None
+    """(``Principal``) list of allowed principals"""
 
 
 class StorySummaryData(Structure):
@@ -3134,6 +3202,11 @@ class CommentInfo(Structure):
     """list of the media attached to the comment"""
     heading: str
     """heading of the comment"""
+    description: str | None = None
+    """
+    in addition to ``heading``, gives a more detailed description of the comment that can be used for search engines
+    and link previews
+    """
     replied_to: RepliedTo | None = None
     """information about the comment this comment is replying to"""
     moment: int
@@ -3249,45 +3322,44 @@ class EntryInfo(Structure):
     """comment details, set if the entry is a comment"""
 
 
-class PluginDescription(Structure):
+class SettingDescriptor(Structure):
     name: str
-    """a unique plugin name; can contain only small latin letters, digits or hyphen"""
+    """name of the setting"""
+    type: SettingType
+    """type of the setting"""
+    default_value: str | None = None
+    """default value of the setting"""
+    internal: bool | None = None
+    """the setting is internal - not displayed to the user"""
+    privileged: bool | None = None
+    """the setting is privileged - may be changed by server owner only"""
+    encrypted: bool | None = None
+    """the setting is stored in the database in encrypted form"""
     title: str | None = None
-    """user-readable title of the plugin"""
-    description: str | None = None
-    """user-readable description of the purpose of the plugin"""
-    location: str | None = None
-    """URL of the plugin; used by the node to call the plugin API"""
-    accepted_events: List[str] | None = None
-    """list of types of internal events the plugin wants to receive; Read more about internal events."""
-    options: List[SettingDescriptor] | None = None
+    """human-friendly description of the setting"""
+    modifiers: SettingTypeModifiers | None = None
     """
-    plugin settings to be added to the list of node settings, the settings appear in the list with a prefix
-    ``plugin.&lt;plugin name>.``
+    additional modifiers that may help to choose a proper UI component for the setting value and to validate the input;
+    the meaning of the modifiers depends on the setting type
     """
 
 
-class PluginInfo(Structure):
-    node_id: str
-    """ID of the node this plugin is connected to"""
-    local: bool
-    """
-    ``True`` if the plugin is enabled for a particular node only, ``False``, if it is enabled for the whole server
-    """
+class SettingMetaInfo(Structure):
     name: str
-    """a unique plugin name"""
-    title: str | None = None
-    """user-readable title of the plugin"""
-    description: str | None = None
-    """user-readable description of the purpose of the plugin"""
-    location: str | None = None
-    """URL of the plugin; used by the node to call the plugin API"""
-    accepted_events: List[str] | None = None
-    """list of types of internal events the plugin wants to receive; Read more about internal events."""
-    settings: List[SettingMetaInfo] | None = None
-    """plugin settings to be added to the list of node settings"""
-    token_id: str | None = None
-    """ID of the token used to authenticate the plugin"""
+    """name of the setting"""
+    type: SettingType
+    """type of the setting"""
+    default_value: str | None = None
+    """default value of the setting"""
+    privileged: bool | None = None
+    """the setting is privileged - may be changed by server owner only"""
+    title: str
+    """human-friendly description of the setting"""
+    modifiers: SettingTypeModifiers | None = None
+    """
+    additional modifiers that may help to choose a proper UI component for the setting value and to validate the input;
+    the meaning of the modifiers depends on the setting type
+    """
 
 
 class StoryInfo(Structure):
@@ -3364,6 +3436,47 @@ class FeedSliceInfo(Structure):
     """total number of stories in the feed before this slice"""
     total_in_future: int
     """total number of stories in the feed after this slice"""
+
+
+class PluginDescription(Structure):
+    name: str
+    """a unique plugin name; can contain only small latin letters, digits or hyphen"""
+    title: str | None = None
+    """user-readable title of the plugin"""
+    description: str | None = None
+    """user-readable description of the purpose of the plugin"""
+    location: str | None = None
+    """URL of the plugin; used by the node to call the plugin API"""
+    accepted_events: List[str] | None = None
+    """list of types of internal events the plugin wants to receive; Read more about internal events."""
+    options: List[SettingDescriptor] | None = None
+    """
+    plugin settings to be added to the list of node settings, the settings appear in the list with a prefix
+    ``plugin.&lt;plugin name>.``
+    """
+
+
+class PluginInfo(Structure):
+    node_id: str
+    """ID of the node this plugin is connected to"""
+    local: bool
+    """
+    ``True`` if the plugin is enabled for a particular node only, ``False``, if it is enabled for the whole server
+    """
+    name: str
+    """a unique plugin name"""
+    title: str | None = None
+    """user-readable title of the plugin"""
+    description: str | None = None
+    """user-readable description of the purpose of the plugin"""
+    location: str | None = None
+    """URL of the plugin; used by the node to call the plugin API"""
+    accepted_events: List[str] | None = None
+    """list of types of internal events the plugin wants to receive; Read more about internal events."""
+    settings: List[SettingMetaInfo] | None = None
+    """plugin settings to be added to the list of node settings"""
+    token_id: str | None = None
+    """ID of the token used to authenticate the plugin"""
 
 
 class PushContent(Structure):

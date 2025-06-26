@@ -28,6 +28,51 @@ class MoeraNode(Caller):
         )
         return structure_list(data, types.ActivityReactionInfo)
 
+    def get_search_history(
+        self, prefix: str | None = None, limit: int | None = None
+    ) -> List[types.SearchHistoryInfo]:
+        """
+        Get a list of previously executed search queries, optionally filtered by the given ``prefix`` and limited by
+        the given ``limit``. The node may decide to return fewer queries than the given ``limit``. The queries are
+        always sorted by creation timestamp, descending.
+
+        :param prefix: find queries with the specified prefix (case-insensitive)
+        :param limit: maximum number of queries returned
+        """
+        location = "/activity/search".format()
+        params = {"prefix": prefix, "limit": limit}
+        data = self.call(
+            "get_search_history", location, method="GET", params=params,
+            schema=schemas.SEARCH_HISTORY_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.SearchHistoryInfo)
+
+    def save_to_search_history(self, history_text: types.SearchHistoryText) -> types.SearchHistoryInfo:
+        """
+        Save a search query in the registry.
+
+        :param history_text:
+        """
+        location = "/activity/search"
+        data = self.call(
+            "save_to_search_history", location, method="POST", body=history_text,
+            schema=schemas.SEARCH_HISTORY_INFO_SCHEMA
+        )
+        return types.SearchHistoryInfo.from_json(data)
+
+    def delete_from_search_history(self, query: str) -> types.Result:
+        """
+        Delete a search query from the registry.
+
+        :param query: the query to be deleted
+        """
+        location = "/activity/search".format()
+        params = {"query": query}
+        data = self.call(
+            "delete_from_search_history", location, method="DELETE", params=params, schema=schemas.RESULT_SCHEMA
+        )
+        return types.Result.from_json(data)
+
     def get_remote_sheriff_orders_slice(
         self, after: int | None = None, before: int | None = None, limit: int | None = None
     ) -> types.SheriffOrdersSliceInfo:
@@ -924,6 +969,23 @@ class MoeraNode(Caller):
         )
         return types.FeedSliceInfo.from_json(data)
 
+    def delete_feed_stories(
+        self, feed_name: str, type: types.StoryType | None = None, receiver: str | None = None,
+        recommended: bool | None = None
+    ) -> types.Result:
+        """
+        Delete all stories from the feed with optional filtering.
+
+        :param feed_name: name of the feed
+        :param type: delete only the stories of the given type
+        :param receiver: delete only the stories about postings located at the given node
+        :param recommended: delete only the stories about recommended postings
+        """
+        location = "/feeds/{feedName}/stories".format(feedName=quote_plus(feed_name))
+        params = {"type": type, "receiver": receiver, "recommended": recommended}
+        data = self.call("delete_feed_stories", location, method="DELETE", params=params, schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
     def get_friend_groups(self) -> List[types.FriendGroupInfo]:
         """
         Get the list of all groups of friends that exist on the node.
@@ -1650,6 +1712,112 @@ class MoeraNode(Caller):
         data = self.call(
             "register_at_push_relay", location, method="POST", body=attributes, schema=schemas.RESULT_SCHEMA
         )
+        return types.Result.from_json(data)
+
+    def get_recommended_postings(
+        self, sheriff: str | None = None, limit: int | None = None
+    ) -> List[types.RecommendedPostingInfo]:
+        """
+        Find postings known to the recommendation service and may be of interest to the client. If the client is
+        authenticated, the service may tune the recommendations for them.
+        
+        The service may decide to return fewer recommendations than the given ``limit``.
+
+        :param sheriff: filter out entries prohibited by the given sheriff
+        :param limit: maximum number of recommendations returned
+        """
+        location = "/recommendations/postings".format()
+        params = {"sheriff": sheriff, "limit": limit}
+        data = self.call(
+            "get_recommended_postings", location, method="GET", params=params,
+            schema=schemas.RECOMMENDED_POSTING_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.RecommendedPostingInfo)
+
+    def get_recommended_postings_for_reading(
+        self, sheriff: str | None = None, limit: int | None = None
+    ) -> List[types.RecommendedPostingInfo]:
+        """
+        Find postings known to the recommendation service and may be of interest to the client to read them. If the
+        client is authenticated, the service may tune the recommendations for them.
+        
+        The service may decide to return fewer recommendations than the given ``limit``.
+
+        :param sheriff: filter out entries prohibited by the given sheriff
+        :param limit: maximum number of recommendations returned
+        """
+        location = "/recommendations/postings/reading".format()
+        params = {"sheriff": sheriff, "limit": limit}
+        data = self.call(
+            "get_recommended_postings_for_reading", location, method="GET", params=params,
+            schema=schemas.RECOMMENDED_POSTING_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.RecommendedPostingInfo)
+
+    def get_recommended_postings_for_commenting(
+        self, sheriff: str | None = None, limit: int | None = None
+    ) -> List[types.RecommendedPostingInfo]:
+        """
+        Find postings known to the recommendation service and may be of interest to the client to take part in the
+        discussion. If the client is authenticated, the service may tune the recommendations for them.
+        
+        The service may decide to return fewer recommendations than the given ``limit``.
+
+        :param sheriff: filter out entries prohibited by the given sheriff
+        :param limit: maximum number of recommendations returned
+        """
+        location = "/recommendations/postings/commenting".format()
+        params = {"sheriff": sheriff, "limit": limit}
+        data = self.call(
+            "get_recommended_postings_for_commenting", location, method="GET", params=params,
+            schema=schemas.RECOMMENDED_POSTING_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.RecommendedPostingInfo)
+
+    def accept_recommended_posting(self, node_name: str, posting_id: str) -> types.Result:
+        """
+        Inform the recommendation service that the recommended posting was accepted by the client.
+
+        :param node_name: name of the remote node
+        :param posting_id: ID of the posting on the remote node
+        """
+        location = "/recommendations/postings/accepted/{nodeName}/{postingId}".format(
+            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+        )
+        data = self.call("accept_recommended_posting", location, method="POST", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def reject_recommended_posting(self, node_name: str, posting_id: str) -> types.Result:
+        """
+        Inform the recommendation service that the recommended posting was rejected by the client.
+
+        :param node_name: name of the remote node
+        :param posting_id: ID of the posting on the remote node
+        """
+        location = "/recommendations/postings/rejected/{nodeName}/{postingId}".format(
+            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+        )
+        data = self.call("reject_recommended_posting", location, method="POST", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def exclude_node_from_recommendations(self, node_name: str) -> types.Result:
+        """
+        Ask the recommendation service to exclude all content from the given node from future recommendations.
+
+        :param node_name: name of the remote node
+        """
+        location = "/recommendations/nodes/excluded/{nodeName}".format(nodeName=quote_plus(node_name))
+        data = self.call("exclude_node_from_recommendations", location, method="POST", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def allow_node_in_recommendations(self, node_name: str) -> types.Result:
+        """
+        Allow the recommendation service to include the content from the given node to future recommendations.
+
+        :param node_name: name of the remote node
+        """
+        location = "/recommendations/nodes/excluded/{nodeName}".format(nodeName=quote_plus(node_name))
+        data = self.call("allow_node_in_recommendations", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
         return types.Result.from_json(data)
 
     def ask_remote_node(self, node_name: str, details: types.AskDescription) -> types.Result:
