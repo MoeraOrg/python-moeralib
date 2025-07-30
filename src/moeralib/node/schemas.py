@@ -289,23 +289,6 @@ SUBSCRIPTION_OPERATIONS_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-ACCEPTED_REACTIONS_SCHEMA: Any = {
-    "type": "object",
-    "properties": {
-        "positive": {
-            "type": "string"
-        },
-        "negative": {
-            "type": "string"
-        },
-    },
-    "required": [
-        "positive",
-        "negative",
-    ],
-    "additionalProperties": False
-}
-
 ASYNC_OPERATION_CREATED_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -1483,6 +1466,19 @@ REGISTERED_NAME_SECRET_SCHEMA: Any = {
     "required": [
         "name",
     ],
+    "additionalProperties": False
+}
+
+REJECTED_REACTIONS_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "positive": {
+            "type": ["string", "null"]
+        },
+        "negative": {
+            "type": ["string", "null"]
+        },
+    },
     "additionalProperties": False
 }
 
@@ -2856,7 +2852,8 @@ POSTING_INFO_SCHEMA: Any = {
             "type": ["array", "null"],
             "items": SHERIFF_MARK_SCHEMA
         },
-        "acceptedReactions": to_nullable_object_schema(ACCEPTED_REACTIONS_SCHEMA),
+        "rejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
+        "commentRejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
         "clientReaction": to_nullable_object_schema(CLIENT_REACTION_INFO_SCHEMA),
         "reactions": to_nullable_object_schema(REACTION_TOTALS_INFO_SCHEMA),
         "sources": {
@@ -3248,7 +3245,9 @@ COMMENT_INFO_SCHEMA: Any = {
             "type": ["array", "null"],
             "items": SHERIFF_MARK_SCHEMA
         },
-        "acceptedReactions": to_nullable_object_schema(ACCEPTED_REACTIONS_SCHEMA),
+        "rejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
+        "ownerRejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
+        "seniorRejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
         "clientReaction": to_nullable_object_schema(CLIENT_REACTION_INFO_SCHEMA),
         "seniorReaction": to_nullable_object_schema(CLIENT_REACTION_INFO_SCHEMA),
         "reactions": to_nullable_object_schema(REACTION_TOTALS_INFO_SCHEMA),
@@ -3338,7 +3337,8 @@ DRAFT_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "ownerAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
-        "acceptedReactions": to_nullable_object_schema(ACCEPTED_REACTIONS_SCHEMA),
+        "rejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
+        "commentRejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
         "bodySrc": {
             "type": ["string", "null"]
         },

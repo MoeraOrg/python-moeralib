@@ -650,18 +650,6 @@ class SubscriptionOperations(Structure):
         return self.delete if self.delete is not None else "admin"
 
 
-class AcceptedReactions(Structure):
-    positive: str
-    """
-    comma-separated list of codes of the positive reactions that are accepted; a code may be prefixed by ``0x`` to
-    designate hexadecimal number and ``+`` to designate a recommended reaction
-    """
-    negative: str
-    """
-    comma-separated list of codes of the negative reactions that are accepted (the format is the same as above)
-    """
-
-
 class AskDescription(Structure):
     subject: AskSubject
     """request subject"""
@@ -946,11 +934,6 @@ class ClientReactionInfo(Structure):
     """reaction creation timestamp - the real time when the reaction was created"""
     deadline: Timestamp | None = None
     """if present, the reaction will be erased at this time"""
-
-
-class CommentMassAttributes(Structure):
-    senior_operations: CommentOperations | None = None
-    """the operations and the corresponding principals that are overridden by the comment's owner ("senior")"""
 
 
 class CommentTotalInfo(Structure):
@@ -1635,6 +1618,19 @@ class RegisteredNameSecret(Structure):
     """human-friendly mnemonic of the updating key"""
     secret: str | None = None
     """base64-encoded secret of the updating key"""
+
+
+class RejectedReactions(Structure):
+    positive: str | None = None
+    """
+    space-separated list of hexadecimal codes of the positive reactions that are rejected; a special code ``*`` means
+    rejection of any non-standard reaction
+    """
+    negative: str | None = None
+    """
+    space-separated list of hexadecimal codes of the negative reactions that are rejected (the format is the same as
+    above)
+    """
 
 
 class RemoteFeed(Structure):
@@ -2600,6 +2596,13 @@ class Body(Structure):
     """link previews"""
 
 
+class CommentMassAttributes(Structure):
+    senior_operations: CommentOperations | None = None
+    """the operations and the corresponding principals that are overridden by the comment's owner ("senior")"""
+    senior_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects, as defined by the posting's owner ("senior")"""
+
+
 class CommentRevisionInfo(Structure):
     id: str
     posting_revision_id: str
@@ -2656,8 +2659,13 @@ class CommentSourceText(Structure):
     """
     media: List[MediaWithDigest] | None = None
     """array of IDs and digests of private media to be attached to the comment"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the comment accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects"""
+    senior_rejected_reactions: RejectedReactions | None = None
+    """
+    types of reactions that the comment rejects, as defined by the posting's owner ("senior"); only the senior may set
+    this
+    """
     replied_to_id: str | None = None
     """ID of the comment this comment is replying to"""
     operations: CommentOperations | None = None
@@ -2697,8 +2705,13 @@ class CommentText(Structure):
     """array of IDs of private media to be attached to the comment"""
     created_at: Timestamp | None = None
     """comment creation timestamp - the real time when the comment was created"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the comment accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects"""
+    senior_rejected_reactions: RejectedReactions | None = None
+    """
+    types of reactions that the comment rejects, as defined by the posting's owner ("senior"); only the senior may set
+    this
+    """
     replied_to_id: str | None = None
     """ID of the comment this comment is replying to"""
     signature: bytes | None = None
@@ -2731,8 +2744,10 @@ class DraftText(Structure):
     """full name of the posting's/comment's owner"""
     owner_avatar: AvatarDescription | None = None
     """avatar of the posting's/comment's owner"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the posting accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting rejects"""
+    comment_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting's comments should reject"""
     body_src: Body | None = None
     """the source text of the draft, a string representation of a JSON structure"""
     body_src_format: SourceFormat | None = None
@@ -2908,8 +2923,10 @@ class PostingInfo(Structure):
     """list of sheriffs supervising the posting"""
     sheriff_marks: List[SheriffMark] | None = None
     """list of sheriff marks on the posting"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the posting accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting rejects"""
+    comment_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting's comments should reject"""
     client_reaction: ClientReactionInfo | None = None
     """details of the existing reaction (if any) of the client's owner"""
     reactions: ReactionTotalsInfo | None = None
@@ -2984,8 +3001,10 @@ class PostingSourceText(Structure):
     """
     media: List[MediaWithDigest] | None = None
     """array of IDs and digests of private media to be attached to the posting"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the posting accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting rejects"""
+    comment_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting's comments should rejects"""
     operations: PostingOperations | None = None
     """the operations and the corresponding principals"""
     comment_operations: CommentOperations | None = None
@@ -3022,8 +3041,10 @@ class PostingText(Structure):
     """array of IDs of private media to be attached to the posting"""
     created_at: Timestamp | None = None
     """posting creation timestamp - the real time when the posting was created"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the posting accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting rejects"""
+    comment_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting's comments should reject"""
     publications: List[StoryAttributes] | None = None
     """list of publications in feeds that must be made after creating the posting (for new postings only)"""
     update_info: UpdateInfo | None = None
@@ -3238,8 +3259,12 @@ class CommentInfo(Structure):
     """operations on the comment that are blocked for the client"""
     sheriff_marks: List[SheriffMark] | None = None
     """list of sheriff marks on the comment"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the comment accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects"""
+    owner_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects, as defined by the comments' owner"""
+    senior_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects, as defined by the posting's owner ("senior")"""
     client_reaction: ClientReactionInfo | None = None
     """details of the existing reaction (if any) of the client's owner"""
     senior_reaction: ClientReactionInfo | None = None
@@ -3285,8 +3310,10 @@ class DraftInfo(Structure):
     """full name of the posting's/comment's owner"""
     owner_avatar: AvatarImage | None = None
     """avatar of the posting's/comment's owner"""
-    accepted_reactions: AcceptedReactions | None = None
-    """types of reactions that the posting accepts"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting rejects"""
+    comment_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment should reject, set for posting drafts, if needed"""
     body_src: Body | None = None
     """the source text of the draft, a string representation of a JSON structure"""
     body_src_format: SourceFormat | None = None
