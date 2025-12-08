@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "moeralib"
-version = "0.17.1"
+version = "0.17.11"
 authors = [
     {name = "Shmuel Leib Melamud", email = "balu@moera.org"},
 ]
