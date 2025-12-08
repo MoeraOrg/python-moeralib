@@ -1220,6 +1220,9 @@ PROFILE_INFO_SCHEMA: Any = {
         "email": {
             "type": ["string", "null"]
         },
+        "emailVerified": {
+            "type": ["boolean", "null"]
+        },
         "title": {
             "type": ["string", "null"]
         },
@@ -1481,6 +1484,36 @@ REJECTED_REACTIONS_SCHEMA: Any = {
     },
     "additionalProperties": False
 }
+
+RECOMMENDED_NODE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "nodeName": {
+            "type": "string"
+        },
+        "fullName": {
+            "type": ["string", "null"]
+        },
+        "title": {
+            "type": ["string", "null"]
+        },
+        "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
+        "subscribersTotal": {
+            "type": "integer"
+        },
+        "postingsTotal": {
+            "type": "integer"
+        },
+    },
+    "required": [
+        "nodeName",
+        "subscribersTotal",
+        "postingsTotal",
+    ],
+    "additionalProperties": False
+}
+
+RECOMMENDED_NODE_INFO_ARRAY_SCHEMA = array_schema(RECOMMENDED_NODE_INFO_SCHEMA)
 
 REMOTE_MEDIA_INFO_SCHEMA: Any = {
     "type": "object",
@@ -2398,6 +2431,25 @@ USER_LIST_SLICE_INFO_SCHEMA: Any = {
     "additionalProperties": False
 }
 
+VERIFICATION_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "correct": {
+            "type": "boolean"
+        },
+        "errorCode": {
+            "type": ["string", "null"]
+        },
+        "errorMessage": {
+            "type": ["string", "null"]
+        },
+    },
+    "required": [
+        "correct",
+    ],
+    "additionalProperties": False
+}
+
 WHO_AM_I_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -2419,6 +2471,9 @@ WHO_AM_I_SCHEMA: Any = {
         "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "frozen": {
             "type": ["boolean", "null"]
+        },
+        "type": {
+            "type": ["string", "null"]
         },
     },
     "additionalProperties": False
@@ -2625,6 +2680,31 @@ COMMENT_REVISION_INFO_SCHEMA: Any = {
 }
 
 COMMENT_REVISION_INFO_ARRAY_SCHEMA = array_schema(COMMENT_REVISION_INFO_SCHEMA)
+
+CONTACT_WITH_RELATIONSHIPS_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "contact": CONTACT_INFO_SCHEMA,
+        "subscriber": to_nullable_object_schema(SUBSCRIBER_INFO_SCHEMA),
+        "subscription": to_nullable_object_schema(SUBSCRIPTION_INFO_SCHEMA),
+        "friend": to_nullable_object_schema(FRIEND_INFO_SCHEMA),
+        "friendOf": to_nullable_object_schema(FRIEND_OF_INFO_SCHEMA),
+        "blocked": {
+            "type": ["array", "null"],
+            "items": BLOCKED_USER_INFO_SCHEMA
+        },
+        "blockedBy": {
+            "type": ["array", "null"],
+            "items": BLOCKED_BY_USER_INFO_SCHEMA
+        },
+    },
+    "required": [
+        "contact",
+    ],
+    "additionalProperties": False
+}
+
+CONTACT_WITH_RELATIONSHIPS_ARRAY_SCHEMA = array_schema(CONTACT_WITH_RELATIONSHIPS_SCHEMA)
 
 FEATURES_SCHEMA: Any = {
     "type": "object",

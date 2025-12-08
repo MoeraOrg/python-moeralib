@@ -17,6 +17,8 @@ BodyFormat = Literal["message", "application"]
 
 DraftType = Literal["new-posting", "posting-update", "new-comment", "comment-update"]
 
+NodeType = Literal["regular", "search", "application"]
+
 OperationStatus = Literal["waiting", "added", "started", "succeeded", "failed", "unknown"]
 
 PrincipalFlag = Literal[
@@ -80,7 +82,7 @@ SearchContentUpdateType = Literal[
     "unsubscribe"
 ]
 
-SearchEngine = Literal["google"]
+SearchEngine = Literal["google", "bing"]
 
 SearchEntryType = Literal["all", "posting", "comment"]
 
@@ -941,6 +943,11 @@ class CommentTotalInfo(Structure):
     """total number of comments in the posting after the operation"""
 
 
+class ContactFilter(Structure):
+    node_names: List[str]
+    """list of node names to fetch"""
+
+
 class ContactInfo(Structure):
     node_name: str
     full_name: str | None = None
@@ -988,6 +995,10 @@ class CredentialsChange(Structure):
 class CredentialsCreated(Structure):
     created: bool
     """``True`` if the credentials are initialized already, ``False`` otherwise"""
+
+
+class CredentialsResetToken(Structure):
+    token: str
 
 
 class DeleteNodeStatus(Structure):
@@ -1408,6 +1419,8 @@ class ProfileInfo(Structure):
     """node owner's gender"""
     email: str | None = None
     """node owner's E-mail address"""
+    email_verified: bool | None = None
+    """``True``, if the node owner's E-mail address is verified, ``False`` otherwise"""
     title: str | None = None
     """node title"""
     bio_src: str | None = None
@@ -1631,6 +1644,20 @@ class RejectedReactions(Structure):
     space-separated list of hexadecimal codes of the negative reactions that are rejected (the format is the same as
     above)
     """
+
+
+class RecommendedNodeInfo(Structure):
+    node_name: str
+    full_name: str | None = None
+    """node owner's full name"""
+    title: str | None = None
+    """node title"""
+    avatar: AvatarImage | None = None
+    """node owner's avatar"""
+    subscribers_total: int
+    """total number of subscribers of the node"""
+    postings_total: int
+    """total number of public postings published by the node"""
 
 
 class RemoteFeed(Structure):
@@ -2482,6 +2509,15 @@ class UserListSliceInfo(Structure):
     """number of items after this slice till the far future"""
 
 
+class VerificationInfo(Structure):
+    correct: bool
+    """``True`` if the verified object is correct, ``False`` otherwise"""
+    error_code: str | None = None
+    """error code"""
+    error_message: str | None = None
+    """human-readable error message"""
+
+
 class WhoAmI(Structure):
     node_name: str | None = None
     node_name_changing: bool | None = None
@@ -2496,6 +2532,8 @@ class WhoAmI(Structure):
     """node owner's avatar"""
     frozen: bool | None = None
     """``True`` if the node is frozen due to inactivity, ``False`` (the default) otherwise"""
+    type: NodeType | None = None
+    """type of the node, ``regular`` by default"""
 
 
 class ActivityReactionFilter(Structure):
@@ -2727,6 +2765,23 @@ class CommentText(Structure):
     the operations and the corresponding principals that are overridden by the posting's owner ("senior"); only the
     senior may set this
     """
+
+
+class ContactWithRelationships(Structure):
+    contact: ContactInfo
+    """contact's details"""
+    subscriber: SubscriberInfo | None = None
+    """information about the contact's subscription to the node's feeds"""
+    subscription: SubscriptionInfo | None = None
+    """information about the nodes's subscription to the contact's feeds"""
+    friend: FriendInfo | None = None
+    """information about the node's friendship with the contact"""
+    friend_of: FriendOfInfo | None = None
+    """information about the contact's friendship with the node"""
+    blocked: List[BlockedUserInfo] | None = None
+    """information about blocking the contact by the node"""
+    blocked_by: List[BlockedByUserInfo] | None = None
+    """information about blocking the node by the contact"""
 
 
 class DraftText(Structure):

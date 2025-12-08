@@ -612,6 +612,19 @@ class MoeraNode(Caller):
         )
         return structure_list(data, types.ContactInfo)
 
+    def fetch_contacts(self, filter: types.ContactFilter) -> List[types.ContactWithRelationships]:
+        """
+        Fetch the detailed information, including relationships, about the contacts matching the filter.
+
+        :param filter:
+        """
+        location = "/people/contacts/fetch"
+        data = self.call(
+            "fetch_contacts", location, method="POST", body=filter,
+            schema=schemas.CONTACT_WITH_RELATIONSHIPS_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.ContactWithRelationships)
+
     def check_credentials(self) -> types.CredentialsCreated:
         """
         Check whether the credentials are initialized already.
@@ -667,6 +680,20 @@ class MoeraNode(Caller):
         location = "/credentials/reset"
         data = self.call("reset_credentials", location, method="POST", auth=False, schema=schemas.EMAIL_HINT_SCHEMA)
         return types.EmailHint.from_json(data)
+
+    def verify_credentials_reset_token(self, reset_token: types.CredentialsResetToken) -> types.VerificationInfo:
+        """
+        Verify the credentials reset token. If the token is valid, it may be used later to change the credentials
+        without knowing the password.
+
+        :param reset_token:
+        """
+        location = "/credentials/reset/verify"
+        data = self.call(
+            "verify_credentials_reset_token", location, method="POST", body=reset_token, auth=False,
+            schema=schemas.VERIFICATION_INFO_SCHEMA
+        )
+        return types.VerificationInfo.from_json(data)
 
     def get_deleted_postings(self, page: int | None = None, limit: int | None = None) -> List[types.PostingInfo]:
         """
@@ -1644,6 +1671,14 @@ class MoeraNode(Caller):
         data = self.call("update_profile", location, method="PUT", body=profile, schema=schemas.PROFILE_INFO_SCHEMA)
         return types.ProfileInfo.from_json(data)
 
+    def verify_email(self) -> types.Result:
+        """
+        Repeat verification process (resend the confirmation mail) for the current e-mail address set in the profile.
+        """
+        location = "/profile/email/verify"
+        data = self.call("verify_email", location, method="POST", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
     def get_delete_node_request_status(self) -> types.DeleteNodeStatus:
         """
         Get the current status of the request to delete the node.
@@ -1715,7 +1750,7 @@ class MoeraNode(Caller):
         return types.Result.from_json(data)
 
     def get_recommended_postings(
-        self, sheriff: str | None = None, limit: int | None = None
+        self, feed: str | None = None, sheriff: str | None = None, limit: int | None = None
     ) -> List[types.RecommendedPostingInfo]:
         """
         Find postings known to the recommendation service and may be of interest to the client. If the client is
@@ -1723,11 +1758,13 @@ class MoeraNode(Caller):
         
         The service may decide to return fewer recommendations than the given ``limit``.
 
+        :param feed: name of the feed to get recommendations for ("news" by default); recommendations for every
+            feed are tracked separately
         :param sheriff: filter out entries prohibited by the given sheriff
         :param limit: maximum number of recommendations returned
         """
         location = "/recommendations/postings".format()
-        params = {"sheriff": sheriff, "limit": limit}
+        params = {"feed": feed, "sheriff": sheriff, "limit": limit}
         data = self.call(
             "get_recommended_postings", location, method="GET", params=params,
             schema=schemas.RECOMMENDED_POSTING_INFO_ARRAY_SCHEMA
@@ -1774,31 +1811,60 @@ class MoeraNode(Caller):
         )
         return structure_list(data, types.RecommendedPostingInfo)
 
-    def accept_recommended_posting(self, node_name: str, posting_id: str) -> types.Result:
+    def accept_recommended_posting(self, node_name: str, posting_id: str, feed: str | None = None) -> types.Result:
         """
         Inform the recommendation service that the recommended posting was accepted by the client.
 
         :param node_name: name of the remote node
         :param posting_id: ID of the posting on the remote node
+        :param feed: name of the feed the recommendation is accepted to ("news" by default); recommendations for
+            every feed are tracked separately
         """
         location = "/recommendations/postings/accepted/{nodeName}/{postingId}".format(
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
         )
-        data = self.call("accept_recommended_posting", location, method="POST", schema=schemas.RESULT_SCHEMA)
+        params = {"feed": feed}
+        data = self.call(
+            "accept_recommended_posting", location, method="POST", params=params, schema=schemas.RESULT_SCHEMA
+        )
         return types.Result.from_json(data)
 
-    def reject_recommended_posting(self, node_name: str, posting_id: str) -> types.Result:
+    def reject_recommended_posting(self, node_name: str, posting_id: str, feed: str | None = None) -> types.Result:
         """
         Inform the recommendation service that the recommended posting was rejected by the client.
 
         :param node_name: name of the remote node
         :param posting_id: ID of the posting on the remote node
+        :param feed: name of the feed the recommendation is rejected for ("news" by default); recommendations for
+            every feed are tracked separately
         """
         location = "/recommendations/postings/rejected/{nodeName}/{postingId}".format(
             nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
         )
-        data = self.call("reject_recommended_posting", location, method="POST", schema=schemas.RESULT_SCHEMA)
+        params = {"feed": feed}
+        data = self.call(
+            "reject_recommended_posting", location, method="POST", params=params, schema=schemas.RESULT_SCHEMA
+        )
         return types.Result.from_json(data)
+
+    def get_recommended_nodes_by_activity(
+        self, sheriff: str | None = None, limit: int | None = None
+    ) -> List[types.RecommendedNodeInfo]:
+        """
+        Find the most active nodes known to the recommendation service.
+        
+        The service may decide to return fewer recommendations than the given ``limit``.
+
+        :param sheriff: filter out nodes prohibited by the given sheriff
+        :param limit: maximum number of recommendations returned
+        """
+        location = "/recommendations/nodes/active".format()
+        params = {"sheriff": sheriff, "limit": limit}
+        data = self.call(
+            "get_recommended_nodes_by_activity", location, method="GET", auth=False, params=params,
+            schema=schemas.RECOMMENDED_NODE_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.RecommendedNodeInfo)
 
     def exclude_node_from_recommendations(self, node_name: str) -> types.Result:
         """
