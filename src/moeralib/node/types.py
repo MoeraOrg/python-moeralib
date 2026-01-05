@@ -2995,6 +2995,11 @@ class PostingInfo(Structure):
     ``True``, if the posting was recommended by a recommendation service (for cached copies of remote postings only),
     ``False`` otherwise
     """
+    external_source_uri: str | None = None
+    """
+    URI of the external source the posting was received from; used by software that automatically forwards postings
+    from other social networks (for admin only)
+    """
 
 
 class PostingRevisionInfo(Structure):
@@ -3116,6 +3121,11 @@ class PostingText(Structure):
     """the operations and the corresponding principals that are overridden in reactions to the posting"""
     comment_reaction_operations: ReactionOperations | None = None
     """the operations and the corresponding principals that are overridden in reactions to the posting's comments"""
+    external_source_uri: str | None = None
+    """
+    URI of the external source the posting was received from; used by software that automatically forwards postings
+    from other social networks (for admin only)
+    """
 
 
 class ReactionCreated(Structure):

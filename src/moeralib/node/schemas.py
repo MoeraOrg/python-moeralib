@@ -2946,6 +2946,9 @@ POSTING_INFO_SCHEMA: Any = {
         "recommended": {
             "type": ["boolean", "null"]
         },
+        "externalSourceUri": {
+            "type": ["string", "null"]
+        },
     },
     "required": [
         "id",

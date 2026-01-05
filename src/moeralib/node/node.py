@@ -1414,6 +1414,20 @@ class MoeraNode(Caller):
         )
         return types.PostingInfo.from_json(data)
 
+    def get_postings_by_external_source(self, external: str) -> List[types.PostingInfo]:
+        """
+        Get all postings coming from the given external source.
+
+        :param external: URI of the external source of the posting
+        """
+        location = "/postings".format()
+        params = {"external": external}
+        data = self.call(
+            "get_postings_by_external_source", location, method="GET", params=params, bodies=True,
+            schema=schemas.POSTING_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.PostingInfo)
+
     def update_posting(self, id: str, posting: types.PostingText) -> types.PostingInfo:
         """
         Update the posting, creating a new revision of it. The text is processed just like in the ``POST`` request.
