@@ -82,7 +82,7 @@ SearchContentUpdateType = Literal[
     "unsubscribe"
 ]
 
-SearchEngine = Literal["google", "bing"]
+SearchEngine = Literal["google", "bing", "yandex"]
 
 SearchEntryType = Literal["all", "posting", "comment"]
 
