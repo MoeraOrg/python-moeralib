@@ -167,6 +167,9 @@ POSTING_OPERATIONS_SCHEMA: Any = {
         "addComment": {
             "type": ["string", "null"]
         },
+        "trustComment": {
+            "type": ["string", "null"]
+        },
         "overrideComment": {
             "type": ["string", "null"]
         },
@@ -208,6 +211,9 @@ PRIVATE_MEDIA_FILE_OPERATIONS_SCHEMA: Any = {
     "type": "object",
     "properties": {
         "view": {
+            "type": ["string", "null"]
+        },
+        "edit": {
             "type": ["string", "null"]
         },
     },
@@ -311,6 +317,15 @@ AVATAR_IMAGE_SCHEMA: Any = {
         "path": {
             "type": "string"
         },
+        "directPath": {
+            "type": ["string", "null"]
+        },
+        "directPathExpiresAt": {
+            "type": ["integer", "null"]
+        },
+        "mimeType": {
+            "type": ["string", "null"]
+        },
         "width": {
             "type": ["integer", "null"]
         },
@@ -339,6 +354,15 @@ AVATAR_INFO_SCHEMA: Any = {
         },
         "path": {
             "type": "string"
+        },
+        "directPath": {
+            "type": ["string", "null"]
+        },
+        "directPathExpiresAt": {
+            "type": ["integer", "null"]
+        },
+        "mimeType": {
+            "type": ["string", "null"]
         },
         "width": {
             "type": ["integer", "null"]
@@ -1007,8 +1031,17 @@ MEDIA_FILE_PREVIEW_INFO_SCHEMA: Any = {
         "targetWidth": {
             "type": "integer"
         },
+        "hash": {
+            "type": "string"
+        },
         "directPath": {
             "type": ["string", "null"]
+        },
+        "directPathExpiresAt": {
+            "type": ["integer", "null"]
+        },
+        "mimeType": {
+            "type": "string"
         },
         "width": {
             "type": "integer"
@@ -1022,6 +1055,8 @@ MEDIA_FILE_PREVIEW_INFO_SCHEMA: Any = {
     },
     "required": [
         "targetWidth",
+        "hash",
+        "mimeType",
         "width",
         "height",
     ],
@@ -1171,6 +1206,9 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "directPath": {
             "type": ["string", "null"]
         },
+        "directPathExpiresAt": {
+            "type": ["integer", "null"]
+        },
         "mimeType": {
             "type": "string"
         },
@@ -1186,6 +1224,9 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "size": {
             "type": "integer"
         },
+        "title": {
+            "type": ["string", "null"]
+        },
         "textContent": {
             "type": ["string", "null"]
         },
@@ -1195,6 +1236,12 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "previews": {
             "type": ["array", "null"],
             "items": MEDIA_FILE_PREVIEW_INFO_SCHEMA
+        },
+        "attachment": {
+            "type": ["boolean", "null"]
+        },
+        "malware": {
+            "type": ["boolean", "null"]
         },
         "operations": to_nullable_object_schema(PRIVATE_MEDIA_FILE_OPERATIONS_SCHEMA),
     },
@@ -1253,6 +1300,15 @@ PUBLIC_MEDIA_FILE_INFO_SCHEMA: Any = {
         },
         "path": {
             "type": "string"
+        },
+        "directPath": {
+            "type": ["string", "null"]
+        },
+        "directPathExpiresAt": {
+            "type": ["integer", "null"]
+        },
+        "mimeType": {
+            "type": ["string", "null"]
         },
         "width": {
             "type": ["integer", "null"]
@@ -1526,6 +1582,12 @@ REMOTE_MEDIA_INFO_SCHEMA: Any = {
         },
         "digest": {
             "type": ["string", "null"]
+        },
+        "mimeType": {
+            "type": ["string", "null"]
+        },
+        "attachment": {
+            "type": ["boolean", "null"]
         },
     },
     "required": [
@@ -3083,6 +3145,9 @@ SEARCH_ENTRY_INFO_SCHEMA: Any = {
         "videoPresent": {
             "type": ["boolean", "null"]
         },
+        "attachmentCount": {
+            "type": ["integer", "null"]
+        },
         "mediaPreview": to_nullable_object_schema(PUBLIC_MEDIA_FILE_INFO_SCHEMA),
         "mediaPreviewId": {
             "type": ["string", "null"]
@@ -3313,6 +3378,9 @@ COMMENT_INFO_SCHEMA: Any = {
         },
         "signatureVersion": {
             "type": ["integer", "null"]
+        },
+        "premoderating": {
+            "type": ["boolean", "null"]
         },
         "operations": to_nullable_object_schema(COMMENT_OPERATIONS_SCHEMA),
         "reactionOperations": to_nullable_object_schema(REACTION_OPERATIONS_SCHEMA),

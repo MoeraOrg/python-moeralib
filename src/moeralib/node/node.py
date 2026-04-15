@@ -1187,7 +1187,9 @@ class MoeraNode(Caller):
         )
         return types.PrivateMediaFileInfo.from_json(data)
 
-    def get_private_media(self, id: str, width: int | None = None, download: bool | None = None) -> IO:
+    def get_private_media(
+        self, id: str, width: int | None = None, download: bool | None = None, ignoremalware: bool | None = None
+    ) -> IO:
         """
         Get media file content (returned in the response body).
 
@@ -1195,9 +1197,11 @@ class MoeraNode(Caller):
         :param width: preferred width of the media in pixels; if present, the node will try to return the smallest
             in size, but the best in quality variant of the media, according to the width provided
         :param download: if ``True``, the node will add ``Content-Disposition: attachment`` header to the output
+        :param ignoremalware: if ``True``, the node will ignore malware detection and return the media file; only
+            admin may use this option
         """
         location = "/media/private/{id}/data".format(id=quote_plus(id))
-        params = {"width": width, "download": download}
+        params = {"width": width, "download": download, "ignoremalware": ignoremalware}
         data = self.call("get_private_media", location, method="GET", params=params, schema="blob")
         return cast(IO, data)
 
@@ -1210,6 +1214,22 @@ class MoeraNode(Caller):
         location = "/media/private/{id}/info".format(id=quote_plus(id))
         data = self.call(
             "get_private_media_info", location, method="GET", schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
+        )
+        return types.PrivateMediaFileInfo.from_json(data)
+
+    def update_private_media_info(
+        self, id: str, attributes: types.PrivateMediaFileAttributes
+    ) -> types.PrivateMediaFileInfo:
+        """
+        Update media file details.
+
+        :param id: media file ID
+        :param attributes:
+        """
+        location = "/media/private/{id}/info".format(id=quote_plus(id))
+        data = self.call(
+            "update_private_media_info", location, method="PUT", body=attributes,
+            schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
         return types.PrivateMediaFileInfo.from_json(data)
 
@@ -2032,6 +2052,21 @@ class MoeraNode(Caller):
             "verify_remote_comment_reaction", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
         return types.AsyncOperationCreated.from_json(data)
+
+    def download_remote_media(self, node_name: str, id: str) -> types.PrivateMediaFileInfo:
+        """
+        Download the private media file from the remote node and store it at the home node.
+
+        :param node_name: name of the remote node
+        :param id: id of the media file
+        """
+        location = "/nodes/{nodeName}/media/private/{id}/download".format(
+            nodeName=quote_plus(node_name), id=quote_plus(id)
+        )
+        data = self.call(
+            "download_remote_media", location, method="POST", schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
+        )
+        return types.PrivateMediaFileInfo.from_json(data)
 
     def create_remote_posting(self, node_name: str, posting: types.PostingSourceText) -> types.Result:
         """

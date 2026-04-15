@@ -106,15 +106,16 @@ SourceFormat = Literal["plain-text", "html", "markdown", "html/visual", "applica
 StoryType = Literal[
     "asked-to-friend", "asked-to-subscribe", "blocked-user", "blocked-user-in-posting", "comment-added",
     "comment-media-reaction-added-negative", "comment-media-reaction-added-positive", "comment-media-reaction-failed",
-    "comment-post-task-failed", "comment-reaction-added-negative", "comment-reaction-added-positive",
-    "comment-reaction-task-failed", "comment-update-task-failed", "defrosting", "friend-added", "friend-deleted",
-    "friend-group-deleted", "mention-comment", "mention-posting", "posting-added",
+    "comment-needs-approval", "comment-post-task-failed", "comment-reaction-added-negative",
+    "comment-reaction-added-positive", "comment-reaction-task-failed", "comment-update-task-failed", "defrosting",
+    "friend-added", "friend-deleted", "friend-group-deleted", "mention-comment", "mention-posting", "posting-added",
     "posting-media-reaction-added-negative", "posting-media-reaction-added-positive", "posting-media-reaction-failed",
     "posting-post-task-failed", "posting-reaction-task-failed", "posting-subscribe-task-failed",
-    "posting-update-task-failed", "posting-updated", "reaction-added-negative", "reaction-added-positive",
-    "reminder-avatar", "reminder-email", "reminder-full-name", "reminder-sheriff-allow", "remote-comment-added",
-    "reply-comment", "search-report", "sheriff-complaint-added", "sheriff-complaint-decided", "sheriff-marked",
-    "sheriff-unmarked", "subscriber-added", "subscriber-deleted", "unblocked-user", "unblocked-user-in-posting"
+    "posting-update-task-failed", "posting-updated", "premoderated-comment-accepted", "premoderated-comment-rejected",
+    "reaction-added-negative", "reaction-added-positive", "reminder-avatar", "reminder-email", "reminder-full-name",
+    "reminder-sheriff-allow", "remote-comment-added", "reply-comment", "search-report", "sheriff-complaint-added",
+    "sheriff-complaint-decided", "sheriff-marked", "sheriff-unmarked", "subscriber-added", "subscriber-deleted",
+    "unblocked-user", "unblocked-user-in-posting"
 ]
 
 SubscriptionReason = Literal["user", "mention", "comment", "auto"]
@@ -442,6 +443,16 @@ class PostingOperations(Structure):
     def add_comment_or_default(self) -> PrincipalValue:
         """add a comment to the posting (this property always returns default value instead of ``None``)"""
         return self.add_comment if self.add_comment is not None else "signed"
+    trust_comment: PrincipalValue | None = None
+    """publish a comment to the posting without premoderation"""
+
+    @property
+    def trust_comment_or_default(self) -> PrincipalValue:
+        """
+        publish a comment to the posting without premoderation (this property always returns default value instead of
+        ``None``)
+        """
+        return self.trust_comment if self.trust_comment is not None else "signed"
     override_comment: PrincipalValue | None = None
     """override the permissions of the posting's comments"""
 
@@ -549,6 +560,13 @@ class PrivateMediaFileOperations(Structure):
     def view_or_default(self) -> PrincipalValue:
         """view the media file (this property always returns default value instead of ``None``)"""
         return self.view if self.view is not None else "public"
+    edit: PrincipalValue | None = None
+    """edit the media file attributes"""
+
+    @property
+    def edit_or_default(self) -> PrincipalValue:
+        """edit the media file attributes (this property always returns default value instead of ``None``)"""
+        return self.edit if self.edit is not None else "owner"
 
 
 class ProfileOperations(Structure):
@@ -706,6 +724,15 @@ class AvatarImage(Structure):
     """ID of the media file"""
     path: str
     """virtual location of the media file, relative to the ``/media`` virtual page"""
+    direct_path: str | None = None
+    """
+    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
+    or CDN
+    """
+    direct_path_expires_at: Timestamp | None = None
+    """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
+    mime_type: str | None = None
+    """MIME type of the media"""
     width: int | None = None
     """width of the media in pixels (``None``, if the media file is not an image/video)"""
     height: int | None = None
@@ -721,6 +748,15 @@ class AvatarInfo(Structure):
     """ID of the media file"""
     path: str
     """virtual location of the media file, relative to the ``/media`` virtual page"""
+    direct_path: str | None = None
+    """
+    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
+    or CDN
+    """
+    direct_path_expires_at: Timestamp | None = None
+    """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
+    mime_type: str | None = None
+    """MIME type of the media"""
     width: int | None = None
     """width of the media in pixels (``None``, if the media file is not an image/video)"""
     height: int | None = None
@@ -1213,11 +1249,17 @@ class LinkPreviewInfo(Structure):
 class MediaFilePreviewInfo(Structure):
     target_width: int
     """the width the preview was prepared for viewing at"""
+    hash: str
+    """SHA-1 hash of the preview"""
     direct_path: str | None = None
     """
-    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem;
-    static images do not accept any query parameters including authentication parameters
+    location of the preview, relative to the ``/media``; points to a static image served directly from a filesystem or
+    CDN
     """
+    direct_path_expires_at: Timestamp | None = None
+    """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
+    mime_type: str
+    """MIME type of the preview"""
     width: int
     """actual width of the preview in pixels"""
     height: int
@@ -1353,6 +1395,11 @@ class PostingSourceInfo(Structure):
     """timestamp when the posting was received from this source"""
 
 
+class PrivateMediaFileAttributes(Structure):
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
+
+
 class PrivateMediaFileInfo(Structure):
     id: str
     """ID of the media file"""
@@ -1362,9 +1409,11 @@ class PrivateMediaFileInfo(Structure):
     """virtual location of the media file, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
     """
-    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem;
-    static images do not accept any query parameters including authentication parameters
+    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
+    or CDN
     """
+    direct_path_expires_at: Timestamp | None = None
+    """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
     mime_type: str
     """MIME type of the media"""
     width: int | None = None
@@ -1378,12 +1427,21 @@ class PrivateMediaFileInfo(Structure):
     """
     size: int
     """size of the media file in bytes"""
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
     text_content: str | None = None
     """the text contained in the image, if any"""
     posting_id: str | None = None
     """ID of the posting linked to the media"""
     previews: List[MediaFilePreviewInfo] | None = None
     """list of media previews - downscaled versions of the media"""
+    attachment: bool | None = None
+    """
+    ``True`` if the media cannot be displayed as an image or video and should be displayed as an attachment instead,
+    ``False`` (default) otherwise
+    """
+    malware: bool | None = None
+    """``True`` if the media file is considered to be malware, ``False`` (default) otherwise"""
     operations: PrivateMediaFileOperations | None = None
     """the supported operations and the corresponding principals"""
 
@@ -1445,6 +1503,15 @@ class PublicMediaFileInfo(Structure):
     """ID of the media file"""
     path: str
     """virtual location of the media file, relative to the ``/media`` virtual page"""
+    direct_path: str | None = None
+    """
+    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
+    or CDN
+    """
+    direct_path_expires_at: Timestamp | None = None
+    """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
+    mime_type: str | None = None
+    """MIME type of the media"""
     width: int | None = None
     """width of the media in pixels (``None``, if the media file is not an image or video)"""
     height: int | None = None
@@ -1674,6 +1741,13 @@ class RemoteMedia(Structure):
     """SHA-1 hash of the media file"""
     digest: str | None = None
     """cryptographic digest of the media file"""
+    mime_type: str
+    """MIME type of the media"""
+    attachment: bool | None = None
+    """
+    ``True`` if the media cannot be displayed as an image or video and should be displayed as an attachment instead,
+    ``False`` (default) otherwise
+    """
 
 
 class RemoteMediaInfo(Structure):
@@ -1683,6 +1757,13 @@ class RemoteMediaInfo(Structure):
     """SHA-1 hash of the media file"""
     digest: str | None = None
     """cryptographic digest of the media file"""
+    mime_type: str | None = None
+    """MIME type of the media"""
+    attachment: bool | None = None
+    """
+    ``True`` if the media cannot be displayed as an image or video and should be displayed as an attachment instead,
+    ``False`` (default) otherwise
+    """
 
 
 class RemotePosting(Structure):
@@ -1782,7 +1863,9 @@ class SearchCommentMediaTextUpdate(Structure):
     """ID of the comment"""
     media_id: str
     """ID of the media"""
-    text_content: str
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
+    text_content: str | None = None
     """text content of the media"""
 
 
@@ -1817,6 +1900,11 @@ class SearchHashtagFilter(Structure):
     """
     if ``True``, return only the entries containing a video, if ``False``, return only the entries that do not contain
     a video
+    """
+    attachment_present: bool | None = None
+    """
+    if ``True``, return only the entries containing a file attachment, if ``False``, return only the entries that do
+    not contain a file attachment
     """
     sheriff_name: str | None = None
     """filter out entries prohibited by the given sheriff"""
@@ -1884,7 +1972,9 @@ class SearchPostingMediaTextUpdate(Structure):
     """ID of the posting"""
     media_id: str
     """ID of the media"""
-    text_content: str
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
+    text_content: str | None = None
     """text content of the media"""
 
 
@@ -1955,6 +2045,11 @@ class SearchTextFilter(Structure):
     """
     if ``True``, return only the entries containing a video, if ``False``, return only the entries that do not contain
     a video
+    """
+    attachment_present: bool | None = None
+    """
+    if ``True``, return only the entries containing a file attachment, if ``False``, return only the entries that do
+    not contain a file attachment
     """
     created_after: Timestamp | None = None
     """return entries created at or after this timestamp"""
@@ -2756,6 +2851,11 @@ class CommentText(Structure):
     """the comment's owner signature (use ``Comment`` fingerprint)"""
     signature_version: int | None = None
     """signature version (i.e. fingerprint version)"""
+    premoderating: bool | None = None
+    """
+    ``True``, if the comment is being be checked by the post's author before publication, ``False`` (default)
+    otherwise; only the senior may set this
+    """
     operations: CommentOperations | None = None
     """the operations and the corresponding principals"""
     reaction_operations: ReactionOperations | None = None
@@ -3158,6 +3258,8 @@ class SearchEntryInfo(Structure):
     """number of images the entry contains"""
     video_present: bool | None = None
     """if ``True``, the entry contains a video"""
+    attachment_count: int | None = None
+    """number of file attachments the entry contains"""
     media_preview: PublicMediaFileInfo | None = None
     """preview of the media attached to the entry, if any"""
     media_preview_id: str | None = None
@@ -3312,6 +3414,10 @@ class CommentInfo(Structure):
     """the comment's owner signature (use ``Comment`` fingerprint)"""
     signature_version: int | None = None
     """signature version (i.e. fingerprint version)"""
+    premoderating: bool | None = None
+    """
+    ``True``, if the comment is being be checked by the post's author before publication, ``False`` (default) otherwise
+    """
     operations: CommentOperations | None = None
     """the supported operations and the corresponding principals"""
     reaction_operations: ReactionOperations | None = None

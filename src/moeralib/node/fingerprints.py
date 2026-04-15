@@ -17,6 +17,27 @@ def create_attachment_fingerprint0(digest: bytes | None) -> bytes:
     return fingerprint_bytes({'version': 0, 'object_type': 'ATTACHMENT'} | locals(), ATTACHMENT_FINGERPRINT0_SCHEMA)
 
 
+CARTE_FINGERPRINT3_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('owner_name', 'string'),
+    ('addresses', 'string[]'),
+    ('beginning', 'number'),
+    ('deadline', 'number'),
+    ('node_name', 'string'),
+    ('client_scope', 'number'),
+    ('admin_scope', 'number'),
+    ('salt', 'bytes'),
+]
+
+
+def create_carte_fingerprint3(
+    owner_name: str | None, addresses: List[str] | None, beginning: Timestamp | None, deadline: Timestamp | None,
+    node_name: str | None, client_scope: int | None, admin_scope: int | None, salt: bytes | None
+) -> bytes:
+    return fingerprint_bytes({'version': 3, 'object_type': 'CARTE'} | locals(), CARTE_FINGERPRINT3_SCHEMA)
+
+
 CARTE_FINGERPRINT2_SCHEMA: FingerprintSchema = [
     ('version', 'number'),
     ('object_type', 'string'),
@@ -75,6 +96,30 @@ def create_carte_fingerprint0(
     permissions: int | None, salt: bytes | None
 ) -> bytes:
     return fingerprint_bytes({'version': 0, 'object_type': 'CARTE'} | locals(), CARTE_FINGERPRINT0_SCHEMA)
+
+
+COMMENT_FINGERPRINT1_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('owner_name', 'string'),
+    ('posting_fingerprint', 'bytes'),
+    ('replied_to_fingerprint', 'bytes'),
+    ('body_src_hash', 'bytes'),
+    ('body_src_format', 'string'),
+    ('body', 'string'),
+    ('body_format', 'string'),
+    ('created_at', 'number'),
+    ('permissions', 'number'),
+    ('attachments', 'bytes[]'),
+]
+
+
+def create_comment_fingerprint1(
+    owner_name: str | None, posting_fingerprint: bytes | None, replied_to_fingerprint: bytes | None,
+    body_src_hash: bytes | None, body_src_format: str | None, body: str | None, body_format: str | None,
+    created_at: Timestamp | None, permissions: int | None, attachments: List[bytes] | None
+) -> bytes:
+    return fingerprint_bytes({'version': 1, 'object_type': 'COMMENT'} | locals(), COMMENT_FINGERPRINT1_SCHEMA)
 
 
 COMMENT_FINGERPRINT0_SCHEMA: FingerprintSchema = [
