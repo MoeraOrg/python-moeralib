@@ -1,4 +1,4 @@
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from typing import Any, cast, Sequence, Tuple, Mapping
 
 import requests
@@ -12,6 +12,15 @@ MAIN_SERVER = 'https://naming.moera.org/moera-naming'
 """Main Moera naming server."""
 DEV_SERVER = 'https://naming-dev.moera.org/moera-naming'
 """Moera developers' naming server."""
+
+ANONYMOUS_NODE_NAME = 'unk_0'
+"""Node name used to represent anonymous content author."""
+ANONYMOUS_NODE_PUBLIC_KEY = b64decode(
+    'VNKYmrV8b1XR7phWvrTUbkfnxsPTKvHIcvJLGrBZQr0Z8eKVdTooBkIWS0CECPjLxPGaQkcKkMcZ6M6wEsJm9A=='
+)
+"""Public key used to verify signatures of anonymous content."""
+ANONYMOUS_NODE_PRIVATE_KEY = b64decode('tCb+02pUSC6FLdQLPvrUhSBjD0xiV5Q+fQmZY3PKybo=')
+"""Private key used to sign anonymous content."""
 
 
 class MoeraNamingError(Exception):
