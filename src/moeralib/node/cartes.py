@@ -6,7 +6,7 @@ from typing import List
 from cryptography.hazmat.primitives.asymmetric import ec
 
 from .caller import CarteSource
-from .fingerprints import create_carte_fingerprint2
+from .fingerprints import create_carte_fingerprint3
 from .node import MoeraNode
 from .types import CarteInfo, CarteAttributes, Scope, Timestamp, SCOPE_VALUES
 from ..crypto import sign_fingerprint
@@ -76,7 +76,7 @@ def to_scope_mask(scope: List[Scope]) -> int:
 
 
 def generate_carte(owner_name: str, signing_key: ec.EllipticCurvePrivateKey, beginning: Timestamp, ttl: int = 600,
-                   address: str | None = None, node_name: str | None = None,
+                   address: List[str] | str | None = None, node_name: str | None = None,
                    client_scope: List[Scope] | int = SCOPE_VALUES["all"], admin_scope: List[Scope] | int = 0) -> str:
     """
     Generate a carte with the given parameters and sign it with the provided private signing key.
@@ -85,7 +85,7 @@ def generate_carte(owner_name: str, signing_key: ec.EllipticCurvePrivateKey, beg
     :param signing_key: the private signing key to sign the carte
     :param beginning: timestamp of the beginning of the carte's life
     :param ttl: length of the carte's life, in seconds
-    :param address: if set, the carte is valid for authentication from the given IP address only
+    :param address: if set, the carte is valid for authentication from the given IP address(-es) only
     :param node_name: if set, the carte is valid for authentication on the specified node only
     :param client_scope: list of permissions granted to the carte
     :param admin_scope: list of additional administrative permissions (of those granted to the carte's owner by
@@ -96,7 +96,9 @@ def generate_carte(owner_name: str, signing_key: ec.EllipticCurvePrivateKey, beg
         client_scope = to_scope_mask(client_scope)
     if isinstance(admin_scope, list):
         admin_scope = to_scope_mask(admin_scope)
-    fingerprint = create_carte_fingerprint2(owner_name, address, beginning, beginning + ttl, node_name, client_scope,
+    if address is not None and not isinstance(address, list):
+        address = [address]
+    fingerprint = create_carte_fingerprint3(owner_name, address, beginning, beginning + ttl, node_name, client_scope,
                                             admin_scope, os.urandom(8))
     signature = sign_fingerprint(fingerprint, signing_key)
     return urlsafe_b64encode(fingerprint + signature).decode('ascii')
