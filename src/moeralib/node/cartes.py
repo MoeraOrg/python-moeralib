@@ -1,7 +1,7 @@
 import os
 from base64 import urlsafe_b64encode
 from time import time
-from typing import List
+from typing import Sequence
 
 from cryptography.hazmat.primitives.asymmetric import ec
 
@@ -20,12 +20,12 @@ class MoeraCartesError(Exception):
 class MoeraCarteSource(CarteSource):
     """Class that gets cartes from the given node, caches them and supplies them for authentication."""
     _node: MoeraNode
-    _client_scope: List[Scope]
-    _admin_scope: List[Scope]
+    _client_scope: list[Scope]
+    _admin_scope: list[Scope]
     _target_node_name: str | None
-    _cartes: List[CarteInfo] = []
+    _cartes: list[CarteInfo]
 
-    def __init__(self, node: MoeraNode, client_scope: List[Scope] | None = None, admin_scope: List[Scope] | None = None,
+    def __init__(self, node: MoeraNode, client_scope: list[Scope] | None = None, admin_scope: list[Scope] | None = None,
                  target_node_name: str | None = None):
         """
         :param node: node to get cartes from
@@ -36,9 +36,17 @@ class MoeraCarteSource(CarteSource):
         :param target_node_name: if set, the cartes are valid for authentication on the specified node only
         """
         self._node = node
-        self._client_scope = client_scope if client_scope is not None else ["all"]
-        self._admin_scope = admin_scope if admin_scope is not None else []
+        if client_scope is None:
+            default_scope: Scope = "all"
+            self._client_scope = [default_scope]
+        else:
+            self._client_scope = client_scope
+        if admin_scope is None:
+            self._admin_scope = []
+        else:
+            self._admin_scope = admin_scope
         self._target_node_name = target_node_name
+        self._cartes = []
 
     def renew(self) -> None:
         """
@@ -59,16 +67,17 @@ class MoeraCarteSource(CarteSource):
             self._cartes = [c for c in self._cartes if c.deadline > now]
             if len(self._cartes) == 0:
                 if renewed:
-                    raise MoeraCartesError("Could not obtain a valid carte from the node")
+                    break
                 self.renew()
                 continue
             for c in self._cartes:
                 if c.beginning <= now:
                     return c.carte
             raise MoeraCartesError("Could not obtain a carte valid for now")
+        raise MoeraCartesError("Could not obtain a valid carte from the node")
 
 
-def to_scope_mask(scope: List[Scope]) -> int:
+def to_scope_mask(scope: Sequence[Scope]) -> int:
     mask = 0
     for sc in scope:
         mask |= SCOPE_VALUES[sc]
@@ -76,8 +85,9 @@ def to_scope_mask(scope: List[Scope]) -> int:
 
 
 def generate_carte(owner_name: str, signing_key: ec.EllipticCurvePrivateKey, beginning: Timestamp, ttl: int = 600,
-                   address: List[str] | str | None = None, node_name: str | None = None,
-                   client_scope: List[Scope] | int = SCOPE_VALUES["all"], admin_scope: List[Scope] | int = 0) -> str:
+                   address: list[str] | str | None = None, node_name: str | None = None,
+                   client_scope: Sequence[Scope] | int = SCOPE_VALUES["all"],
+                   admin_scope: Sequence[Scope] | int = 0) -> str:
     """
     Generate a carte with the given parameters and sign it with the provided private signing key.
 
@@ -92,13 +102,15 @@ def generate_carte(owner_name: str, signing_key: ec.EllipticCurvePrivateKey, beg
            the target node) granted to the carte
     :return: the carte
     """
-    if isinstance(client_scope, list):
-        client_scope = to_scope_mask(client_scope)
-    if isinstance(admin_scope, list):
-        admin_scope = to_scope_mask(admin_scope)
-    if address is not None and not isinstance(address, list):
-        address = [address]
-    fingerprint = create_carte_fingerprint3(owner_name, address, beginning, beginning + ttl, node_name, client_scope,
-                                            admin_scope, os.urandom(8))
+    client_scope_mask = to_scope_mask(client_scope) if not isinstance(client_scope, int) else client_scope
+    admin_scope_mask = to_scope_mask(admin_scope) if not isinstance(admin_scope, int) else admin_scope
+    if address is None:
+        addresses: list[str] | None = None
+    elif isinstance(address, list):
+        addresses = address
+    else:
+        addresses = [address]
+    fingerprint = create_carte_fingerprint3(owner_name, addresses, beginning, beginning + ttl, node_name,
+                                            client_scope_mask, admin_scope_mask, os.urandom(8))
     signature = sign_fingerprint(fingerprint, signing_key)
     return urlsafe_b64encode(fingerprint + signature).decode('ascii')
