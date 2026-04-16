@@ -2873,7 +2873,7 @@ class ContactWithRelationships(Structure):
     subscriber: SubscriberInfo | None = None
     """information about the contact's subscription to the node's feeds"""
     subscription: SubscriptionInfo | None = None
-    """information about the nodes's subscription to the contact's feeds"""
+    """information about the node's subscription to the contact's feeds"""
     friend: FriendInfo | None = None
     """information about the node's friendship with the contact"""
     friend_of: FriendOfInfo | None = None
