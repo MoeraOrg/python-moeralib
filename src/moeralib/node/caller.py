@@ -137,6 +137,8 @@ class Caller:
     _token: str | None = None
     _carte: str | None = None
     _carte_source: CarteSource | None = None
+    _verify_ssl: bool = True
+    """Whether SSL certificates should be verified."""
     _auth_method: NodeAuth = NodeAuth.NONE
 
     def node_url(self, url: str) -> None:
@@ -158,6 +160,10 @@ class Caller:
     def carte_source(self, carte_source: CarteSource) -> None:
         """Set a source of cartes for authentication."""
         self._carte_source = carte_source
+
+    def verify_ssl(self, verify_ssl: bool) -> None:
+        """Enable or disable SSL certificate verification."""
+        self._verify_ssl = verify_ssl
 
     def auth_method(self, auth_method: NodeAuth) -> None:
         """Select authentication method for the following requests."""
@@ -246,7 +252,8 @@ class Caller:
                 json=body_encoded,
                 data=body_file,
                 stream=schema == "blob",
-                timeout=timeout_duration(method, body_encoded, body_file)
+                timeout=timeout_duration(method, body_encoded, body_file),
+                verify=self._verify_ssl
             )
 
             response = r.json()

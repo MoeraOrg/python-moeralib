@@ -11,7 +11,8 @@ from ..structure import comma_separated_flags, structure_list
 class MoeraNode(Caller):
     """Node API interface."""
 
-    def __init__(self, node_url: str | None = None):
+    def __init__(self, node_url: str | None = None, verify_ssl: bool = True):
+        self.verify_ssl(verify_ssl)
         if node_url is not None:
             self.node_url(node_url)
 

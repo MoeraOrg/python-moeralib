@@ -63,13 +63,16 @@ CONNECTION_TIMEOUT = 10 # seconds
 class MoeraNaming:
     """Naming API interface."""
     _server: str
+    _verify_ssl: bool
     _call_id: int
 
-    def __init__(self, server: str = MAIN_SERVER):
+    def __init__(self, server: str = MAIN_SERVER, verify_ssl: bool = True):
         """
         :param server: the naming server URL
+        :param verify_ssl: ``True`` to verify SSL certificates, ``False`` otherwise
         """
         self._server = server
+        self._verify_ssl = verify_ssl
         self._call_id = 0
 
     def call(self, method: str, params: Sequence[Any], schema: Any = None):
@@ -90,7 +93,8 @@ class MoeraNaming:
                     'jsonrpc': '2.0',
                     'id': self._call_id,
                 },
-                timeout=CONNECTION_TIMEOUT
+                timeout=CONNECTION_TIMEOUT,
+                verify=self._verify_ssl
             )
             self._call_id += 1
 
@@ -287,15 +291,16 @@ def expand(node_name: str | None) -> str | None:
     return f'{name}_{gen}'
 
 
-def resolve(name: str, naming_server: str = MAIN_SERVER) -> str | None:
+def resolve(name: str, naming_server: str = MAIN_SERVER, verify_ssl: bool = True) -> str | None:
     """
     Shortcut function to resolve a node name and get the node URI.
 
     :param name: the node name
     :param naming_server: a naming server to be used
+    :param verify_ssl: ``True`` to verify SSL certificates, ``False`` otherwise
     :return: the node URI, or ``None`` if the name does not exist
     """
     (name, gen) = node_name_parse(name)
-    naming = MoeraNaming(naming_server)
+    naming = MoeraNaming(naming_server, verify_ssl=verify_ssl)
     info = naming.get_current(name, gen)
     return info.node_uri if info is not None else None
