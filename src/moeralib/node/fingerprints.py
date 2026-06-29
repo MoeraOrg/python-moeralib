@@ -146,6 +146,46 @@ def create_comment_fingerprint0(
     return fingerprint_bytes({'version': 0, 'object_type': 'COMMENT'} | locals(), COMMENT_FINGERPRINT0_SCHEMA)
 
 
+MEDIA_GRANT_FINGERPRINT1_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('node_name', 'string'),
+    ('media_id', 'string'),
+    ('expires', 'number'),
+    ('download', 'boolean'),
+    ('file_name', 'string'),
+    ('salt', 'bytes'),
+]
+
+
+def create_media_grant_fingerprint1(
+    node_name: str | None, media_id: str | None, expires: Timestamp | None, download: bool | None,
+    file_name: str | None, salt: bytes | None
+) -> bytes:
+    return fingerprint_bytes({'version': 1, 'object_type': 'MEDIA_GRANT'} | locals(), MEDIA_GRANT_FINGERPRINT1_SCHEMA)
+
+
+MEDIA_GRANT_FINGERPRINT0_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('node_name', 'string'),
+    ('posting_id', 'string'),
+    ('comment_id', 'string'),
+    ('media_id', 'string'),
+    ('expires', 'number'),
+    ('download', 'boolean'),
+    ('file_name', 'string'),
+    ('salt', 'bytes'),
+]
+
+
+def create_media_grant_fingerprint0(
+    node_name: str | None, posting_id: str | None, comment_id: str | None, media_id: str | None,
+    expires: Timestamp | None, download: bool | None, file_name: str | None, salt: bytes | None
+) -> bytes:
+    return fingerprint_bytes({'version': 0, 'object_type': 'MEDIA_GRANT'} | locals(), MEDIA_GRANT_FINGERPRINT0_SCHEMA)
+
+
 NOTIFICATION_PACKET_FINGERPRINT1_SCHEMA: FingerprintSchema = [
     ('version', 'number'),
     ('object_type', 'string'),

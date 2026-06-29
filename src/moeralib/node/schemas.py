@@ -999,6 +999,9 @@ LINK_PREVIEW_SCHEMA: Any = {
         "imageHash": {
             "type": ["string", "null"]
         },
+        "publishedAt": {
+            "type": ["integer", "null"]
+        },
     },
     "additionalProperties": False
 }
@@ -1021,6 +1024,9 @@ LINK_PREVIEW_INFO_SCHEMA: Any = {
         "imageUrl": {
             "type": ["string", "null"]
         },
+        "publishedAt": {
+            "type": ["integer", "null"]
+        },
     },
     "additionalProperties": False
 }
@@ -1032,6 +1038,9 @@ MEDIA_FILE_PREVIEW_INFO_SCHEMA: Any = {
             "type": "integer"
         },
         "hash": {
+            "type": "string"
+        },
+        "path": {
             "type": "string"
         },
         "directPath": {
@@ -1056,6 +1065,7 @@ MEDIA_FILE_PREVIEW_INFO_SCHEMA: Any = {
     "required": [
         "targetWidth",
         "hash",
+        "path",
         "mimeType",
         "width",
         "height",
@@ -1086,6 +1096,29 @@ NODE_NAME_INFO_SCHEMA: Any = {
         },
         "operations": to_nullable_object_schema(NODE_NAME_OPERATIONS_SCHEMA),
     },
+    "additionalProperties": False
+}
+
+PARENT_MEDIA_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "nodeName": {
+            "type": ["string", "null"]
+        },
+        "mediaId": {
+            "type": "string"
+        },
+        "postingId": {
+            "type": "string"
+        },
+        "commentId": {
+            "type": ["string", "null"]
+        },
+    },
+    "required": [
+        "mediaId",
+        "postingId",
+    ],
     "additionalProperties": False
 }
 
@@ -1135,9 +1168,6 @@ POSTING_FEATURES_SCHEMA: Any = {
                 "type": "string"
             }
         },
-        "mediaMaxSize": {
-            "type": "integer"
-        },
         "imageRecommendedSize": {
             "type": "integer"
         },
@@ -1154,7 +1184,6 @@ POSTING_FEATURES_SCHEMA: Any = {
     "required": [
         "subjectPresent",
         "sourceFormats",
-        "mediaMaxSize",
         "imageRecommendedSize",
         "imageRecommendedPixels",
         "imageFormats",
@@ -1200,6 +1229,9 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "hash": {
             "type": "string"
         },
+        "digest": {
+            "type": "string"
+        },
         "path": {
             "type": "string"
         },
@@ -1230,9 +1262,6 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "textContent": {
             "type": ["string", "null"]
         },
-        "postingId": {
-            "type": ["string", "null"]
-        },
         "previews": {
             "type": ["array", "null"],
             "items": MEDIA_FILE_PREVIEW_INFO_SCHEMA
@@ -1243,11 +1272,18 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "malware": {
             "type": ["boolean", "null"]
         },
+        "grant": {
+            "type": ["string", "null"]
+        },
+        "grantExpiresAt": {
+            "type": ["integer", "null"]
+        },
         "operations": to_nullable_object_schema(PRIVATE_MEDIA_FILE_OPERATIONS_SCHEMA),
     },
     "required": [
         "id",
         "hash",
+        "digest",
         "path",
         "mimeType",
         "size",
@@ -1577,6 +1613,12 @@ REMOTE_MEDIA_INFO_SCHEMA: Any = {
         "id": {
             "type": "string"
         },
+        "nodeName": {
+            "type": "string"
+        },
+        "mediaId": {
+            "type": "string"
+        },
         "hash": {
             "type": ["string", "null"]
         },
@@ -1586,12 +1628,29 @@ REMOTE_MEDIA_INFO_SCHEMA: Any = {
         "mimeType": {
             "type": ["string", "null"]
         },
+        "width": {
+            "type": ["integer", "null"]
+        },
+        "height": {
+            "type": ["integer", "null"]
+        },
+        "size": {
+            "type": ["integer", "null"]
+        },
+        "title": {
+            "type": ["string", "null"]
+        },
         "attachment": {
             "type": ["boolean", "null"]
+        },
+        "grant": {
+            "type": ["string", "null"]
         },
     },
     "required": [
         "id",
+        "nodeName",
+        "mediaId",
     ],
     "additionalProperties": False
 }
@@ -2679,70 +2738,6 @@ BODY_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-COMMENT_REVISION_INFO_SCHEMA: Any = {
-    "type": "object",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "postingRevisionId": {
-            "type": "string"
-        },
-        "bodyPreview": {
-            "type": ["string", "null"]
-        },
-        "bodySrcHash": {
-            "type": "string"
-        },
-        "bodySrcFormat": {
-            "type": ["string", "null"]
-        },
-        "body": {
-            "type": "string"
-        },
-        "bodyFormat": {
-            "type": ["string", "null"]
-        },
-        "heading": {
-            "type": "string"
-        },
-        "description": {
-            "type": ["string", "null"]
-        },
-        "createdAt": {
-            "type": "integer"
-        },
-        "deletedAt": {
-            "type": ["integer", "null"]
-        },
-        "deadline": {
-            "type": ["integer", "null"]
-        },
-        "digest": {
-            "type": ["string", "null"]
-        },
-        "signature": {
-            "type": ["string", "null"]
-        },
-        "signatureVersion": {
-            "type": ["integer", "null"]
-        },
-        "clientReaction": to_nullable_object_schema(CLIENT_REACTION_INFO_SCHEMA),
-        "reactions": to_nullable_object_schema(REACTION_TOTALS_INFO_SCHEMA),
-    },
-    "required": [
-        "id",
-        "postingRevisionId",
-        "bodySrcHash",
-        "body",
-        "heading",
-        "createdAt",
-    ],
-    "additionalProperties": False
-}
-
-COMMENT_REVISION_INFO_ARRAY_SCHEMA = array_schema(COMMENT_REVISION_INFO_SCHEMA)
-
 CONTACT_WITH_RELATIONSHIPS_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -2842,13 +2837,53 @@ MEDIA_ATTACHMENT_SCHEMA: Any = {
     "type": "object",
     "properties": {
         "media": to_nullable_object_schema(PRIVATE_MEDIA_FILE_INFO_SCHEMA),
+        "mediaLeaseId": {
+            "type": ["string", "null"]
+        },
         "remoteMedia": to_nullable_object_schema(REMOTE_MEDIA_INFO_SCHEMA),
+        "postingId": {
+            "type": ["string", "null"]
+        },
         "embedded": {
             "type": "boolean"
         },
     },
     "required": [
         "embedded",
+    ],
+    "additionalProperties": False
+}
+
+MEDIA_CAPTION_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "mediaId": {
+            "type": "string"
+        },
+        "captionSrc": {
+            "type": ["string", "null"]
+        },
+        "captionSrcFormat": {
+            "type": ["string", "null"]
+        },
+    },
+    "required": [
+        "mediaId",
+    ],
+    "additionalProperties": False
+}
+
+MEDIA_LEASE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "media": PRIVATE_MEDIA_FILE_INFO_SCHEMA,
+    },
+    "required": [
+        "id",
+        "media",
     ],
     "additionalProperties": False
 }
@@ -2881,9 +2916,7 @@ POSTING_INFO_SCHEMA: Any = {
         "receiverPostingId": {
             "type": ["string", "null"]
         },
-        "parentMediaId": {
-            "type": ["string", "null"]
-        },
+        "parentMedia": to_nullable_object_schema(PARENT_MEDIA_INFO_SCHEMA),
         "ownerName": {
             "type": "string"
         },
@@ -3003,6 +3036,9 @@ POSTING_INFO_SCHEMA: Any = {
             "items": POSTING_SOURCE_INFO_SCHEMA
         },
         "totalComments": {
+            "type": ["integer", "null"]
+        },
+        "viewCount": {
             "type": ["integer", "null"]
         },
         "recommended": {
@@ -3149,6 +3185,9 @@ SEARCH_ENTRY_INFO_SCHEMA: Any = {
             "type": ["integer", "null"]
         },
         "mediaPreview": to_nullable_object_schema(PUBLIC_MEDIA_FILE_INFO_SCHEMA),
+        "mediaPreviewNodeName": {
+            "type": ["string", "null"]
+        },
         "mediaPreviewId": {
             "type": ["string", "null"]
         },
@@ -3420,6 +3459,74 @@ COMMENT_INFO_SCHEMA: Any = {
     "additionalProperties": False
 }
 
+COMMENT_REVISION_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "postingRevisionId": {
+            "type": "string"
+        },
+        "bodyPreview": {
+            "type": ["string", "null"]
+        },
+        "bodySrcHash": {
+            "type": "string"
+        },
+        "bodySrcFormat": {
+            "type": ["string", "null"]
+        },
+        "body": {
+            "type": "string"
+        },
+        "bodyFormat": {
+            "type": ["string", "null"]
+        },
+        "media": {
+            "type": ["array", "null"],
+            "items": MEDIA_ATTACHMENT_SCHEMA
+        },
+        "heading": {
+            "type": "string"
+        },
+        "description": {
+            "type": ["string", "null"]
+        },
+        "createdAt": {
+            "type": "integer"
+        },
+        "deletedAt": {
+            "type": ["integer", "null"]
+        },
+        "deadline": {
+            "type": ["integer", "null"]
+        },
+        "digest": {
+            "type": ["string", "null"]
+        },
+        "signature": {
+            "type": ["string", "null"]
+        },
+        "signatureVersion": {
+            "type": ["integer", "null"]
+        },
+        "clientReaction": to_nullable_object_schema(CLIENT_REACTION_INFO_SCHEMA),
+        "reactions": to_nullable_object_schema(REACTION_TOTALS_INFO_SCHEMA),
+    },
+    "required": [
+        "id",
+        "postingRevisionId",
+        "bodySrcHash",
+        "body",
+        "heading",
+        "createdAt",
+    ],
+    "additionalProperties": False
+}
+
+COMMENT_REVISION_INFO_ARRAY_SCHEMA = array_schema(COMMENT_REVISION_INFO_SCHEMA)
+
 COMMENTS_SLICE_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -3506,6 +3613,10 @@ DRAFT_INFO_SCHEMA: Any = {
             "type": ["array", "null"],
             "items": MEDIA_ATTACHMENT_SCHEMA
         },
+        "mediaCaptions": {
+            "type": ["array", "null"],
+            "items": MEDIA_CAPTION_SCHEMA
+        },
         "heading": {
             "type": "string"
         },
@@ -3528,17 +3639,6 @@ DRAFT_INFO_SCHEMA: Any = {
 }
 
 DRAFT_INFO_ARRAY_SCHEMA = array_schema(DRAFT_INFO_SCHEMA)
-
-ENTRY_INFO_SCHEMA: Any = {
-    "type": "object",
-    "properties": {
-        "posting": to_nullable_object_schema(POSTING_INFO_SCHEMA),
-        "comment": to_nullable_object_schema(COMMENT_INFO_SCHEMA),
-    },
-    "additionalProperties": False
-}
-
-ENTRY_INFO_ARRAY_SCHEMA = array_schema(ENTRY_INFO_SCHEMA)
 
 SETTING_META_INFO_SCHEMA: Any = {
     "type": "object",

@@ -31,18 +31,17 @@ PushContentType = Literal["story-added", "story-deleted", "feed-updated"]
 PushRelayType = Literal["fcm"]
 
 Scope = Literal[
-    "none", "identify", "other", "view-media", "view-content", "add-post", "update-post", "add-comment",
-    "update-comment", "react", "delete-own-content", "delete-others-content", "view-people", "block", "friend",
-    "remote-identify", "drafts", "view-feeds", "update-feeds", "name", "plugins", "view-profile", "update-profile",
-    "sheriff", "view-settings", "update-settings", "subscribe", "tokens", "user-lists", "grant", "upload-public-media",
-    "upload-private-media", "view-all", "all"
+    "none", "identify", "other", "view-content", "add-post", "update-post", "add-comment", "update-comment", "react",
+    "delete-own-content", "delete-others-content", "view-people", "block", "friend", "remote-identify", "drafts",
+    "view-feeds", "update-feeds", "name", "plugins", "view-profile", "update-profile", "sheriff", "view-settings",
+    "update-settings", "subscribe", "tokens", "user-lists", "grant", "upload-public-media", "upload-private-media",
+    "lease-media", "view-all", "all"
 ]
 
 SCOPE_VALUES: Mapping[Scope, int] = {
     "none": 0x00000000,
     "identify": 0x00000000,
     "other": 0x00000001,
-    "view-media": 0x00000002,
     "view-content": 0x00000004,
     "add-post": 0x00000008,
     "update-post": 0x00000010,
@@ -71,15 +70,16 @@ SCOPE_VALUES: Mapping[Scope, int] = {
     "grant": 0x08000000,
     "upload-public-media": 0x10000000,
     "upload-private-media": 0x20000000,
-    "view-all": 0x00088406,
-    "all": 0x3fffffff,
+    "lease-media": 0x40000000,
+    "view-all": 0x00088404,
+    "all": 0x7ffffffd,
 }
 
 SearchContentUpdateType = Literal[
-    "block", "comment-add", "comment-update", "comment-update-heading", "comment-update-media-text", "comment-delete",
-    "friend", "profile", "posting-add", "posting-update", "posting-update-heading", "posting-update-media-text",
-    "posting-delete", "reaction-add", "reaction-delete", "reactions-delete-all", "subscribe", "unblock", "unfriend",
-    "unsubscribe"
+    "block", "comment-add", "comment-update", "comment-update-heading", "comment-update-media",
+    "comment-update-media-text", "comment-delete", "friend", "profile", "posting-add", "posting-update",
+    "posting-update-heading", "posting-update-media", "posting-update-media-text", "posting-delete", "reaction-add",
+    "reaction-delete", "reactions-delete-all", "subscribe", "unblock", "unfriend", "unsubscribe"
 ]
 
 SearchEngine = Literal["google", "bing", "yandex"]
@@ -1231,6 +1231,8 @@ class LinkPreview(Structure):
     """description of the page"""
     image_hash: str | None = None
     """hash of the image presenting the page"""
+    published_at: Timestamp | None = None
+    """timestamp of the page publication time"""
 
 
 class LinkPreviewInfo(Structure):
@@ -1244,6 +1246,13 @@ class LinkPreviewInfo(Structure):
     """description of the page"""
     image_url: str | None = None
     """URL of the image presenting the page"""
+    published_at: Timestamp | None = None
+    """timestamp of the page publication time"""
+
+
+class MediaDownloadAttributes(Structure):
+    grant: str
+    """media grant allowing access to the media"""
 
 
 class MediaFilePreviewInfo(Structure):
@@ -1251,6 +1260,8 @@ class MediaFilePreviewInfo(Structure):
     """the width the preview was prepared for viewing at"""
     hash: str
     """SHA-1 hash of the preview"""
+    path: str
+    """virtual location of the preview, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
     """
     location of the preview, relative to the ``/media``; points to a static image served directly from a filesystem or
@@ -1268,11 +1279,15 @@ class MediaFilePreviewInfo(Structure):
     """``True`` if the preview is identical to the original media, ``False`` otherwise"""
 
 
-class MediaWithDigest(Structure):
-    id: str
+class MediaLeaseAttributes(Structure):
+    node_name: str
+    """name of the node that receives the lease"""
+    media_id: str
     """ID of the media file"""
-    digest: str | None = None
-    """cryptographic digest of the media file"""
+    posting_id: str | None = None
+    """ID of the posting used to verify access to the media file"""
+    comment_id: str | None = None
+    """ID of the comment used to verify access to the media file"""
 
 
 class NameToRegister(Structure):
@@ -1316,6 +1331,26 @@ class NodeNameInfo(Structure):
     """``True``, if updating key mnemonic is being stored on the node, ``False`` otherwise"""
     operations: NodeNameOperations | None = None
     """the supported operations and the corresponding principals"""
+
+
+class ParentMediaInfo(Structure):
+    node_name: str | None = None
+    """
+    name of the node containing the media the posting is linked to; if ``None``, the media is located on the same node
+    as the posting
+    """
+    media_id: str
+    """ID of the media the posting is linked to; the media is located on the ``nodeName`` node"""
+    posting_id: str
+    """
+    ID of the posting that owns the attachment the posting is linked to; the posting is located at the same node as the
+    posting
+    """
+    comment_id: str | None = None
+    """
+    ID of the comment that owns the attachment the posting is linked to; if set, ``postingId`` contains ID of the
+    parent posting of the comment; the comment is located at the same node as the posting
+    """
 
 
 class PeopleGeneralInfo(Structure):
@@ -1370,8 +1405,6 @@ class PostingFeatures(Structure):
     """``True`` if new postings are recommended to have a subject, ``False`` otherwise"""
     source_formats: List[SourceFormat]
     """list of source text formats the node understands"""
-    media_max_size: int
-    """maximal size of a media attachment in a post"""
     image_recommended_size: int
     """maximal size of a compressed image in a post"""
     image_recommended_pixels: int
@@ -1405,6 +1438,8 @@ class PrivateMediaFileInfo(Structure):
     """ID of the media file"""
     hash: str
     """SHA-1 hash of the media file"""
+    digest: str
+    """cryptographic digest of the media file"""
     path: str
     """virtual location of the media file, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
@@ -1431,8 +1466,6 @@ class PrivateMediaFileInfo(Structure):
     """title of the media file, may be used as an alternative to the file name"""
     text_content: str | None = None
     """the text contained in the image, if any"""
-    posting_id: str | None = None
-    """ID of the posting linked to the media"""
     previews: List[MediaFilePreviewInfo] | None = None
     """list of media previews - downscaled versions of the media"""
     attachment: bool | None = None
@@ -1442,6 +1475,10 @@ class PrivateMediaFileInfo(Structure):
     """
     malware: bool | None = None
     """``True`` if the media file is considered to be malware, ``False`` (default) otherwise"""
+    grant: str | None = None
+    """media grant allowing access to the media"""
+    grant_expires_at: Timestamp | None = None
+    """grant expiration timestamp - the real time when the grant will not be valid anymore"""
     operations: PrivateMediaFileOperations | None = None
     """the supported operations and the corresponding principals"""
 
@@ -1735,35 +1772,61 @@ class RemoteFeed(Structure):
 
 
 class RemoteMedia(Structure):
-    id: str
+    node_name: str
+    """name of the node the media file is located on"""
+    media_id: str
     """ID of the media file"""
-    hash: str | None = None
+    hash: str
     """SHA-1 hash of the media file"""
-    digest: str | None = None
+    digest: str
     """cryptographic digest of the media file"""
     mime_type: str
     """MIME type of the media"""
+    width: int | None = None
+    """width of the media in pixels (``None``, if the media file is not an image or video)"""
+    height: int | None = None
+    """height of the media in pixels (``None``, if the media file is not an image or video)"""
+    size: int
+    """size of the media file in bytes"""
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
     attachment: bool | None = None
     """
     ``True`` if the media cannot be displayed as an image or video and should be displayed as an attachment instead,
     ``False`` (default) otherwise
     """
+    lease_id: str | None = None
+    """ID of the lease"""
 
 
 class RemoteMediaInfo(Structure):
     id: str
-    """ID of the media file"""
+    """ID of the remote media file object"""
+    node_name: str
+    """name of the node the media file is located on"""
+    media_id: str
+    """ID of the media file on the node it is located on"""
     hash: str | None = None
     """SHA-1 hash of the media file"""
     digest: str | None = None
     """cryptographic digest of the media file"""
     mime_type: str | None = None
     """MIME type of the media"""
+    width: int | None = None
+    """width of the media in pixels (``None``, if the media file is not an image or video)"""
+    height: int | None = None
+    """height of the media in pixels (``None``, if the media file is not an image or video)"""
+    size: int | None = None
+    """size of the media file in bytes"""
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
     attachment: bool | None = None
     """
     ``True`` if the media cannot be displayed as an image or video and should be displayed as an attachment instead,
     ``False`` (default) otherwise
     """
+    grant: str | None = None
+    """media grant allowing access to the media"""
 
 
 class RemotePosting(Structure):
@@ -1854,6 +1917,23 @@ class SearchCommentHeadingUpdate(Structure):
     """ID of the comment"""
     heading: str
     """heading of the posting"""
+
+
+class SearchCommentMediaUpdate(Structure):
+    posting_id: str
+    """ID of the posting"""
+    comment_id: str
+    """ID of the comment"""
+    media_id: str
+    """ID of the media"""
+    remote_media_node_name: str
+    """name of the node where the media is originated from"""
+    remote_media_id: str
+    """ID of the media on the original node"""
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
+    text_content: str | None = None
+    """text content of the media"""
 
 
 class SearchCommentMediaTextUpdate(Structure):
@@ -1965,6 +2045,21 @@ class SearchPostingHeadingUpdate(Structure):
     """ID of the posting"""
     heading: str
     """heading of the posting"""
+
+
+class SearchPostingMediaUpdate(Structure):
+    posting_id: str
+    """ID of the posting"""
+    media_id: str
+    """ID of the media"""
+    remote_media_node_name: str
+    """name of the node where the media is originated from"""
+    remote_media_id: str
+    """ID of the media on the original node"""
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
+    text_content: str | None = None
+    """text content of the media"""
 
 
 class SearchPostingMediaTextUpdate(Structure):
@@ -2613,6 +2708,17 @@ class VerificationInfo(Structure):
     """human-readable error message"""
 
 
+class VisitDetails(Structure):
+    posting_id: str
+    """ID of the visited posting"""
+    comment_id: str | None = None
+    """ID of the visited comment"""
+    media_id: str | None = None
+    """ID of the visited media"""
+    referrer: str | None = None
+    """page referrer"""
+
+
 class WhoAmI(Structure):
     node_name: str | None = None
     node_name_changing: bool | None = None
@@ -2736,137 +2842,6 @@ class CommentMassAttributes(Structure):
     """types of reactions that the comment rejects, as defined by the posting's owner ("senior")"""
 
 
-class CommentRevisionInfo(Structure):
-    id: str
-    posting_revision_id: str
-    """ID of the posting revision that was actual at the moment of creation of this comment revision"""
-    body_preview: Body | None = None
-    """preview of the revision's body, a string representation of a JSON structure"""
-    body_src_hash: bytes
-    """hash of the source text of the revision"""
-    body_src_format: SourceFormat | None = None
-    """
-    format of the source text of the revision, the list of available formats is returned in ``PostingFeatures``
-    """
-    body: Body
-    """body of the revision, a string representation of a JSON structure"""
-    body_format: BodyFormat | None = None
-    """format of the body of the revision, may have any value meaningful for the client"""
-    heading: str
-    """heading of the revision"""
-    description: str | None = None
-    """
-    in addition to ``heading``, gives a more detailed description of the revision that can be used for search engines
-    and link previews
-    """
-    created_at: Timestamp
-    """revision creation timestamp - the real time when the revision was created"""
-    deleted_at: Timestamp | None = None
-    """revision deletion timestamp - the time when the revision was deleted"""
-    deadline: Timestamp | None = None
-    """
-    revision deletion timestamp - the time when the revision will be deleted and the previous revision will take its
-    place
-    """
-    digest: bytes | None = None
-    """cryptographic digest of the revision (use ``Comment`` fingerprint)"""
-    signature: bytes | None = None
-    """the comment's owner signature (use ``Comment`` fingerprint)"""
-    signature_version: int | None = None
-    """signature version (i.e. fingerprint version)"""
-    client_reaction: ClientReactionInfo | None = None
-    """details of the existing reaction (if any) of the client's owner"""
-    reactions: ReactionTotalsInfo | None = None
-    """summary of reactions to the revision"""
-
-
-class CommentSourceText(Structure):
-    owner_avatar: AvatarDescription | None = None
-    """avatar of the comment's owner"""
-    body_src: Body | None = None
-    """the source text of the comment, a string representation of a JSON structure"""
-    body_src_format: SourceFormat | None = None
-    """
-    format of the source text of the comment, ``plain-text`` by default; the list of available formats is returned in
-    ``PostingFeatures``
-    """
-    media: List[MediaWithDigest] | None = None
-    """array of IDs and digests of private media to be attached to the comment"""
-    rejected_reactions: RejectedReactions | None = None
-    """types of reactions that the comment rejects"""
-    senior_rejected_reactions: RejectedReactions | None = None
-    """
-    types of reactions that the comment rejects, as defined by the posting's owner ("senior"); only the senior may set
-    this
-    """
-    replied_to_id: str | None = None
-    """ID of the comment this comment is replying to"""
-    operations: CommentOperations | None = None
-    """the operations and the corresponding principals"""
-    reaction_operations: ReactionOperations | None = None
-    """the operations and the corresponding principals that are overridden in reactions to the comment"""
-    senior_operations: CommentOperations | None = None
-    """
-    the operations and the corresponding principals that are overridden by the posting's owner ("senior"); only the
-    senior may set this
-    """
-
-
-class CommentText(Structure):
-    owner_name: str | None = None
-    """node name of the comment's owner"""
-    owner_full_name: str | None = None
-    """full name of the comment's owner"""
-    owner_gender: str | None = None
-    """gender of the comment's owner"""
-    owner_avatar: AvatarDescription | None = None
-    """avatar of the comment's owner"""
-    body_preview: Body | None = None
-    """preview of the comment's body, a string representation of a JSON structure"""
-    body_src: Body | None = None
-    """the source text of the comment, a string representation of a JSON structure"""
-    body_src_format: SourceFormat | None = None
-    """
-    format of the source text of the comment, ``plain-text`` by default; the list of available formats is returned in
-    ``PostingFeatures``
-    """
-    body: Body | None = None
-    """body of the comment, a string representation of a JSON structure"""
-    body_format: BodyFormat | None = None
-    """format of the body of the comment, may have any value meaningful for the client"""
-    media: List[str] | None = None
-    """array of IDs of private media to be attached to the comment"""
-    created_at: Timestamp | None = None
-    """comment creation timestamp - the real time when the comment was created"""
-    rejected_reactions: RejectedReactions | None = None
-    """types of reactions that the comment rejects"""
-    senior_rejected_reactions: RejectedReactions | None = None
-    """
-    types of reactions that the comment rejects, as defined by the posting's owner ("senior"); only the senior may set
-    this
-    """
-    replied_to_id: str | None = None
-    """ID of the comment this comment is replying to"""
-    signature: bytes | None = None
-    """the comment's owner signature (use ``Comment`` fingerprint)"""
-    signature_version: int | None = None
-    """signature version (i.e. fingerprint version)"""
-    premoderating: bool | None = None
-    """
-    ``True``, if the comment is being be checked by the post's author before publication, ``False`` (default)
-    otherwise; only the senior may set this
-    """
-    operations: CommentOperations | None = None
-    """the operations and the corresponding principals"""
-    reaction_operations: ReactionOperations | None = None
-    """the operations and the corresponding principals that are overridden in reactions to the comment"""
-    senior_operations: CommentOperations | None = None
-    """
-    the operations and the corresponding principals that are overridden by the posting's owner ("senior"); only the
-    senior may set this
-    """
-
-
 class ContactWithRelationships(Structure):
     contact: ContactInfo
     """contact's details"""
@@ -2882,46 +2857,6 @@ class ContactWithRelationships(Structure):
     """information about blocking the contact by the node"""
     blocked_by: List[BlockedByUserInfo] | None = None
     """information about blocking the node by the contact"""
-
-
-class DraftText(Structure):
-    draft_type: DraftType
-    """type of the draft"""
-    receiver_name: str
-    """name of the node the draft is related to"""
-    receiver_posting_id: str | None = None
-    """ID of the posting, mandatory for all types, except ``new-posting``"""
-    receiver_comment_id: str | None = None
-    """ID of the comment, mandatory for ``comment-update`` type"""
-    replied_to_id: str | None = None
-    """ID of the comment replied to"""
-    owner_full_name: str | None = None
-    """full name of the posting's/comment's owner"""
-    owner_avatar: AvatarDescription | None = None
-    """avatar of the posting's/comment's owner"""
-    rejected_reactions: RejectedReactions | None = None
-    """types of reactions that the posting rejects"""
-    comment_rejected_reactions: RejectedReactions | None = None
-    """types of reactions that the posting's comments should reject"""
-    body_src: Body | None = None
-    """the source text of the draft, a string representation of a JSON structure"""
-    body_src_format: SourceFormat | None = None
-    """
-    format of the source text of the draft, ``plain-text`` by default; the list of available formats is returned in
-    ``PostingFeatures``
-    """
-    media: List[RemoteMedia] | None = None
-    """list of the media attached to the draft, the media may be located on another node"""
-    publish_at: Timestamp | None = None
-    """story publication timestamp - the time the story must be published under in the feed"""
-    update_info: UpdateInfo | None = None
-    """description of the update"""
-    operations: PostingOperations | None = None
-    """draft of the list of operations and the corresponding principals"""
-    comment_operations: CommentOperations | None = None
-    """
-    draft of the list of operations and the corresponding principals that are overridden in the posting's comments
-    """
 
 
 class Features(Structure):
@@ -2968,10 +2903,48 @@ class FriendDescription(Structure):
 class MediaAttachment(Structure):
     media: PrivateMediaFileInfo | None = None
     """details of the attached media, may be absent if the media is not located on the node"""
+    media_lease_id: str | None = None
+    """(drafts only) ID of the lease of the local media to the target node"""
     remote_media: RemoteMediaInfo | None = None
     """details of the media, if it is located on another node"""
+    posting_id: str | None = None
+    """ID of the child posting linked to the attachment, if any"""
     embedded: bool
     """``True`` if the media is used in the body of the posting/comment, ``False`` otherwise"""
+
+
+class MediaCaption(Structure):
+    media_id: str
+    """ID of the media file the caption belongs to"""
+    caption_src: Body | None = None
+    """caption source text, a string representation of a JSON structure"""
+    caption_src_format: SourceFormat | None = None
+    """format of the caption source text"""
+
+
+class MediaCaptionText(Structure):
+    media_id: str
+    """ID of the media file the caption belongs to"""
+    caption_src: Body | None = None
+    """caption source text, a string representation of a JSON structure"""
+    caption_src_format: SourceFormat | None = None
+    """format of the caption source text"""
+
+
+class MediaLeaseInfo(Structure):
+    id: str
+    """ID of the lease"""
+    media: PrivateMediaFileInfo
+    """details of the media"""
+
+
+class MediaToAttach(Structure):
+    local_media_id: str | None = None
+    """ID of the local media to attach"""
+    local_media_lease_id: str | None = None
+    """(drafts only) ID of the lease of the local media to the target node"""
+    remote_media: RemoteMedia | None = None
+    """remote media to attach"""
 
 
 class PostingInfo(Structure):
@@ -2992,8 +2965,8 @@ class PostingInfo(Structure):
     """avatar of the node where the posting was published (for cached copies of remote postings only)"""
     receiver_posting_id: str | None = None
     """ID of the original posting (for cached copies of remote postings only)"""
-    parent_media_id: str | None = None
-    """ID of the media the posting is linked to, if any"""
+    parent_media: ParentMediaInfo | None = None
+    """information about the media the posting is linked to, if any"""
     owner_name: str
     """node name of the posting's owner"""
     owner_full_name: str | None = None
@@ -3090,6 +3063,8 @@ class PostingInfo(Structure):
     """details of the sources the posting was received from (for cached copies of remote postings only)"""
     total_comments: int | None = None
     """total number of comments to the posting"""
+    view_count: int | None = None
+    """number of posting views (for admin only)"""
     recommended: bool | None = None
     """
     ``True``, if the posting was recommended by a recommendation service (for cached copies of remote postings only),
@@ -3159,8 +3134,10 @@ class PostingSourceText(Structure):
     format of the source text of the posting, ``plain-text`` by default; the list of available formats is returned in
     ``PostingFeatures``
     """
-    media: List[MediaWithDigest] | None = None
-    """array of IDs and digests of private media to be attached to the posting"""
+    media: List[MediaToAttach] | None = None
+    """array of media to be attached to the posting"""
+    media_captions: List[MediaCaptionText] | None = None
+    """captions of the media to be attached to the posting"""
     rejected_reactions: RejectedReactions | None = None
     """types of reactions that the posting rejects"""
     comment_rejected_reactions: RejectedReactions | None = None
@@ -3197,8 +3174,8 @@ class PostingText(Structure):
     """body of the posting, a string representation of a JSON structure"""
     body_format: BodyFormat | None = None
     """format of the body of the posting, may have any value meaningful for the client"""
-    media: List[str] | None = None
-    """array of IDs of private media to be attached to the posting"""
+    media: List[MediaToAttach] | None = None
+    """array of media to be attached to the posting"""
     created_at: Timestamp | None = None
     """posting creation timestamp - the real time when the posting was created"""
     rejected_reactions: RejectedReactions | None = None
@@ -3262,6 +3239,11 @@ class SearchEntryInfo(Structure):
     """number of file attachments the entry contains"""
     media_preview: PublicMediaFileInfo | None = None
     """preview of the media attached to the entry, if any"""
+    media_preview_node_name: str | None = None
+    """
+    Source node of the media attached to the entry that was chosen for the preview (``None``, if the media is located
+    on the same node as the entry)
+    """
     media_preview_id: str | None = None
     """ID of the media attached to the entry that was chosen for the preview"""
     replied_to: SearchRepliedTo | None = None
@@ -3444,6 +3426,52 @@ class CommentInfo(Structure):
     """summary of reactions to the comment"""
 
 
+class CommentRevisionInfo(Structure):
+    id: str
+    posting_revision_id: str
+    """ID of the posting revision that was actual at the moment of creation of this comment revision"""
+    body_preview: Body | None = None
+    """preview of the revision's body, a string representation of a JSON structure"""
+    body_src_hash: bytes
+    """hash of the source text of the revision"""
+    body_src_format: SourceFormat | None = None
+    """
+    format of the source text of the revision, the list of available formats is returned in ``PostingFeatures``
+    """
+    body: Body
+    """body of the revision, a string representation of a JSON structure"""
+    body_format: BodyFormat | None = None
+    """format of the body of the revision, may have any value meaningful for the client"""
+    media: List[MediaAttachment] | None = None
+    """list of the media attached to the revision"""
+    heading: str
+    """heading of the revision"""
+    description: str | None = None
+    """
+    in addition to ``heading``, gives a more detailed description of the revision that can be used for search engines
+    and link previews
+    """
+    created_at: Timestamp
+    """revision creation timestamp - the real time when the revision was created"""
+    deleted_at: Timestamp | None = None
+    """revision deletion timestamp - the time when the revision was deleted"""
+    deadline: Timestamp | None = None
+    """
+    revision deletion timestamp - the time when the revision will be deleted and the previous revision will take its
+    place
+    """
+    digest: bytes | None = None
+    """cryptographic digest of the revision (use ``Comment`` fingerprint)"""
+    signature: bytes | None = None
+    """the comment's owner signature (use ``Comment`` fingerprint)"""
+    signature_version: int | None = None
+    """signature version (i.e. fingerprint version)"""
+    client_reaction: ClientReactionInfo | None = None
+    """details of the existing reaction (if any) of the client's owner"""
+    reactions: ReactionTotalsInfo | None = None
+    """summary of reactions to the revision"""
+
+
 class CommentsSliceInfo(Structure):
     before: int
     """the slice contains all comments before this moment, inclusive. May be the far future."""
@@ -3457,6 +3485,95 @@ class CommentsSliceInfo(Structure):
     """number of comments before this slice till the far past"""
     total_in_future: int
     """number of comments after this slice till the far future"""
+
+
+class CommentSourceText(Structure):
+    owner_avatar: AvatarDescription | None = None
+    """avatar of the comment's owner"""
+    body_src: Body | None = None
+    """the source text of the comment, a string representation of a JSON structure"""
+    body_src_format: SourceFormat | None = None
+    """
+    format of the source text of the comment, ``plain-text`` by default; the list of available formats is returned in
+    ``PostingFeatures``
+    """
+    media: List[MediaToAttach] | None = None
+    """array of media to be attached to the comment"""
+    media_captions: List[MediaCaptionText] | None = None
+    """captions of the media to be attached to the comment"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects"""
+    senior_rejected_reactions: RejectedReactions | None = None
+    """
+    types of reactions that the comment rejects, as defined by the posting's owner ("senior"); only the senior may set
+    this
+    """
+    replied_to_id: str | None = None
+    """ID of the comment this comment is replying to"""
+    operations: CommentOperations | None = None
+    """the operations and the corresponding principals"""
+    reaction_operations: ReactionOperations | None = None
+    """the operations and the corresponding principals that are overridden in reactions to the comment"""
+    senior_operations: CommentOperations | None = None
+    """
+    the operations and the corresponding principals that are overridden by the posting's owner ("senior"); only the
+    senior may set this
+    """
+
+
+class CommentText(Structure):
+    owner_name: str | None = None
+    """node name of the comment's owner"""
+    owner_full_name: str | None = None
+    """full name of the comment's owner"""
+    owner_gender: str | None = None
+    """gender of the comment's owner"""
+    owner_avatar: AvatarDescription | None = None
+    """avatar of the comment's owner"""
+    body_preview: Body | None = None
+    """preview of the comment's body, a string representation of a JSON structure"""
+    body_src: Body | None = None
+    """the source text of the comment, a string representation of a JSON structure"""
+    body_src_format: SourceFormat | None = None
+    """
+    format of the source text of the comment, ``plain-text`` by default; the list of available formats is returned in
+    ``PostingFeatures``
+    """
+    body: Body | None = None
+    """body of the comment, a string representation of a JSON structure"""
+    body_format: BodyFormat | None = None
+    """format of the body of the comment, may have any value meaningful for the client"""
+    media: List[MediaToAttach] | None = None
+    """array of IDs of private media to be attached to the comment"""
+    created_at: Timestamp | None = None
+    """comment creation timestamp - the real time when the comment was created"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the comment rejects"""
+    senior_rejected_reactions: RejectedReactions | None = None
+    """
+    types of reactions that the comment rejects, as defined by the posting's owner ("senior"); only the senior may set
+    this
+    """
+    replied_to_id: str | None = None
+    """ID of the comment this comment is replying to"""
+    signature: bytes | None = None
+    """the comment's owner signature (use ``Comment`` fingerprint)"""
+    signature_version: int | None = None
+    """signature version (i.e. fingerprint version)"""
+    premoderating: bool | None = None
+    """
+    ``True``, if the comment is being be checked by the post's author before publication, ``False`` (default)
+    otherwise; only the senior may set this
+    """
+    operations: CommentOperations | None = None
+    """the operations and the corresponding principals"""
+    reaction_operations: ReactionOperations | None = None
+    """the operations and the corresponding principals that are overridden in reactions to the comment"""
+    senior_operations: CommentOperations | None = None
+    """
+    the operations and the corresponding principals that are overridden by the posting's owner ("senior"); only the
+    senior may set this
+    """
 
 
 class DraftInfo(Structure):
@@ -3498,6 +3615,8 @@ class DraftInfo(Structure):
     """format of the body of the draft"""
     media: List[MediaAttachment] | None = None
     """list of the media attached to the draft"""
+    media_captions: List[MediaCaption] | None = None
+    """captions of the media attached to the draft"""
     heading: str
     """heading of the draft"""
     publish_at: Timestamp | None = None
@@ -3513,11 +3632,46 @@ class DraftInfo(Structure):
     """
 
 
-class EntryInfo(Structure):
-    posting: PostingInfo | None = None
-    """posting details, set if the entry is a posting"""
-    comment: CommentInfo | None = None
-    """comment details, set if the entry is a comment"""
+class DraftText(Structure):
+    draft_type: DraftType
+    """type of the draft"""
+    receiver_name: str
+    """name of the node the draft is related to"""
+    receiver_posting_id: str | None = None
+    """ID of the posting, mandatory for all types, except ``new-posting``"""
+    receiver_comment_id: str | None = None
+    """ID of the comment, mandatory for ``comment-update`` type"""
+    replied_to_id: str | None = None
+    """ID of the comment replied to"""
+    owner_full_name: str | None = None
+    """full name of the posting's/comment's owner"""
+    owner_avatar: AvatarDescription | None = None
+    """avatar of the posting's/comment's owner"""
+    rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting rejects"""
+    comment_rejected_reactions: RejectedReactions | None = None
+    """types of reactions that the posting's comments should reject"""
+    body_src: Body | None = None
+    """the source text of the draft, a string representation of a JSON structure"""
+    body_src_format: SourceFormat | None = None
+    """
+    format of the source text of the draft, ``plain-text`` by default; the list of available formats is returned in
+    ``PostingFeatures``
+    """
+    media: List[MediaToAttach] | None = None
+    """list of the media attached to the draft"""
+    media_captions: List[MediaCaptionText] | None = None
+    """captions of the media attached to the draft"""
+    publish_at: Timestamp | None = None
+    """story publication timestamp - the time the story must be published under in the feed"""
+    update_info: UpdateInfo | None = None
+    """description of the update"""
+    operations: PostingOperations | None = None
+    """draft of the list of operations and the corresponding principals"""
+    comment_operations: CommentOperations | None = None
+    """
+    draft of the list of operations and the corresponding principals that are overridden in the posting's comments
+    """
 
 
 class SettingDescriptor(Structure):

@@ -57,12 +57,16 @@ def encode_bodies(data: Structure | Sequence[Structure]) -> Structure | list[Str
     if isinstance(data, Sequence):
         return [encode_bodies(item) for item in data]
     encoded = deepcopy(data)
+    if getattr(data, 'media_captions', None) is not None:
+        encoded.media_captions = [encode_bodies(item) for item in getattr(data, 'media_captions')]
     if getattr(data, 'body', None) is not None:
         encoded.body = encode_body(getattr(data, 'body'), getattr(data, 'body_format', None))
     if getattr(data, 'body_preview', None) is not None:
         encoded.body_preview = encode_body(getattr(data, 'body_preview'), getattr(data, 'body_format', None))
     if getattr(data, 'body_src', None) is not None:
         encoded.body_src = encode_body(getattr(data, 'body_src'), getattr(data, 'body_src_format', None))
+    if getattr(data, 'caption_src', None) is not None:
+        encoded.caption_src = encode_body(getattr(data, 'caption_src'), getattr(data, 'caption_src_format', None))
     return encoded
 
 
@@ -87,6 +91,8 @@ def decode_bodies(name: str, data):
         decoded['stories'] = [decode_bodies(name, item) for item in data['stories']]
     if data.get('comments', None) is not None:
         decoded['comments'] = [decode_bodies(name, item) for item in data['comments']]
+    if data.get('mediaCaptions', None) is not None:
+        decoded['mediaCaptions'] = [decode_bodies(name, item) for item in data['mediaCaptions']]
     if data.get('comment', None) is not None:
         decoded['comment'] = decode_bodies(name, data['comment'])
     if data.get('posting', None) is not None:
@@ -97,6 +103,8 @@ def decode_bodies(name: str, data):
         decoded['bodyPreview'] = decode_body(name, data['bodyPreview'], data.get('bodyFormat', None))
     if data.get('bodySrc', None) is not None:
         decoded['bodySrc'] = decode_body(name, data['bodySrc'], data.get('bodySrcFormat', None))
+    if data.get('captionSrc', None) is not None:
+        decoded['captionSrc'] = decode_body(name, data['captionSrc'], data.get('captionSrcFormat', None))
     return decoded
 
 
