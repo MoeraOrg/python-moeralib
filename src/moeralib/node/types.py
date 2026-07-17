@@ -988,6 +988,7 @@ class ContactInfo(Structure):
     node_name: str
     full_name: str | None = None
     gender: str | None = None
+    title: str | None = None
     avatar: AvatarImage | None = None
     distance: float
     """
@@ -1012,6 +1013,11 @@ class ContactInfo(Structure):
     """the supported operations and the corresponding principals as defined by the contact's owner"""
     admin_operations: ContactOperations | None = None
     """the operations and the corresponding principals that are overridden by the node administrator"""
+
+
+class VisitedNodeAttributes(Structure):
+    node_name: str
+    """name of the visited node"""
 
 
 class Credentials(Structure):
@@ -1235,21 +1241,6 @@ class LinkPreview(Structure):
     """timestamp of the page publication time"""
 
 
-class LinkPreviewInfo(Structure):
-    site_name: str | None = None
-    """name of the site"""
-    url: str | None = None
-    """canonical URL of the page"""
-    title: str | None = None
-    """title of the page"""
-    description: str | None = None
-    """description of the page"""
-    image_url: str | None = None
-    """URL of the image presenting the page"""
-    published_at: Timestamp | None = None
-    """timestamp of the page publication time"""
-
-
 class MediaDownloadAttributes(Structure):
     grant: str
     """media grant allowing access to the media"""
@@ -1288,6 +1279,36 @@ class MediaLeaseAttributes(Structure):
     """ID of the posting used to verify access to the media file"""
     comment_id: str | None = None
     """ID of the comment used to verify access to the media file"""
+
+
+class MediaUploadAttributes(Structure):
+    mime_type: str
+    """MIME type of the media source file"""
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
+    file_size: int
+    """full file size in bytes"""
+    chunk_size: int | None = None
+    """client-proposed chunk size in bytes"""
+
+
+class MediaUploadInfo(Structure):
+    id: str
+    """upload ID"""
+    mime_type: str | None = None
+    """MIME type of the media source file"""
+    title: str | None = None
+    """title of the media file, may be used as an alternative to the file name"""
+    file_size: int
+    """full file size in bytes"""
+    chunk_size: int
+    """chunk size in bytes"""
+    uploaded_chunks: List[int]
+    """zero-based numbers of uploaded chunks, sorted in natural order"""
+    deadline: Timestamp
+    """upload expiration timestamp - the real time when the upload may be deleted"""
+    completed_at: Timestamp | None = None
+    """upload completion timestamp - the real time when all chunks were uploaded"""
 
 
 class NameToRegister(Structure):
@@ -1405,10 +1426,6 @@ class PostingFeatures(Structure):
     """``True`` if new postings are recommended to have a subject, ``False`` otherwise"""
     source_formats: List[SourceFormat]
     """list of source text formats the node understands"""
-    image_recommended_size: int
-    """maximal size of a compressed image in a post"""
-    image_recommended_pixels: int
-    """maximal resolution of a compressed image in a post (in pixels)"""
     image_formats: List[str]
     """list of image formats (in MIME type form) the node understands"""
 
@@ -2900,6 +2917,21 @@ class FriendDescription(Structure):
     """groups of friends the node is to be included into"""
 
 
+class LinkPreviewInfo(Structure):
+    site_name: str | None = None
+    """name of the site"""
+    url: str | None = None
+    """canonical URL of the page"""
+    title: str | None = None
+    """title of the page"""
+    description: str | None = None
+    """description of the page"""
+    image: PrivateMediaFileInfo | None = None
+    """image presenting the page"""
+    published_at: Timestamp | None = None
+    """timestamp of the page publication time"""
+
+
 class MediaAttachment(Structure):
     media: PrivateMediaFileInfo | None = None
     """details of the attached media, may be absent if the media is not located on the node"""
@@ -3279,7 +3311,7 @@ class SettingTypeModifiers(Structure):
     """
     preferred format of displaying the value
     (``int``, ``string``)
-    
+
     * ``size`` - data size in bytes/kilobytes/megabytes etc.;
     * ``select`` - selection of a value from the provided list.
     """

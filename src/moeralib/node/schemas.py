@@ -621,6 +621,9 @@ CONTACT_INFO_SCHEMA: Any = {
         "gender": {
             "type": ["string", "null"]
         },
+        "title": {
+            "type": ["string", "null"]
+        },
         "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "distance": {
             "type": "number"
@@ -1006,31 +1009,6 @@ LINK_PREVIEW_SCHEMA: Any = {
     "additionalProperties": False
 }
 
-LINK_PREVIEW_INFO_SCHEMA: Any = {
-    "type": "object",
-    "properties": {
-        "siteName": {
-            "type": ["string", "null"]
-        },
-        "url": {
-            "type": ["string", "null"]
-        },
-        "title": {
-            "type": ["string", "null"]
-        },
-        "description": {
-            "type": ["string", "null"]
-        },
-        "imageUrl": {
-            "type": ["string", "null"]
-        },
-        "publishedAt": {
-            "type": ["integer", "null"]
-        },
-    },
-    "additionalProperties": False
-}
-
 MEDIA_FILE_PREVIEW_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -1069,6 +1047,47 @@ MEDIA_FILE_PREVIEW_INFO_SCHEMA: Any = {
         "mimeType",
         "width",
         "height",
+    ],
+    "additionalProperties": False
+}
+
+MEDIA_UPLOAD_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "mimeType": {
+            "type": ["string", "null"]
+        },
+        "title": {
+            "type": ["string", "null"]
+        },
+        "fileSize": {
+            "type": "integer"
+        },
+        "chunkSize": {
+            "type": "integer"
+        },
+        "uploadedChunks": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        },
+        "deadline": {
+            "type": "integer"
+        },
+        "completedAt": {
+            "type": ["integer", "null"]
+        },
+    },
+    "required": [
+        "id",
+        "fileSize",
+        "chunkSize",
+        "uploadedChunks",
+        "deadline",
     ],
     "additionalProperties": False
 }
@@ -1168,12 +1187,6 @@ POSTING_FEATURES_SCHEMA: Any = {
                 "type": "string"
             }
         },
-        "imageRecommendedSize": {
-            "type": "integer"
-        },
-        "imageRecommendedPixels": {
-            "type": "integer"
-        },
         "imageFormats": {
             "type": "array",
             "items": {
@@ -1184,8 +1197,6 @@ POSTING_FEATURES_SCHEMA: Any = {
     "required": [
         "subjectPresent",
         "sourceFormats",
-        "imageRecommendedSize",
-        "imageRecommendedPixels",
         "imageFormats",
     ],
     "additionalProperties": False
@@ -2832,6 +2843,29 @@ FEED_INFO_SCHEMA: Any = {
 }
 
 FEED_INFO_ARRAY_SCHEMA = array_schema(FEED_INFO_SCHEMA)
+
+LINK_PREVIEW_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "siteName": {
+            "type": ["string", "null"]
+        },
+        "url": {
+            "type": ["string", "null"]
+        },
+        "title": {
+            "type": ["string", "null"]
+        },
+        "description": {
+            "type": ["string", "null"]
+        },
+        "image": to_nullable_object_schema(PRIVATE_MEDIA_FILE_INFO_SCHEMA),
+        "publishedAt": {
+            "type": ["integer", "null"]
+        },
+    },
+    "additionalProperties": False
+}
 
 MEDIA_ATTACHMENT_SCHEMA: Any = {
     "type": "object",

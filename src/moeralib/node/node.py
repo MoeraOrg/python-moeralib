@@ -597,9 +597,9 @@ class MoeraNode(Caller):
         Search for contacts matching the search ``query``. Every space-delimited word in the query must match
         case-insensitively a beginning of the contact's node name or a beginning of any space-delimited word in the
         contact's full name. The order of words is not significant.
-        
+
         The node may decide to return fewer contacts than the given ``limit``.
-        
+
         The contacts are sorted by *social distance* from the node, which depends on their subscription and friendship
         status and the number of recent reactions and comments.
 
@@ -1159,16 +1159,41 @@ class MoeraNode(Caller):
         data = self.call("revoke_all", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
         return types.Result.from_json(data)
 
-    def upload_private_media(self, file: IO, file_type: str) -> types.PrivateMediaFileInfo:
+    def create_link_preview(self, url: str) -> types.LinkPreviewInfo:
         """
-        Upload a new private media file. The content of the file is passed in the request body.
+        Parse the page located at the URL and return the title, the description and the picture that may be used to
+        build a preview of the page.
 
-        :param file:
-        :param file_type: content-type of ``file``
+        :param url:
         """
-        location = "/media/private"
+        location = "/link-preview".format()
+        params = {"url": url}
         data = self.call(
-            "upload_private_media", location, method="POST", body_file=file, body_file_type=file_type,
+            "create_link_preview", location, method="GET", params=params, schema=schemas.LINK_PREVIEW_INFO_SCHEMA
+        )
+        return types.LinkPreviewInfo.from_json(data)
+
+    def upload_private_media(
+        self, file: IO | None = None, file_type: str | None = None, upload: str | None = None, url: str | None = None,
+        downsize: bool | None = None
+    ) -> types.PrivateMediaFileInfo:
+        """
+        Upload a new private media file. The content of the file is passed in the request body. Alternatively, the file
+        can be uploaded using Media upload API and its ID passed in the `upload` query parameter. The second
+        alternative is to pass the URL of the media in the `url` query parameter, the media will be downloaded to the
+        node.
+
+        :param upload: ID of the media upload to be used instead of the request body
+        :param url: URL of the media to be used instead of the request body
+        :param downsize: `true` to scale the uploaded image down to the size recommended by the node, if possible;
+            the default is `false`
+        :param file: optional
+        :param file_type: optional content-type of ``file``
+        """
+        location = "/media/private".format()
+        params = {"upload": upload, "url": url, "downsize": downsize}
+        data = self.call(
+            "upload_private_media", location, method="POST", body_file=file, body_file_type=file_type, params=params,
             schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
         return types.PrivateMediaFileInfo.from_json(data)
@@ -1284,6 +1309,54 @@ class MoeraNode(Caller):
         """
         location = "/media/leases/{id}".format(id=quote_plus(id))
         data = self.call("delete_media_lease", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def create_media_upload(self, attributes: types.MediaUploadAttributes) -> types.MediaUploadInfo:
+        """
+        Create a new chunked upload of a private media source file.
+
+        :param attributes:
+        """
+        location = "/media/upload"
+        data = self.call(
+            "create_media_upload", location, method="POST", body=attributes, schema=schemas.MEDIA_UPLOAD_INFO_SCHEMA
+        )
+        return types.MediaUploadInfo.from_json(data)
+
+    def get_media_upload(self, id: str) -> types.MediaUploadInfo:
+        """
+        Get chunked upload details.
+
+        :param id: upload ID
+        """
+        location = "/media/upload/{id}".format(id=quote_plus(id))
+        data = self.call("get_media_upload", location, method="GET", schema=schemas.MEDIA_UPLOAD_INFO_SCHEMA)
+        return types.MediaUploadInfo.from_json(data)
+
+    def upload_media_chunk(self, id: str, chunk: int, file: IO, file_type: str) -> types.MediaUploadInfo:
+        """
+        Upload one chunk of a private media source file.
+
+        :param id: upload ID
+        :param chunk: zero-based chunk number
+        :param file:
+        :param file_type: content-type of ``file``
+        """
+        location = "/media/upload/{id}/{chunk}".format(id=quote_plus(id), chunk=quote_plus(chunk))
+        data = self.call(
+            "upload_media_chunk", location, method="PUT", body_file=file, body_file_type=file_type,
+            schema=schemas.MEDIA_UPLOAD_INFO_SCHEMA
+        )
+        return types.MediaUploadInfo.from_json(data)
+
+    def delete_media_upload(self, id: str) -> types.Result:
+        """
+        Delete a chunked media upload and the corresponding source file.
+
+        :param id: upload ID
+        """
+        location = "/media/upload/{id}".format(id=quote_plus(id))
+        data = self.call("delete_media_upload", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
         return types.Result.from_json(data)
 
     def get_node_name(self) -> types.NodeNameInfo:
@@ -1746,31 +1819,6 @@ class MoeraNode(Caller):
         )
         return types.DeleteNodeStatus.from_json(data)
 
-    def proxy_media(self, url: str) -> IO:
-        """
-        Open the URL passed in the parameters and pass to the client the media file returned by the server.
-
-        :param url:
-        """
-        location = "/proxy/media".format()
-        params = {"url": url}
-        data = self.call("proxy_media", location, method="GET", params=params, schema="blob")
-        return cast(IO, data)
-
-    def proxy_link_preview(self, url: str) -> types.LinkPreviewInfo:
-        """
-        Parse the page located at the URL and return the title, the description and the picture that may be used to
-        build a preview of the page.
-
-        :param url:
-        """
-        location = "/proxy/link-preview".format()
-        params = {"url": url}
-        data = self.call(
-            "proxy_link_preview", location, method="GET", params=params, schema=schemas.LINK_PREVIEW_INFO_SCHEMA
-        )
-        return types.LinkPreviewInfo.from_json(data)
-
     def register_at_push_relay(self, attributes: types.PushRelayClientAttributes) -> types.Result:
         """
         Register a client at the push relay server to receive messages from this node. The operation is synchronous.
@@ -1789,7 +1837,7 @@ class MoeraNode(Caller):
         """
         Find postings known to the recommendation service and may be of interest to the client. If the client is
         authenticated, the service may tune the recommendations for them.
-        
+
         The service may decide to return fewer recommendations than the given ``limit``.
 
         :param feed: name of the feed to get recommendations for ("news" by default); recommendations for every
@@ -1811,7 +1859,7 @@ class MoeraNode(Caller):
         """
         Find postings known to the recommendation service and may be of interest to the client to read them. If the
         client is authenticated, the service may tune the recommendations for them.
-        
+
         The service may decide to return fewer recommendations than the given ``limit``.
 
         :param sheriff: filter out entries prohibited by the given sheriff
@@ -1831,7 +1879,7 @@ class MoeraNode(Caller):
         """
         Find postings known to the recommendation service and may be of interest to the client to take part in the
         discussion. If the client is authenticated, the service may tune the recommendations for them.
-        
+
         The service may decide to return fewer recommendations than the given ``limit``.
 
         :param sheriff: filter out entries prohibited by the given sheriff
@@ -1886,7 +1934,7 @@ class MoeraNode(Caller):
     ) -> List[types.RecommendedNodeInfo]:
         """
         Find the most active nodes known to the recommendation service.
-        
+
         The service may decide to return fewer recommendations than the given ``limit``.
 
         :param sheriff: filter out nodes prohibited by the given sheriff
@@ -2231,9 +2279,9 @@ class MoeraNode(Caller):
         Search for Moera nodes matching the search ``query``. Every space-delimited word in the query must match
         case-insensitively a beginning of the node's name or a beginning of any non-letter-delimited word in the node's
         full name. The order of words is not significant.
-        
+
         The search engine may decide to return fewer nodes than the given ``limit``.
-        
+
         The returned nodes are sorted by their relevance. The exact definition of this term is left to the search
         engine's implementation.
 
@@ -2252,9 +2300,9 @@ class MoeraNode(Caller):
         Search for Moera nodes matching the search ``query`` and return a short list of "smart suggestions" for the
         user. Every space-delimited word in the query must match case-insensitively a beginning of the node's name or a
         beginning of any non-letter-delimited word in the node's full name. The order of words is not significant.
-        
+
         The search engine may decide to return fewer nodes than the given ``limit``.
-        
+
         The returned nodes are sorted by their relevance. The exact definition of this term is left to the search
         engine's implementation.
 
@@ -2273,9 +2321,9 @@ class MoeraNode(Caller):
     def search_entries_by_hashtag(self, filter: types.SearchHashtagFilter) -> types.SearchHashtagSliceInfo:
         """
         Search for postings and comments containing the specified hashtag(s) and optionally filtered by other criteria.
-        
+
         The search engine may decide to return fewer nodes than the given ``limit``.
-        
+
         The returned entries are sorted by moment in descending order.
 
         :param filter:
@@ -2291,9 +2339,9 @@ class MoeraNode(Caller):
         """
         Search for postings and comments containing the specified words or text fragment, and optionally filtered by
         other criteria.
-        
+
         The search engine may decide to return fewer nodes than the given ``limit``.
-        
+
         The returned entries are sorted by their relevance. The exact definition of this term is left to the search
         engine's implementation.
 
@@ -2311,7 +2359,7 @@ class MoeraNode(Caller):
         Update the given settings. If the input contains node settings, they are validated and the first validation
         error is returned, if any. The update is always performed as a whole - if there is an error saving any one of
         the settings in the input, none of them are updated.
-        
+
         If one of the settings to be updated is privileged, *root secret* authentication is required. If one of the
         settings to be updated is non-privileged, *admin* authentication is required.
 
@@ -2745,6 +2793,46 @@ class MoeraNode(Caller):
         """
         location = "/user-lists/{name}/items/{nodeName}".format(name=quote_plus(name), nodeName=quote_plus(node_name))
         data = self.call("delete_user_list_item", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def get_visited_nodes(self, query: str | None = None, limit: int | None = None) -> List[types.SearchNodeInfo]:
+        """
+        Search for visited nodes matching the search ``query``. Every space-delimited word in the query must match
+        case-insensitively a beginning of the node's name or a beginning of any space-delimited word in the node's full
+        name. The order of words is not significant.
+
+        The node may decide to return fewer nodes than the given ``limit``.
+
+        The nodes are sorted by *social distance* from the node.
+
+        :param query: the search query
+        :param limit: maximum number of nodes returned
+        """
+        location = "/people/visited".format()
+        params = {"query": query, "limit": limit}
+        data = self.call(
+            "get_visited_nodes", location, method="GET", params=params, schema=schemas.SEARCH_NODE_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.SearchNodeInfo)
+
+    def record_visited_node(self, node: types.VisitedNodeAttributes) -> types.Result:
+        """
+        Record a visit to the node.
+
+        :param node:
+        """
+        location = "/people/visited"
+        data = self.call("record_visited_node", location, method="POST", body=node, schema=schemas.RESULT_SCHEMA)
+        return types.Result.from_json(data)
+
+    def delete_visited_node(self, node_name: str) -> types.Result:
+        """
+        Delete all visits to the node.
+
+        :param node_name: name of the visited node
+        """
+        location = "/people/visited/{nodeName}".format(nodeName=quote_plus(node_name))
+        data = self.call("delete_visited_node", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
         return types.Result.from_json(data)
 
     def record_visit(self, visit: types.VisitDetails) -> types.Result:

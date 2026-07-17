@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from io import StringIO
 import re
 import sys
 from typing import Any, TextIO, Mapping, List, Sequence
@@ -191,6 +192,7 @@ def generate_operations(operations: Any, tfile: TextIO, sfile: TextIO) -> None:
 PY_TYPES = {
     'String': 'str',
     'String[]': 'List[str]',
+    'int[]': 'List[int]',
     'short': 'int',
     'int': 'int',
     'long': 'int',
@@ -214,6 +216,7 @@ def to_py_type(api_type: str) -> str:
 SCHEMA_TYPES = {
     'String': ('string', False),
     'String[]': ('string', True),
+    'int[]': ('integer', True),
     'short': ('integer', False),
     'int': ('integer', False),
     'long': ('integer', False),
@@ -470,8 +473,12 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                         print('Unrecognised type "{type}" of the input body of the request "{method} {url}"'
                               .format(type=inp['type'], method=request['type'], url=request['url']))
                         exit(1)
-                    params += ', file: IO, file_type: str'
-                    param_docs += [('file', ''), ('file_type', 'content-type of ``file``')]
+                    if inp.get('optional', False):
+                        params += ', file: IO | None = None, file_type: str | None = None'
+                        param_docs += [('file', 'optional'), ('file_type', 'optional content-type of ``file``')]
+                    else:
+                        params += ', file: IO, file_type: str'
+                        param_docs += [('file', ''), ('file_type', 'content-type of ``file``')]
                     call_params += f', body_file=file, body_file_type=file_type'
                 else:
                     if 'name' not in inp:
@@ -485,8 +492,12 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                         call_params += f', src_bodies=True'
                     if inp.get('array', False):
                         py_type = f'List[{py_type}]'
-                    params += f', {name}: {py_type}'
-                    param_docs += [(name, '')]
+                    if inp.get('optional', False):
+                        params += f', {name}: {py_type} | None = None'
+                        param_docs += [(name, 'optional')]
+                    else:
+                        params += f', {name}: {py_type}'
+                        param_docs += [(name, '')]
                     call_params += f', body={name}'
             params += tail_params
 
@@ -612,22 +623,34 @@ class MoeraNode(Caller):
 '''
 
 
+def clean_whitespace(s: str) -> str:
+    return re.sub(r'(?m)^[ \t]+$', '', s)
+
+
+def write_clean(path: str, content: str) -> None:
+    with open(path, 'w+') as ofile:
+        ofile.write(clean_whitespace(content))
+
+
 def generate_types(api: Any, outdir: str) -> None:
     structs = scan_structures(api)
 
-    with open(outdir + '/types.py', 'w+') as tfile:
-        with open(outdir + '/schemas.py', 'w+') as sfile:
-            tfile.write(PREAMBLE_TYPES)
-            sfile.write(PREAMBLE_SCHEMAS)
-            for enum in api['enums']:
-                generate_enum(enum, tfile)
-            for operations in api['operations']:
-                generate_operations(operations, tfile, sfile)
-            generate_structures(structs, tfile, sfile)
+    tfile = StringIO()
+    sfile = StringIO()
+    tfile.write(PREAMBLE_TYPES)
+    sfile.write(PREAMBLE_SCHEMAS)
+    for enum in api['enums']:
+        generate_enum(enum, tfile)
+    for operations in api['operations']:
+        generate_operations(operations, tfile, sfile)
+    generate_structures(structs, tfile, sfile)
+    write_clean(outdir + '/types.py', tfile.getvalue())
+    write_clean(outdir + '/schemas.py', sfile.getvalue())
 
-    with open(outdir + '/node.py', 'w+') as afile:
-        afile.write(PREAMBLE_CALLS)
-        generate_calls(api, structs, afile)
+    afile = StringIO()
+    afile.write(PREAMBLE_CALLS)
+    generate_calls(api, structs, afile)
+    write_clean(outdir + '/node.py', afile.getvalue())
 
 
 FP_TYPES = {
@@ -706,13 +729,14 @@ from .types import Timestamp'''
 
 
 def generate_fingerprints(fp: Any, outdir: str) -> None:
-    with open(outdir + '/fingerprints.py', 'w+') as ffile:
-        ffile.write(PREAMBLE_FINGERPRINTS)
-        for object in fp['objects']:
-            name = object['name']
-            for schema in object['versions']:
-                version = schema['version']
-                generate_fingerprint(schema, name, version, ffile)
+    ffile = StringIO()
+    ffile.write(PREAMBLE_FINGERPRINTS)
+    for object in fp['objects']:
+        name = object['name']
+        for schema in object['versions']:
+            version = schema['version']
+            generate_fingerprint(schema, name, version, ffile)
+    write_clean(outdir + '/fingerprints.py', ffile.getvalue())
 
 
 if len(sys.argv) < 3 or sys.argv[1] == '':
