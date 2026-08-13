@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/python-moeralib.iml" filepath="$PROJECT_DIR$/.idea/python-moeralib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/moeralib.iml" filepath="$PROJECT_DIR$/.idea/moeralib.iml" />
     </modules>
   </component>
 </project>

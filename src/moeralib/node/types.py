@@ -115,7 +115,7 @@ StoryType = Literal[
     "reaction-added-negative", "reaction-added-positive", "reminder-avatar", "reminder-email", "reminder-full-name",
     "reminder-sheriff-allow", "remote-comment-added", "reply-comment", "search-report", "sheriff-complaint-added",
     "sheriff-complaint-decided", "sheriff-marked", "sheriff-unmarked", "subscriber-added", "subscriber-deleted",
-    "unblocked-user", "unblocked-user-in-posting"
+    "unblocked-user", "unblocked-user-in-posting", "video-comment-published", "video-posting-published"
 ]
 
 SubscriptionReason = Literal["user", "mention", "comment", "auto"]
@@ -726,8 +726,8 @@ class AvatarImage(Structure):
     """virtual location of the media file, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
     """
-    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
-    or CDN
+    location of the media file, relative to the ``/media`` or an absolute URL; points to a static image served directly
+    from a filesystem or CDN
     """
     direct_path_expires_at: Timestamp | None = None
     """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
@@ -750,8 +750,8 @@ class AvatarInfo(Structure):
     """virtual location of the media file, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
     """
-    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
-    or CDN
+    location of the media file, relative to the ``/media`` or an absolute URL; points to a static image served directly
+    from a filesystem or CDN
     """
     direct_path_expires_at: Timestamp | None = None
     """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
@@ -1015,11 +1015,6 @@ class ContactInfo(Structure):
     """the operations and the corresponding principals that are overridden by the node administrator"""
 
 
-class VisitedNodeAttributes(Structure):
-    node_name: str
-    """name of the visited node"""
-
-
 class Credentials(Structure):
     login: str
     password: str
@@ -1255,8 +1250,8 @@ class MediaFilePreviewInfo(Structure):
     """virtual location of the preview, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
     """
-    location of the preview, relative to the ``/media``; points to a static image served directly from a filesystem or
-    CDN
+    location of the preview, relative to the ``/media`` or an absolute URL; points to a static image served directly
+    from a filesystem or CDN
     """
     direct_path_expires_at: Timestamp | None = None
     """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
@@ -1428,6 +1423,8 @@ class PostingFeatures(Structure):
     """list of source text formats the node understands"""
     image_formats: List[str]
     """list of image formats (in MIME type form) the node understands"""
+    video_formats: List[str]
+    """list of video formats (in MIME type form) the node understands"""
 
 
 class PostingSourceInfo(Structure):
@@ -1461,11 +1458,20 @@ class PrivateMediaFileInfo(Structure):
     """virtual location of the media file, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
     """
-    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
-    or CDN
+    location of the media file, relative to the ``/media`` or an absolute URL; points to the media served directly from
+    a filesystem or CDN
     """
     direct_path_expires_at: Timestamp | None = None
     """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
+    direct_download_path: str | None = None
+    """
+    location of the original media file with attachment content disposition, relative to the ``/media`` or an absolute
+    URL
+    """
+    direct_download_path_expires_at: Timestamp | None = None
+    """
+    direct download path expiration timestamp - the real time when the direct download path will not be valid anymore
+    """
     mime_type: str
     """MIME type of the media"""
     width: int | None = None
@@ -1479,6 +1485,12 @@ class PrivateMediaFileInfo(Structure):
     """
     size: int
     """size of the media file in bytes"""
+    duration: float | None = None
+    """duration of the media in seconds (``None``, if the media file is not an audio or video)"""
+    uncompressed: bool | None = None
+    """``True`` if requested video compression is not complete"""
+    compressed_media_id: str | None = None
+    """ID of the compressed media file, if compression is complete"""
     title: str | None = None
     """title of the media file, may be used as an alternative to the file name"""
     text_content: str | None = None
@@ -1559,8 +1571,8 @@ class PublicMediaFileInfo(Structure):
     """virtual location of the media file, relative to the ``/media`` virtual page"""
     direct_path: str | None = None
     """
-    location of the media file, relative to the ``/media``; points to a static image served directly from a filesystem
-    or CDN
+    location of the media file, relative to the ``/media`` or an absolute URL; points to the media served directly from
+    a filesystem or CDN
     """
     direct_path_expires_at: Timestamp | None = None
     """direct path expiration timestamp - the real time when the direct path will not be valid anymore"""
@@ -1805,6 +1817,8 @@ class RemoteMedia(Structure):
     """height of the media in pixels (``None``, if the media file is not an image or video)"""
     size: int
     """size of the media file in bytes"""
+    duration: float | None = None
+    """duration of the media in seconds (``None``, if the media file is not an audio or video)"""
     title: str | None = None
     """title of the media file, may be used as an alternative to the file name"""
     attachment: bool | None = None
@@ -1835,8 +1849,12 @@ class RemoteMediaInfo(Structure):
     """height of the media in pixels (``None``, if the media file is not an image or video)"""
     size: int | None = None
     """size of the media file in bytes"""
+    duration: float | None = None
+    """duration of the media in seconds (``None``, if the media file is not an audio or video)"""
     title: str | None = None
     """title of the media file, may be used as an alternative to the file name"""
+    text_content: str | None = None
+    """the text contained in the image, if any"""
     attachment: bool | None = None
     """
     ``True`` if the media cannot be displayed as an image or video and should be displayed as an attachment instead,
@@ -1960,6 +1978,8 @@ class SearchCommentMediaTextUpdate(Structure):
     """ID of the comment"""
     media_id: str
     """ID of the media"""
+    media_node_name: str | None = None
+    """name of the node where the media is located"""
     title: str | None = None
     """title of the media file, may be used as an alternative to the file name"""
     text_content: str | None = None
@@ -2084,6 +2104,8 @@ class SearchPostingMediaTextUpdate(Structure):
     """ID of the posting"""
     media_id: str
     """ID of the media"""
+    media_node_name: str | None = None
+    """name of the node where the media is located"""
     title: str | None = None
     """title of the media file, may be used as an alternative to the file name"""
     text_content: str | None = None
@@ -2736,6 +2758,11 @@ class VisitDetails(Structure):
     """page referrer"""
 
 
+class VisitedNodeAttributes(Structure):
+    node_name: str
+    """name of the visited node"""
+
+
 class WhoAmI(Structure):
     node_name: str | None = None
     node_name_changing: bool | None = None
@@ -3157,6 +3184,8 @@ class PostingRevisionInfo(Structure):
 
 
 class PostingSourceText(Structure):
+    owner_full_name: str | None = None
+    """full name of the posting's owner"""
     owner_avatar: AvatarDescription | None = None
     """avatar of the posting's owner"""
     body_src: Body | None = None
@@ -3174,6 +3203,8 @@ class PostingSourceText(Structure):
     """types of reactions that the posting rejects"""
     comment_rejected_reactions: RejectedReactions | None = None
     """types of reactions that the posting's comments should rejects"""
+    publications: List[StoryAttributes] | None = None
+    """list of publications in feeds that must be made after creating the posting (for new postings only)"""
     operations: PostingOperations | None = None
     """the operations and the corresponding principals"""
     comment_operations: CommentOperations | None = None
@@ -3278,6 +3309,8 @@ class SearchEntryInfo(Structure):
     """
     media_preview_id: str | None = None
     """ID of the media attached to the entry that was chosen for the preview"""
+    media_preview_mime_type: str | None = None
+    """MIME type of the media attached to the entry that was chosen for the preview"""
     replied_to: SearchRepliedTo | None = None
     """information about the comment this comment is replying to"""
     created_at: Timestamp
@@ -3520,6 +3553,8 @@ class CommentsSliceInfo(Structure):
 
 
 class CommentSourceText(Structure):
+    owner_full_name: str | None = None
+    """full name of the comment's owner"""
     owner_avatar: AvatarDescription | None = None
     """avatar of the comment's owner"""
     body_src: Body | None = None

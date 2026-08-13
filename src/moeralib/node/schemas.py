@@ -1193,11 +1193,18 @@ POSTING_FEATURES_SCHEMA: Any = {
                 "type": "string"
             }
         },
+        "videoFormats": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
     },
     "required": [
         "subjectPresent",
         "sourceFormats",
         "imageFormats",
+        "videoFormats",
     ],
     "additionalProperties": False
 }
@@ -1252,6 +1259,12 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         "directPathExpiresAt": {
             "type": ["integer", "null"]
         },
+        "directDownloadPath": {
+            "type": ["string", "null"]
+        },
+        "directDownloadPathExpiresAt": {
+            "type": ["integer", "null"]
+        },
         "mimeType": {
             "type": "string"
         },
@@ -1266,6 +1279,15 @@ PRIVATE_MEDIA_FILE_INFO_SCHEMA: Any = {
         },
         "size": {
             "type": "integer"
+        },
+        "duration": {
+            "type": ["number", "null"]
+        },
+        "uncompressed": {
+            "type": ["boolean", "null"]
+        },
+        "compressedMediaId": {
+            "type": ["string", "null"]
         },
         "title": {
             "type": ["string", "null"]
@@ -1648,7 +1670,13 @@ REMOTE_MEDIA_INFO_SCHEMA: Any = {
         "size": {
             "type": ["integer", "null"]
         },
+        "duration": {
+            "type": ["number", "null"]
+        },
         "title": {
+            "type": ["string", "null"]
+        },
+        "textContent": {
             "type": ["string", "null"]
         },
         "attachment": {
@@ -3223,6 +3251,9 @@ SEARCH_ENTRY_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "mediaPreviewId": {
+            "type": ["string", "null"]
+        },
+        "mediaPreviewMimeType": {
             "type": ["string", "null"]
         },
         "repliedTo": to_nullable_object_schema(SEARCH_REPLIED_TO_SCHEMA),

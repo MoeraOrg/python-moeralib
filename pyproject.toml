@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "moeralib"
-version = "0.18.7"
+version = "0.18.9"
 authors = [
     {name = "Shmuel Leib Melamud", email = "balu@moera.org"},
 ]
@@ -21,12 +21,13 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 dependencies = [
-    "requests>=2.33.1",
+    "requests>=2.34.2",
     "camel-converter>=5.1.0",
     "jsonschema>=4.26.0",
-    "cryptography~=46.0.7",
+    "cryptography~=48.0.1",
     "mnemonic>=0.21",
     "ecpy>=1.2.5",
+    "pyrefly>=0.60.0",
 ]
 
 [project.urls]
