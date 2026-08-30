@@ -1,6 +1,7 @@
 import json
 from copy import deepcopy
 from enum import Enum
+from importlib.metadata import version
 from typing import Any, IO, Mapping, Sequence
 
 import requests
@@ -49,7 +50,7 @@ class MoeraNodeConnectionError(Exception):
 
 def encode_body(decoded: Body, format: BodyFormat | SourceFormat | None) -> str:
     if format is not None and format.lower() == "application":
-        return decoded.text
+        return decoded.text or ''
     return json.dumps(decoded.json(), indent=None)
 
 
@@ -76,7 +77,9 @@ def decode_body(name: str, encoded: str, format: BodyFormat | SourceFormat | Non
     try:
         body = json.loads(encoded)
         validate(body, schema=schemas.BODY_SCHEMA)
-        return Body.from_json(body)
+        result = Body.from_json(body)
+        assert result is not None
+        return result
     except json.JSONDecodeError as e:
         raise MoeraNodeError(name, 'Invalid body encoding') from e
     except ValidationError as e:
@@ -126,13 +129,17 @@ class CarteSource:
 
 
 FETCH_TIMEOUT = 10 # seconds
-UPDATE_TIMEOUT = 60 # seconds
+SMALL_UPDATE_TIMEOUT = 30 # seconds
+LARGE_UPDATE_TIMEOUT = 60 # seconds
 LARGE_BODY_MIN = 65536
 
-def timeout_duration(method: str, body_encoded: str | None, body_file: IO | None) -> int | None:
+def timeout_duration(method: str, body_encoded: Any | None, body_file: IO | None) -> int | None:
     if method == "POST" or method == "PUT":
-        large_body = body_file is not None or body_encoded is not None and len(body_encoded) > LARGE_BODY_MIN
-        duration =  UPDATE_TIMEOUT if large_body else FETCH_TIMEOUT
+        large_body = (
+            body_file is not None
+            or body_encoded is not None and len(json.dumps(body_encoded)) > LARGE_BODY_MIN
+        )
+        duration = LARGE_UPDATE_TIMEOUT if large_body else SMALL_UPDATE_TIMEOUT
     else:
         duration = FETCH_TIMEOUT
 
@@ -148,6 +155,7 @@ class Caller:
     _verify_ssl: bool = True
     """Whether SSL certificates should be verified."""
     _auth_method: NodeAuth = NodeAuth.NONE
+    _user_agent: str | None = None
 
     def node_url(self, url: str) -> None:
         """Set node URL."""
@@ -193,6 +201,10 @@ class Caller:
         """Select root admin secret authentication for the following requests."""
         self.auth_method(NodeAuth.ROOT_ADMIN)
 
+    def user_agent(self, agent: str) -> None:
+        """Set the User-Agent string."""
+        self._user_agent = agent
+
     def call(self, name: str, location: str, params: Mapping[str, str | int | None] | None = None, method: str = 'GET',
              body: Structure | Sequence[Structure] | None = None, body_file: IO | None = None,
              body_file_type: str | None = None, auth: bool = True, schema: Any = None,
@@ -226,7 +238,8 @@ class Caller:
 
             headers = {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json' if body_file_type is None else body_file_type
+                'Content-Type': 'application/json' if body_file_type is None else body_file_type,
+                'User-Agent': self._user_agent or f"moeralib/{version('moeralib')}"
             }
             bearer: str | None = None
             if auth:
@@ -267,7 +280,9 @@ class Caller:
             response = r.json()
             if r.status_code not in [200, 201]:
                 validate(response, schema=schemas.RESULT_SCHEMA)
-                raise MoeraNodeApiError(name, Result.from_json(response))
+                result = Result.from_json(response)
+                assert result is not None
+                raise MoeraNodeApiError(name, result)
             if schema is not None and schema != "blob":
                 validate(response, schema=schema)
 

@@ -59,7 +59,9 @@ class MoeraNode(Caller):
             "save_to_search_history", location, method="POST", body=history_text,
             schema=schemas.SEARCH_HISTORY_INFO_SCHEMA
         )
-        return types.SearchHistoryInfo.from_json(data)
+        result = types.SearchHistoryInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_from_search_history(self, query: str) -> types.Result:
         """
@@ -72,7 +74,9 @@ class MoeraNode(Caller):
         data = self.call(
             "delete_from_search_history", location, method="DELETE", params=params, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_remote_sheriff_orders_slice(
         self, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -92,7 +96,9 @@ class MoeraNode(Caller):
             "get_remote_sheriff_orders_slice", location, method="GET", auth=False, params=params,
             schema=schemas.SHERIFF_ORDERS_SLICE_INFO_SCHEMA
         )
-        return types.SheriffOrdersSliceInfo.from_json(data)
+        result = types.SheriffOrdersSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_remote_posting_verification_status(self, id: str) -> types.RemotePostingVerificationInfo:
         """
@@ -100,12 +106,14 @@ class MoeraNode(Caller):
 
         :param id: asynchronous operation ID
         """
-        location = "/async-operations/remote-posting-verification/{id}".format(id=quote_plus(id))
+        location = "/async-operations/remote-posting-verification/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "get_remote_posting_verification_status", location, method="GET",
             schema=schemas.REMOTE_POSTING_VERIFICATION_INFO_SCHEMA
         )
-        return types.RemotePostingVerificationInfo.from_json(data)
+        result = types.RemotePostingVerificationInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_remote_reaction_verification_status(self, id: str) -> types.RemoteReactionVerificationInfo:
         """
@@ -114,12 +122,14 @@ class MoeraNode(Caller):
 
         :param id: asynchronous operation ID
         """
-        location = "/async-operations/remote-reaction-verification/{id}".format(id=quote_plus(id))
+        location = "/async-operations/remote-reaction-verification/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "get_remote_reaction_verification_status", location, method="GET",
             schema=schemas.REMOTE_REACTION_VERIFICATION_INFO_SCHEMA
         )
-        return types.RemoteReactionVerificationInfo.from_json(data)
+        result = types.RemoteReactionVerificationInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_avatars(self) -> List[types.AvatarInfo]:
         """
@@ -139,7 +149,9 @@ class MoeraNode(Caller):
         """
         location = "/avatars"
         data = self.call("create_avatar", location, method="POST", body=avatar, schema=schemas.AVATAR_INFO_SCHEMA)
-        return types.AvatarInfo.from_json(data)
+        result = types.AvatarInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_avatar(self, id: str) -> types.AvatarInfo:
         """
@@ -147,9 +159,11 @@ class MoeraNode(Caller):
 
         :param id: avatar ID
         """
-        location = "/avatars/{id}".format(id=quote_plus(id))
+        location = "/avatars/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_avatar", location, method="GET", auth=False, schema=schemas.AVATAR_INFO_SCHEMA)
-        return types.AvatarInfo.from_json(data)
+        result = types.AvatarInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_avatar(self, id: str) -> types.Result:
         """
@@ -157,9 +171,11 @@ class MoeraNode(Caller):
 
         :param id: avatar ID
         """
-        location = "/avatars/{id}".format(id=quote_plus(id))
+        location = "/avatars/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_avatar", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def reorder_avatars(self, order: types.AvatarsOrdered) -> List[types.AvatarOrdinal]:
         """
@@ -185,7 +201,9 @@ class MoeraNode(Caller):
         data = self.call(
             "block_instant", location, method="POST", body=instant, schema=schemas.BLOCKED_INSTANT_INFO_SCHEMA
         )
-        return types.BlockedInstantInfo.from_json(data)
+        result = types.BlockedInstantInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_blocked_instant(self, id: str) -> types.BlockedInstantInfo:
         """
@@ -193,9 +211,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the blocked instant
         """
-        location = "/blocked-instants/{id}".format(id=quote_plus(id))
+        location = "/blocked-instants/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_blocked_instant", location, method="GET", schema=schemas.BLOCKED_INSTANT_INFO_SCHEMA)
-        return types.BlockedInstantInfo.from_json(data)
+        result = types.BlockedInstantInfo.from_json(data)
+        assert result is not None
+        return result
 
     def unblock_instant(self, id: str) -> types.Result:
         """
@@ -203,9 +223,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the blocked instant
         """
-        location = "/blocked-instants/{id}".format(id=quote_plus(id))
+        location = "/blocked-instants/{id}".format(id=quote_plus(str(id)))
         data = self.call("unblock_instant", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def search_blocked_instants(self, filter: types.BlockedInstantFilter) -> List[types.BlockedInstantInfo]:
         """
@@ -229,7 +251,9 @@ class MoeraNode(Caller):
         """
         location = "/people/blocked-users"
         data = self.call("block_user", location, method="POST", body=user, schema=schemas.BLOCKED_USER_INFO_SCHEMA)
-        return types.BlockedUserInfo.from_json(data)
+        result = types.BlockedUserInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_blocked_user(self, id: str) -> types.BlockedUserInfo:
         """
@@ -237,9 +261,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the blocked user
         """
-        location = "/people/blocked-users/{id}".format(id=quote_plus(id))
+        location = "/people/blocked-users/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_blocked_user", location, method="GET", schema=schemas.BLOCKED_USER_INFO_SCHEMA)
-        return types.BlockedUserInfo.from_json(data)
+        result = types.BlockedUserInfo.from_json(data)
+        assert result is not None
+        return result
 
     def unblock_user(self, id: str) -> types.Result:
         """
@@ -247,9 +273,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the blocked user
         """
-        location = "/people/blocked-users/{id}".format(id=quote_plus(id))
+        location = "/people/blocked-users/{id}".format(id=quote_plus(str(id)))
         data = self.call("unblock_user", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def search_blocked_users(self, filter: types.BlockedUserFilter) -> List[types.BlockedUserInfo]:
         """
@@ -272,7 +300,9 @@ class MoeraNode(Caller):
         data = self.call(
             "get_blocked_users_checksums", location, method="GET", schema=schemas.BLOCKED_USERS_CHECKSUMS_SCHEMA
         )
-        return types.BlockedUsersChecksums.from_json(data)
+        result = types.BlockedUsersChecksums.from_json(data)
+        assert result is not None
+        return result
 
     def get_blocked_by_user(self, id: str) -> types.BlockedByUserInfo:
         """
@@ -280,9 +310,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the blocked-by user
         """
-        location = "/people/blocked-by-users/{id}".format(id=quote_plus(id))
+        location = "/people/blocked-by-users/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_blocked_by_user", location, method="GET", schema=schemas.BLOCKED_BY_USER_INFO_SCHEMA)
-        return types.BlockedByUserInfo.from_json(data)
+        result = types.BlockedByUserInfo.from_json(data)
+        assert result is not None
+        return result
 
     def search_blocked_by_users(self, filter: types.BlockedByUserFilter) -> List[types.BlockedByUserInfo]:
         """
@@ -306,7 +338,9 @@ class MoeraNode(Caller):
         """
         location = "/cartes"
         data = self.call("create_cartes", location, method="POST", body=attributes, schema=schemas.CARTE_SET_SCHEMA)
-        return types.CarteSet.from_json(data)
+        result = types.CarteSet.from_json(data)
+        assert result is not None
+        return result
 
     def verify_carte(self, client_carte: types.ClientCarte) -> types.CarteVerificationInfo:
         """
@@ -319,7 +353,9 @@ class MoeraNode(Caller):
         data = self.call(
             "verify_carte", location, method="POST", body=client_carte, schema=schemas.CARTE_VERIFICATION_INFO_SCHEMA
         )
-        return types.CarteVerificationInfo.from_json(data)
+        result = types.CarteVerificationInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_comments_slice(
         self, posting_id: str, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -334,13 +370,15 @@ class MoeraNode(Caller):
         :param before: filter comments posted at or before this moment
         :param limit: maximum number of comments returned
         """
-        location = "/postings/{postingId}/comments".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/comments".format(postingId=quote_plus(str(posting_id)))
         params = {"after": after, "before": before, "limit": limit}
         data = self.call(
             "get_comments_slice", location, method="GET", params=params, bodies=True,
             schema=schemas.COMMENTS_SLICE_INFO_SCHEMA
         )
-        return types.CommentsSliceInfo.from_json(data)
+        result = types.CommentsSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_comment(self, posting_id: str, comment: types.CommentText) -> types.CommentCreated:
         """
@@ -351,12 +389,14 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting
         :param comment:
         """
-        location = "/postings/{postingId}/comments".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/comments".format(postingId=quote_plus(str(posting_id)))
         data = self.call(
             "create_comment", location, method="POST", src_bodies=True, body=comment, bodies=True,
             schema=schemas.COMMENT_CREATED_SCHEMA
         )
-        return types.CommentCreated.from_json(data)
+        result = types.CommentCreated.from_json(data)
+        assert result is not None
+        return result
 
     def get_comment(self, posting_id: str, comment_id: str, with_source: bool = False) -> types.CommentInfo:
         """
@@ -367,14 +407,16 @@ class MoeraNode(Caller):
         :param with_source: include source text of the comment
         """
         location = "/postings/{postingId}/comments/{commentId}".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         include = comma_separated_flags({"source": with_source})
         params = {"include": include}
         data = self.call(
             "get_comment", location, method="GET", params=params, bodies=True, schema=schemas.COMMENT_INFO_SCHEMA
         )
-        return types.CommentInfo.from_json(data)
+        result = types.CommentInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_all_comments(self, posting_id: str, attributes: types.CommentMassAttributes) -> types.Result:
         """
@@ -383,9 +425,11 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting
         :param attributes:
         """
-        location = "/postings/{postingId}/comments".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/comments".format(postingId=quote_plus(str(posting_id)))
         data = self.call("update_all_comments", location, method="PUT", body=attributes, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def update_comment(self, posting_id: str, comment_id: str, comment: types.CommentText) -> types.CommentInfo:
         """
@@ -396,13 +440,15 @@ class MoeraNode(Caller):
         :param comment:
         """
         location = "/postings/{postingId}/comments/{commentId}".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "update_comment", location, method="PUT", src_bodies=True, body=comment, bodies=True,
             schema=schemas.COMMENT_INFO_SCHEMA
         )
-        return types.CommentInfo.from_json(data)
+        result = types.CommentInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_comment(self, posting_id: str, comment_id: str) -> types.CommentTotalInfo:
         """
@@ -413,10 +459,12 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment
         """
         location = "/postings/{postingId}/comments/{commentId}".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         data = self.call("delete_comment", location, method="DELETE", schema=schemas.COMMENT_TOTAL_INFO_SCHEMA)
-        return types.CommentTotalInfo.from_json(data)
+        result = types.CommentTotalInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_postings_attached_to_comment(self, posting_id: str, comment_id: str) -> List[types.PostingInfo]:
         """
@@ -426,7 +474,7 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment
         """
         location = "/postings/{postingId}/comments/{commentId}/attached".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "get_postings_attached_to_comment", location, method="GET", bodies=True,
@@ -442,7 +490,7 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment
         """
         location = "/postings/{postingId}/comments/{commentId}/revisions".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "get_comment_revisions", location, method="GET", bodies=True,
@@ -459,12 +507,14 @@ class MoeraNode(Caller):
         :param id: ID of the revision
         """
         location = "/postings/{postingId}/comments/{commentId}/revisions/{id}".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id), id=quote_plus(id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id)), id=quote_plus(str(id))
         )
         data = self.call(
             "get_comment_revision", location, method="GET", bodies=True, schema=schemas.COMMENT_REVISION_INFO_SCHEMA
         )
-        return types.CommentRevisionInfo.from_json(data)
+        result = types.CommentRevisionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_comment_reaction(
         self, posting_id: str, comment_id: str, reaction: types.ReactionDescription
@@ -480,12 +530,14 @@ class MoeraNode(Caller):
         :param reaction:
         """
         location = "/postings/{postingId}/comments/{commentId}/reactions".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "create_comment_reaction", location, method="POST", body=reaction, schema=schemas.REACTION_CREATED_SCHEMA
         )
-        return types.ReactionCreated.from_json(data)
+        result = types.ReactionCreated.from_json(data)
+        assert result is not None
+        return result
 
     def update_comment_reaction(
         self, posting_id: str, comment_id: str, owner_name: str, reaction: types.ReactionOverride
@@ -499,12 +551,15 @@ class MoeraNode(Caller):
         :param reaction:
         """
         location = "/postings/{postingId}/comments/{commentId}/reactions/{ownerName}".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id), ownerName=quote_plus(owner_name)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id)),
+            ownerName=quote_plus(str(owner_name))
         )
         data = self.call(
             "update_comment_reaction", location, method="PUT", body=reaction, schema=schemas.REACTION_INFO_SCHEMA
         )
-        return types.ReactionInfo.from_json(data)
+        result = types.ReactionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_comment_reactions_slice(
         self, posting_id: str, comment_id: str, negative: bool | None = None, emoji: int | None = None,
@@ -524,14 +579,16 @@ class MoeraNode(Caller):
         :param limit: maximum number of reactions returned
         """
         location = "/postings/{postingId}/comments/{commentId}/reactions".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         params = {"negative": negative, "emoji": emoji, "before": before, "limit": limit}
         data = self.call(
             "get_comment_reactions_slice", location, method="GET", params=params,
             schema=schemas.REACTIONS_SLICE_INFO_SCHEMA
         )
-        return types.ReactionsSliceInfo.from_json(data)
+        result = types.ReactionsSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_comment_reaction(self, posting_id: str, comment_id: str, owner_name: str) -> types.ReactionInfo:
         """
@@ -543,10 +600,13 @@ class MoeraNode(Caller):
         :param owner_name: reaction owner node name
         """
         location = "/postings/{postingId}/comments/{commentId}/reactions/{ownerName}".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id), ownerName=quote_plus(owner_name)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id)),
+            ownerName=quote_plus(str(owner_name))
         )
         data = self.call("get_comment_reaction", location, method="GET", schema=schemas.REACTION_INFO_SCHEMA)
-        return types.ReactionInfo.from_json(data)
+        result = types.ReactionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_all_comment_reactions(self, posting_id: str, comment_id: str) -> types.Result:
         """
@@ -556,10 +616,12 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment
         """
         location = "/postings/{postingId}/comments/{commentId}/reactions".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         data = self.call("delete_all_comment_reactions", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_comment_reaction(self, posting_id: str, comment_id: str, owner_name: str) -> types.ReactionTotalsInfo:
         """
@@ -570,12 +632,15 @@ class MoeraNode(Caller):
         :param owner_name: reaction owner node name
         """
         location = "/postings/{postingId}/comments/{commentId}/reactions/{ownerName}".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id), ownerName=quote_plus(owner_name)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id)),
+            ownerName=quote_plus(str(owner_name))
         )
         data = self.call(
             "delete_comment_reaction", location, method="DELETE", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo.from_json(data)
+        result = types.ReactionTotalsInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_comment_reaction_totals(self, posting_id: str, comment_id: str) -> types.ReactionTotalsInfo:
         """
@@ -585,12 +650,14 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment
         """
         location = "/postings/{postingId}/comments/{commentId}/reaction-totals".format(
-            postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            postingId=quote_plus(str(posting_id)), commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "get_comment_reaction_totals", location, method="GET", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo.from_json(data)
+        result = types.ReactionTotalsInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_contacts(self, query: str | None = None, limit: int | None = None) -> List[types.ContactInfo]:
         """
@@ -634,7 +701,9 @@ class MoeraNode(Caller):
         data = self.call(
             "check_credentials", location, method="GET", auth=False, schema=schemas.CREDENTIALS_CREATED_SCHEMA
         )
-        return types.CredentialsCreated.from_json(data)
+        result = types.CredentialsCreated.from_json(data)
+        assert result is not None
+        return result
 
     def create_credentials(self, credentials: types.Credentials) -> types.Result:
         """
@@ -648,7 +717,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_credentials", location, method="POST", body=credentials, auth=False, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def update_credentials(self, credentials: types.CredentialsChange) -> types.Result:
         """
@@ -662,7 +733,9 @@ class MoeraNode(Caller):
         data = self.call(
             "update_credentials", location, method="PUT", body=credentials, auth=False, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_credentials(self) -> types.Result:
         """
@@ -670,7 +743,9 @@ class MoeraNode(Caller):
         """
         location = "/credentials"
         data = self.call("delete_credentials", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def reset_credentials(self) -> types.EmailHint:
         """
@@ -680,7 +755,9 @@ class MoeraNode(Caller):
         """
         location = "/credentials/reset"
         data = self.call("reset_credentials", location, method="POST", auth=False, schema=schemas.EMAIL_HINT_SCHEMA)
-        return types.EmailHint.from_json(data)
+        result = types.EmailHint.from_json(data)
+        assert result is not None
+        return result
 
     def verify_credentials_reset_token(self, reset_token: types.CredentialsResetToken) -> types.VerificationInfo:
         """
@@ -694,7 +771,9 @@ class MoeraNode(Caller):
             "verify_credentials_reset_token", location, method="POST", body=reset_token, auth=False,
             schema=schemas.VERIFICATION_INFO_SCHEMA
         )
-        return types.VerificationInfo.from_json(data)
+        result = types.VerificationInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_deleted_postings(self, page: int | None = None, limit: int | None = None) -> List[types.PostingInfo]:
         """
@@ -718,11 +797,13 @@ class MoeraNode(Caller):
 
         :param id: ID of the posting
         """
-        location = "/deleted-postings/{id}".format(id=quote_plus(id))
+        location = "/deleted-postings/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "get_deleted_posting", location, method="GET", bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo.from_json(data)
+        result = types.PostingInfo.from_json(data)
+        assert result is not None
+        return result
 
     def restore_deleted_posting(self, id: str) -> types.PostingInfo:
         """
@@ -730,11 +811,13 @@ class MoeraNode(Caller):
 
         :param id: ID of the posting
         """
-        location = "/deleted-postings/{id}/restore".format(id=quote_plus(id))
+        location = "/deleted-postings/{id}/restore".format(id=quote_plus(str(id)))
         data = self.call(
             "restore_deleted_posting", location, method="POST", bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo.from_json(data)
+        result = types.PostingInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_delete_posting_revisions(
         self, posting_id: str, limit: int | None = None
@@ -746,7 +829,7 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting
         :param limit: maximum number of revisions returned
         """
-        location = "/deleted-postings/{postingId}/revisions".format(postingId=quote_plus(posting_id))
+        location = "/deleted-postings/{postingId}/revisions".format(postingId=quote_plus(str(posting_id)))
         params = {"limit": limit}
         data = self.call(
             "get_delete_posting_revisions", location, method="GET", params=params, bodies=True,
@@ -762,13 +845,15 @@ class MoeraNode(Caller):
         :param id: ID of the revision
         """
         location = "/deleted-postings/{postingId}/revisions/{id}".format(
-            postingId=quote_plus(posting_id), id=quote_plus(id)
+            postingId=quote_plus(str(posting_id)), id=quote_plus(str(id))
         )
         data = self.call(
             "get_deleted_posting_revision", location, method="GET", bodies=True,
             schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo.from_json(data)
+        result = types.PostingRevisionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def restore_deleted_posting_revision(self, posting_id: str, id: str) -> types.PostingRevisionInfo:
         """
@@ -779,13 +864,15 @@ class MoeraNode(Caller):
         :param id: ID of the revision
         """
         location = "/postings/{postingId}/revisions/{id}/restore".format(
-            postingId=quote_plus(posting_id), id=quote_plus(id)
+            postingId=quote_plus(str(posting_id)), id=quote_plus(str(id))
         )
         data = self.call(
             "restore_deleted_posting_revision", location, method="POST", bodies=True,
             schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo.from_json(data)
+        result = types.PostingRevisionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_domains(self) -> List[types.DomainInfo]:
         """
@@ -802,9 +889,11 @@ class MoeraNode(Caller):
 
         :param name: domain name
         """
-        location = "/domains/{name}".format(name=quote_plus(name))
+        location = "/domains/{name}".format(name=quote_plus(str(name)))
         data = self.call("get_domain", location, method="GET", schema=schemas.DOMAIN_INFO_SCHEMA)
-        return types.DomainInfo.from_json(data)
+        result = types.DomainInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_domain(self, domain: types.DomainAttributes) -> types.DomainInfo:
         """
@@ -815,7 +904,9 @@ class MoeraNode(Caller):
         """
         location = "/domains"
         data = self.call("create_domain", location, method="POST", body=domain, schema=schemas.DOMAIN_INFO_SCHEMA)
-        return types.DomainInfo.from_json(data)
+        result = types.DomainInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_domain(self, name: str, domain: types.DomainAttributes) -> types.DomainInfo:
         """
@@ -827,9 +918,11 @@ class MoeraNode(Caller):
         :param name: domain's hostname
         :param domain:
         """
-        location = "/domains/{name}".format(name=quote_plus(name))
+        location = "/domains/{name}".format(name=quote_plus(str(name)))
         data = self.call("update_domain", location, method="PUT", body=domain, schema=schemas.DOMAIN_INFO_SCHEMA)
-        return types.DomainInfo.from_json(data)
+        result = types.DomainInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_domain(self, name: str) -> types.Result:
         """
@@ -838,9 +931,11 @@ class MoeraNode(Caller):
 
         :param name: domain name
         """
-        location = "/domains/{name}".format(name=quote_plus(name))
+        location = "/domains/{name}".format(name=quote_plus(str(name)))
         data = self.call("delete_domain", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def is_domain_available(self, node_name: str) -> types.DomainAvailable:
         """
@@ -856,7 +951,9 @@ class MoeraNode(Caller):
             "is_domain_available", location, method="GET", auth=False, params=params,
             schema=schemas.DOMAIN_AVAILABLE_SCHEMA
         )
-        return types.DomainAvailable.from_json(data)
+        result = types.DomainAvailable.from_json(data)
+        assert result is not None
+        return result
 
     def get_drafts(
         self, draft_type: types.DraftType, node_name: str, posting_id: str | None = None, comment_id: str | None = None,
@@ -894,7 +991,9 @@ class MoeraNode(Caller):
             "create_draft", location, method="POST", src_bodies=True, body=draft, bodies=True,
             schema=schemas.DRAFT_INFO_SCHEMA
         )
-        return types.DraftInfo.from_json(data)
+        result = types.DraftInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_draft(self, id: str) -> types.DraftInfo:
         """
@@ -902,9 +1001,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the draft
         """
-        location = "/drafts/{id}".format(id=quote_plus(id))
+        location = "/drafts/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_draft", location, method="GET", bodies=True, schema=schemas.DRAFT_INFO_SCHEMA)
-        return types.DraftInfo.from_json(data)
+        result = types.DraftInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_draft(self, id: str, draft: types.DraftText) -> types.DraftInfo:
         """
@@ -913,12 +1014,14 @@ class MoeraNode(Caller):
         :param id: ID of the draft
         :param draft:
         """
-        location = "/drafts/{id}".format(id=quote_plus(id))
+        location = "/drafts/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "update_draft", location, method="PUT", src_bodies=True, body=draft, bodies=True,
             schema=schemas.DRAFT_INFO_SCHEMA
         )
-        return types.DraftInfo.from_json(data)
+        result = types.DraftInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_draft(self, id: str) -> types.Result:
         """
@@ -926,9 +1029,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the draft
         """
-        location = "/drafts/{id}".format(id=quote_plus(id))
+        location = "/drafts/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_draft", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_features(self) -> types.Features:
         """
@@ -936,7 +1041,9 @@ class MoeraNode(Caller):
         """
         location = "/features"
         data = self.call("get_features", location, method="GET", schema=schemas.FEATURES_SCHEMA)
-        return types.Features.from_json(data)
+        result = types.Features.from_json(data)
+        assert result is not None
+        return result
 
     def get_feeds(self) -> List[types.FeedInfo]:
         """
@@ -952,9 +1059,11 @@ class MoeraNode(Caller):
 
         :param feed_name: name of the feed
         """
-        location = "/feeds/{feedName}".format(feedName=quote_plus(feed_name))
+        location = "/feeds/{feedName}".format(feedName=quote_plus(str(feed_name)))
         data = self.call("get_feed_general", location, method="GET", schema=schemas.FEED_INFO_SCHEMA)
-        return types.FeedInfo.from_json(data)
+        result = types.FeedInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_feed_status(self, feed_name: str) -> types.FeedStatus:
         """
@@ -962,9 +1071,11 @@ class MoeraNode(Caller):
 
         :param feed_name: name of the feed
         """
-        location = "/feeds/{feedName}/status".format(feedName=quote_plus(feed_name))
+        location = "/feeds/{feedName}/status".format(feedName=quote_plus(str(feed_name)))
         data = self.call("get_feed_status", location, method="GET", schema=schemas.FEED_STATUS_SCHEMA)
-        return types.FeedStatus.from_json(data)
+        result = types.FeedStatus.from_json(data)
+        assert result is not None
+        return result
 
     def update_feed_status(self, feed_name: str, change: types.FeedStatusChange) -> types.FeedStatus:
         """
@@ -973,9 +1084,11 @@ class MoeraNode(Caller):
         :param feed_name: name of the feed
         :param change:
         """
-        location = "/feeds/{feedName}/status".format(feedName=quote_plus(feed_name))
+        location = "/feeds/{feedName}/status".format(feedName=quote_plus(str(feed_name)))
         data = self.call("update_feed_status", location, method="PUT", body=change, schema=schemas.FEED_STATUS_SCHEMA)
-        return types.FeedStatus.from_json(data)
+        result = types.FeedStatus.from_json(data)
+        assert result is not None
+        return result
 
     def get_feed_slice(
         self, feed_name: str, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -990,12 +1103,14 @@ class MoeraNode(Caller):
         :param before: filter stories posted at or before this moment
         :param limit: maximum number of stories returned
         """
-        location = "/feeds/{feedName}/stories".format(feedName=quote_plus(feed_name))
+        location = "/feeds/{feedName}/stories".format(feedName=quote_plus(str(feed_name)))
         params = {"after": after, "before": before, "limit": limit}
         data = self.call(
             "get_feed_slice", location, method="GET", params=params, bodies=True, schema=schemas.FEED_SLICE_INFO_SCHEMA
         )
-        return types.FeedSliceInfo.from_json(data)
+        result = types.FeedSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_feed_stories(
         self, feed_name: str, type: types.StoryType | None = None, receiver: str | None = None,
@@ -1009,10 +1124,12 @@ class MoeraNode(Caller):
         :param receiver: delete only the stories about postings located at the given node
         :param recommended: delete only the stories about recommended postings
         """
-        location = "/feeds/{feedName}/stories".format(feedName=quote_plus(feed_name))
+        location = "/feeds/{feedName}/stories".format(feedName=quote_plus(str(feed_name)))
         params = {"type": type, "receiver": receiver, "recommended": recommended}
         data = self.call("delete_feed_stories", location, method="DELETE", params=params, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_friend_groups(self) -> List[types.FriendGroupInfo]:
         """
@@ -1028,9 +1145,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the group of friends
         """
-        location = "/people/friends/groups/{id}".format(id=quote_plus(id))
+        location = "/people/friends/groups/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_friend_group", location, method="GET", schema=schemas.FRIEND_GROUP_INFO_SCHEMA)
-        return types.FriendGroupInfo.from_json(data)
+        result = types.FriendGroupInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_friend_group(self, friend_group: types.FriendGroupDescription) -> types.FriendGroupInfo:
         """
@@ -1042,7 +1161,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_friend_group", location, method="POST", body=friend_group, schema=schemas.FRIEND_GROUP_INFO_SCHEMA
         )
-        return types.FriendGroupInfo.from_json(data)
+        result = types.FriendGroupInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_friend_group(self, id: str, friend_group: types.FriendGroupDescription) -> types.FriendGroupInfo:
         """
@@ -1051,11 +1172,13 @@ class MoeraNode(Caller):
         :param id: ID of the group of friends
         :param friend_group:
         """
-        location = "/people/friends/groups/{id}".format(id=quote_plus(id))
+        location = "/people/friends/groups/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "update_friend_group", location, method="PUT", body=friend_group, schema=schemas.FRIEND_GROUP_INFO_SCHEMA
         )
-        return types.FriendGroupInfo.from_json(data)
+        result = types.FriendGroupInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_friend_group(self, id: str) -> types.Result:
         """
@@ -1063,9 +1186,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the group of friends
         """
-        location = "/people/friends/groups/{id}".format(id=quote_plus(id))
+        location = "/people/friends/groups/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_friend_group", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_friends(self, group_id: str | None = None) -> List[types.FriendInfo]:
         """
@@ -1084,9 +1209,11 @@ class MoeraNode(Caller):
 
         :param name: name of the node
         """
-        location = "/people/friends/{name}".format(name=quote_plus(name))
+        location = "/people/friends/{name}".format(name=quote_plus(str(name)))
         data = self.call("get_friend", location, method="GET", schema=schemas.FRIEND_INFO_SCHEMA)
-        return types.FriendInfo.from_json(data)
+        result = types.FriendInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_friends(self, friends: List[types.FriendDescription]) -> List[types.FriendInfo]:
         """
@@ -1116,9 +1243,11 @@ class MoeraNode(Caller):
 
         :param name: name of the node
         """
-        location = "/people/friend-ofs/{name}".format(name=quote_plus(name))
+        location = "/people/friend-ofs/{name}".format(name=quote_plus(str(name)))
         data = self.call("get_friend_of", location, method="GET", schema=schemas.FRIEND_OF_INFO_SCHEMA)
-        return types.FriendOfInfo.from_json(data)
+        result = types.FriendOfInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_all_grants(self) -> List[types.GrantInfo]:
         """
@@ -1134,9 +1263,11 @@ class MoeraNode(Caller):
 
         :param node_name: name of the node
         """
-        location = "/grants/{nodeName}".format(nodeName=quote_plus(node_name))
+        location = "/grants/{nodeName}".format(nodeName=quote_plus(str(node_name)))
         data = self.call("get_grant", location, method="GET", schema=schemas.GRANT_INFO_SCHEMA)
-        return types.GrantInfo.from_json(data)
+        result = types.GrantInfo.from_json(data)
+        assert result is not None
+        return result
 
     def grant_or_revoke(self, node_name: str, change: types.GrantChange) -> types.GrantInfo:
         """
@@ -1145,9 +1276,11 @@ class MoeraNode(Caller):
         :param node_name: name of the node
         :param change:
         """
-        location = "/grants/{nodeName}".format(nodeName=quote_plus(node_name))
+        location = "/grants/{nodeName}".format(nodeName=quote_plus(str(node_name)))
         data = self.call("grant_or_revoke", location, method="PUT", body=change, schema=schemas.GRANT_INFO_SCHEMA)
-        return types.GrantInfo.from_json(data)
+        result = types.GrantInfo.from_json(data)
+        assert result is not None
+        return result
 
     def revoke_all(self, node_name: str) -> types.Result:
         """
@@ -1155,9 +1288,11 @@ class MoeraNode(Caller):
 
         :param node_name: name of the node
         """
-        location = "/grants/{nodeName}".format(nodeName=quote_plus(node_name))
+        location = "/grants/{nodeName}".format(nodeName=quote_plus(str(node_name)))
         data = self.call("revoke_all", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def create_link_preview(self, url: str) -> types.LinkPreviewInfo:
         """
@@ -1171,7 +1306,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_link_preview", location, method="GET", params=params, schema=schemas.LINK_PREVIEW_INFO_SCHEMA
         )
-        return types.LinkPreviewInfo.from_json(data)
+        result = types.LinkPreviewInfo.from_json(data)
+        assert result is not None
+        return result
 
     def upload_private_media(
         self, file: IO | None = None, file_type: str | None = None, upload: str | None = None, url: str | None = None,
@@ -1197,7 +1334,9 @@ class MoeraNode(Caller):
             "upload_private_media", location, method="POST", body_file=file, body_file_type=file_type, params=params,
             schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PrivateMediaFileInfo.from_json(data)
+        result = types.PrivateMediaFileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_private_media(
         self, id: str, width: int | None = None, download: bool | None = None, grant: str | None = None,
@@ -1214,7 +1353,7 @@ class MoeraNode(Caller):
         :param ignoremalware: if ``True``, the node will ignore malware detection and return the media file; only
             admin may use this option
         """
-        location = "/media/private/{id}/data".format(id=quote_plus(id))
+        location = "/media/private/{id}/data".format(id=quote_plus(str(id)))
         params = {"width": width, "download": download, "grant": grant, "ignoremalware": ignoremalware}
         data = self.call("get_private_media", location, method="GET", params=params, schema="blob")
         return cast(IO, data)
@@ -1226,13 +1365,15 @@ class MoeraNode(Caller):
         :param id: media file ID
         :param grant: media grant allowing access to the media file
         """
-        location = "/media/private/{id}/info".format(id=quote_plus(id))
+        location = "/media/private/{id}/info".format(id=quote_plus(str(id)))
         params = {"grant": grant}
         data = self.call(
             "get_private_media_info", location, method="GET", params=params,
             schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PrivateMediaFileInfo.from_json(data)
+        result = types.PrivateMediaFileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_private_media_info(
         self, id: str, attributes: types.PrivateMediaFileAttributes
@@ -1243,12 +1384,14 @@ class MoeraNode(Caller):
         :param id: media file ID
         :param attributes:
         """
-        location = "/media/private/{id}/info".format(id=quote_plus(id))
+        location = "/media/private/{id}/info".format(id=quote_plus(str(id)))
         data = self.call(
             "update_private_media_info", location, method="PUT", body=attributes,
             schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PrivateMediaFileInfo.from_json(data)
+        result = types.PrivateMediaFileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def upload_public_media(self, file: IO, file_type: str) -> types.PublicMediaFileInfo:
         """
@@ -1262,7 +1405,9 @@ class MoeraNode(Caller):
             "upload_public_media", location, method="POST", body_file=file, body_file_type=file_type,
             schema=schemas.PUBLIC_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PublicMediaFileInfo.from_json(data)
+        result = types.PublicMediaFileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_public_media(self, id: str, width: int | None = None, download: bool | None = None) -> IO:
         """
@@ -1273,7 +1418,7 @@ class MoeraNode(Caller):
             in size, but the best in quality variant of the media, according to the width provided
         :param download: if ``True``, the node will add ``Content-Disposition: attachment`` header to the output
         """
-        location = "/media/public/{id}/data".format(id=quote_plus(id))
+        location = "/media/public/{id}/data".format(id=quote_plus(str(id)))
         params = {"width": width, "download": download}
         data = self.call("get_public_media", location, method="GET", auth=False, params=params, schema="blob")
         return cast(IO, data)
@@ -1284,11 +1429,13 @@ class MoeraNode(Caller):
 
         :param id: media file ID
         """
-        location = "/media/public/{id}/info".format(id=quote_plus(id))
+        location = "/media/public/{id}/info".format(id=quote_plus(str(id)))
         data = self.call(
             "get_public_media_info", location, method="GET", auth=False, schema=schemas.PUBLIC_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PublicMediaFileInfo.from_json(data)
+        result = types.PublicMediaFileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_media_lease(self, attributes: types.MediaLeaseAttributes) -> types.MediaLeaseInfo:
         """
@@ -1300,7 +1447,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_media_lease", location, method="POST", body=attributes, schema=schemas.MEDIA_LEASE_INFO_SCHEMA
         )
-        return types.MediaLeaseInfo.from_json(data)
+        result = types.MediaLeaseInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_media_lease(self, id: str) -> types.Result:
         """
@@ -1308,9 +1457,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the lease
         """
-        location = "/media/leases/{id}".format(id=quote_plus(id))
+        location = "/media/leases/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_media_lease", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def create_media_upload(self, attributes: types.MediaUploadAttributes) -> types.MediaUploadInfo:
         """
@@ -1322,7 +1473,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_media_upload", location, method="POST", body=attributes, schema=schemas.MEDIA_UPLOAD_INFO_SCHEMA
         )
-        return types.MediaUploadInfo.from_json(data)
+        result = types.MediaUploadInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_media_upload(self, id: str) -> types.MediaUploadInfo:
         """
@@ -1330,9 +1483,11 @@ class MoeraNode(Caller):
 
         :param id: upload ID
         """
-        location = "/media/upload/{id}".format(id=quote_plus(id))
+        location = "/media/upload/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_media_upload", location, method="GET", schema=schemas.MEDIA_UPLOAD_INFO_SCHEMA)
-        return types.MediaUploadInfo.from_json(data)
+        result = types.MediaUploadInfo.from_json(data)
+        assert result is not None
+        return result
 
     def upload_media_chunk(self, id: str, chunk: int, file: IO, file_type: str) -> types.MediaUploadInfo:
         """
@@ -1343,12 +1498,14 @@ class MoeraNode(Caller):
         :param file:
         :param file_type: content-type of ``file``
         """
-        location = "/media/upload/{id}/{chunk}".format(id=quote_plus(id), chunk=quote_plus(chunk))
+        location = "/media/upload/{id}/{chunk}".format(id=quote_plus(str(id)), chunk=quote_plus(str(chunk)))
         data = self.call(
             "upload_media_chunk", location, method="PUT", body_file=file, body_file_type=file_type,
             schema=schemas.MEDIA_UPLOAD_INFO_SCHEMA
         )
-        return types.MediaUploadInfo.from_json(data)
+        result = types.MediaUploadInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_media_upload(self, id: str) -> types.Result:
         """
@@ -1356,9 +1513,11 @@ class MoeraNode(Caller):
 
         :param id: upload ID
         """
-        location = "/media/upload/{id}".format(id=quote_plus(id))
+        location = "/media/upload/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_media_upload", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_node_name(self) -> types.NodeNameInfo:
         """
@@ -1366,7 +1525,9 @@ class MoeraNode(Caller):
         """
         location = "/node-name"
         data = self.call("get_node_name", location, method="GET", schema=schemas.NODE_NAME_INFO_SCHEMA)
-        return types.NodeNameInfo.from_json(data)
+        result = types.NodeNameInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_node_name(self, name_to_register: types.NameToRegister) -> types.RegisteredNameSecret:
         """
@@ -1382,7 +1543,9 @@ class MoeraNode(Caller):
             "create_node_name", location, method="POST", body=name_to_register,
             schema=schemas.REGISTERED_NAME_SECRET_SCHEMA
         )
-        return types.RegisteredNameSecret.from_json(data)
+        result = types.RegisteredNameSecret.from_json(data)
+        assert result is not None
+        return result
 
     def update_node_name(self, secret: types.RegisteredNameSecret) -> types.Result:
         """
@@ -1394,7 +1557,9 @@ class MoeraNode(Caller):
         """
         location = "/node-name"
         data = self.call("update_node_name", location, method="PUT", body=secret, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_node_name(self) -> types.Result:
         """
@@ -1403,7 +1568,9 @@ class MoeraNode(Caller):
         """
         location = "/node-name"
         data = self.call("delete_node_name", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_stored_mnemonic(self) -> types.KeyMnemonic:
         """
@@ -1411,7 +1578,9 @@ class MoeraNode(Caller):
         """
         location = "/node-name/mnemonic"
         data = self.call("get_stored_mnemonic", location, method="GET", schema=schemas.KEY_MNEMONIC_SCHEMA)
-        return types.KeyMnemonic.from_json(data)
+        result = types.KeyMnemonic.from_json(data)
+        assert result is not None
+        return result
 
     def store_mnemonic(self, mnemonic: types.KeyMnemonic) -> types.Result:
         """
@@ -1421,7 +1590,9 @@ class MoeraNode(Caller):
         """
         location = "/node-name/mnemonic"
         data = self.call("store_mnemonic", location, method="POST", body=mnemonic, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_stored_mnemonic(self) -> types.Result:
         """
@@ -1429,7 +1600,9 @@ class MoeraNode(Caller):
         """
         location = "/node-name/mnemonic"
         data = self.call("delete_stored_mnemonic", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def send_notification(self, packet: types.NotificationPacket) -> types.Result:
         """
@@ -1443,7 +1616,9 @@ class MoeraNode(Caller):
         data = self.call(
             "send_notification", location, method="POST", body=packet, auth=False, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_people_general(self) -> types.PeopleGeneralInfo:
         """
@@ -1451,7 +1626,9 @@ class MoeraNode(Caller):
         """
         location = "/people"
         data = self.call("get_people_general", location, method="GET", schema=schemas.PEOPLE_GENERAL_INFO_SCHEMA)
-        return types.PeopleGeneralInfo.from_json(data)
+        result = types.PeopleGeneralInfo.from_json(data)
+        assert result is not None
+        return result
 
     def register_plugin(self, plugin: types.PluginDescription) -> types.PluginInfo:
         """
@@ -1462,7 +1639,9 @@ class MoeraNode(Caller):
         """
         location = "/plugins"
         data = self.call("register_plugin", location, method="POST", body=plugin, schema=schemas.PLUGIN_INFO_SCHEMA)
-        return types.PluginInfo.from_json(data)
+        result = types.PluginInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_plugins(self) -> List[types.PluginInfo]:
         """
@@ -1478,9 +1657,11 @@ class MoeraNode(Caller):
 
         :param plugin_name: name of the plugin
         """
-        location = "/plugins/{pluginName}".format(pluginName=quote_plus(plugin_name))
+        location = "/plugins/{pluginName}".format(pluginName=quote_plus(str(plugin_name)))
         data = self.call("get_plugin", location, method="GET", schema=schemas.PLUGIN_INFO_SCHEMA)
-        return types.PluginInfo.from_json(data)
+        result = types.PluginInfo.from_json(data)
+        assert result is not None
+        return result
 
     def unregister_plugin(self, plugin_name: str) -> types.Result:
         """
@@ -1488,9 +1669,11 @@ class MoeraNode(Caller):
 
         :param plugin_name: name of the plugin
         """
-        location = "/plugins/{pluginName}".format(pluginName=quote_plus(plugin_name))
+        location = "/plugins/{pluginName}".format(pluginName=quote_plus(str(plugin_name)))
         data = self.call("unregister_plugin", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def create_posting(self, posting: types.PostingText) -> types.PostingInfo:
         """
@@ -1506,7 +1689,9 @@ class MoeraNode(Caller):
             "create_posting", location, method="POST", src_bodies=True, body=posting, bodies=True,
             schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo.from_json(data)
+        result = types.PostingInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_postings_by_external_source(self, external: str) -> List[types.PostingInfo]:
         """
@@ -1529,12 +1714,14 @@ class MoeraNode(Caller):
         :param id: ID of the posting
         :param posting:
         """
-        location = "/postings/{id}".format(id=quote_plus(id))
+        location = "/postings/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "update_posting", location, method="PUT", src_bodies=True, body=posting, bodies=True,
             schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo.from_json(data)
+        result = types.PostingInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_posting(self, id: str, with_source: bool = False) -> types.PostingInfo:
         """
@@ -1543,13 +1730,15 @@ class MoeraNode(Caller):
         :param id: ID of the posting
         :param with_source: include source text of the posting
         """
-        location = "/postings/{id}".format(id=quote_plus(id))
+        location = "/postings/{id}".format(id=quote_plus(str(id)))
         include = comma_separated_flags({"source": with_source})
         params = {"include": include}
         data = self.call(
             "get_posting", location, method="GET", params=params, bodies=True, schema=schemas.POSTING_INFO_SCHEMA
         )
-        return types.PostingInfo.from_json(data)
+        result = types.PostingInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_posting(self, id: str) -> types.Result:
         """
@@ -1558,9 +1747,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the posting
         """
-        location = "/postings/{id}".format(id=quote_plus(id))
+        location = "/postings/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_posting", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_postings_attached_to_posting(self, id: str) -> List[types.PostingInfo]:
         """
@@ -1568,7 +1759,7 @@ class MoeraNode(Caller):
 
         :param id: ID of the posting
         """
-        location = "/postings/{id}/attached".format(id=quote_plus(id))
+        location = "/postings/{id}/attached".format(id=quote_plus(str(id)))
         data = self.call(
             "get_postings_attached_to_posting", location, method="GET", bodies=True,
             schema=schemas.POSTING_INFO_ARRAY_SCHEMA
@@ -1583,7 +1774,7 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting
         :param limit: maximum number of revisions returned
         """
-        location = "/postings/{postingId}/revisions".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/revisions".format(postingId=quote_plus(str(posting_id)))
         params = {"limit": limit}
         data = self.call(
             "get_posting_revisions", location, method="GET", params=params, bodies=True,
@@ -1598,11 +1789,15 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting
         :param id: ID of the revision
         """
-        location = "/postings/{postingId}/revisions/{id}".format(postingId=quote_plus(posting_id), id=quote_plus(id))
+        location = "/postings/{postingId}/revisions/{id}".format(
+            postingId=quote_plus(str(posting_id)), id=quote_plus(str(id))
+        )
         data = self.call(
             "get_posting_revision", location, method="GET", bodies=True, schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo.from_json(data)
+        result = types.PostingRevisionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def restore_posting_revision(self, posting_id: str, id: str) -> types.PostingRevisionInfo:
         """
@@ -1612,13 +1807,15 @@ class MoeraNode(Caller):
         :param id: ID of the revision
         """
         location = "/postings/{postingId}/revisions/{id}/restore".format(
-            postingId=quote_plus(posting_id), id=quote_plus(id)
+            postingId=quote_plus(str(posting_id)), id=quote_plus(str(id))
         )
         data = self.call(
             "restore_posting_revision", location, method="POST", bodies=True,
             schema=schemas.POSTING_REVISION_INFO_SCHEMA
         )
-        return types.PostingRevisionInfo.from_json(data)
+        result = types.PostingRevisionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_posting_reaction(self, posting_id: str, reaction: types.ReactionDescription) -> types.ReactionCreated:
         """
@@ -1630,11 +1827,13 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting
         :param reaction:
         """
-        location = "/postings/{postingId}/reactions".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/reactions".format(postingId=quote_plus(str(posting_id)))
         data = self.call(
             "create_posting_reaction", location, method="POST", body=reaction, schema=schemas.REACTION_CREATED_SCHEMA
         )
-        return types.ReactionCreated.from_json(data)
+        result = types.ReactionCreated.from_json(data)
+        assert result is not None
+        return result
 
     def get_posting_reactions_slice(
         self, posting_id: str, negative: bool | None = None, emoji: int | None = None, before: int | None = None,
@@ -1652,13 +1851,15 @@ class MoeraNode(Caller):
         :param before: filter reactions created at or before this moment
         :param limit: maximum number of reactions returned
         """
-        location = "/postings/{postingId}/reactions".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/reactions".format(postingId=quote_plus(str(posting_id)))
         params = {"negative": negative, "emoji": emoji, "before": before, "limit": limit}
         data = self.call(
             "get_posting_reactions_slice", location, method="GET", params=params,
             schema=schemas.REACTIONS_SLICE_INFO_SCHEMA
         )
-        return types.ReactionsSliceInfo.from_json(data)
+        result = types.ReactionsSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_posting_reaction(
         self, posting_id: str, owner_name: str, reaction: types.ReactionOverride
@@ -1671,12 +1872,14 @@ class MoeraNode(Caller):
         :param reaction:
         """
         location = "/postings/{postingId}/reactions/{ownerName}".format(
-            postingId=quote_plus(posting_id), ownerName=quote_plus(owner_name)
+            postingId=quote_plus(str(posting_id)), ownerName=quote_plus(str(owner_name))
         )
         data = self.call(
             "update_posting_reaction", location, method="PUT", body=reaction, schema=schemas.REACTION_INFO_SCHEMA
         )
-        return types.ReactionInfo.from_json(data)
+        result = types.ReactionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_posting_reaction(self, posting_id: str, owner_name: str) -> types.ReactionInfo:
         """
@@ -1687,10 +1890,12 @@ class MoeraNode(Caller):
         :param owner_name: reaction owner node name
         """
         location = "/postings/{postingId}/reactions/{ownerName}".format(
-            postingId=quote_plus(posting_id), ownerName=quote_plus(owner_name)
+            postingId=quote_plus(str(posting_id)), ownerName=quote_plus(str(owner_name))
         )
         data = self.call("get_posting_reaction", location, method="GET", schema=schemas.REACTION_INFO_SCHEMA)
-        return types.ReactionInfo.from_json(data)
+        result = types.ReactionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_all_posting_reactions(self, posting_id: str) -> types.Result:
         """
@@ -1698,9 +1903,11 @@ class MoeraNode(Caller):
 
         :param posting_id: ID of the posting
         """
-        location = "/postings/{postingId}/reactions".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/reactions".format(postingId=quote_plus(str(posting_id)))
         data = self.call("delete_all_posting_reactions", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_posting_reaction(self, posting_id: str, owner_name: str) -> types.ReactionTotalsInfo:
         """
@@ -1710,12 +1917,14 @@ class MoeraNode(Caller):
         :param owner_name: reaction owner node name
         """
         location = "/postings/{postingId}/reactions/{ownerName}".format(
-            postingId=quote_plus(posting_id), ownerName=quote_plus(owner_name)
+            postingId=quote_plus(str(posting_id)), ownerName=quote_plus(str(owner_name))
         )
         data = self.call(
             "delete_posting_reaction", location, method="DELETE", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo.from_json(data)
+        result = types.ReactionTotalsInfo.from_json(data)
+        assert result is not None
+        return result
 
     def search_posting_reactions(self, filter: types.ReactionsFilter) -> List[types.ReactionInfo]:
         """
@@ -1736,11 +1945,13 @@ class MoeraNode(Caller):
 
         :param posting_id: ID of the posting
         """
-        location = "/postings/{postingId}/reaction-totals".format(postingId=quote_plus(posting_id))
+        location = "/postings/{postingId}/reaction-totals".format(postingId=quote_plus(str(posting_id)))
         data = self.call(
             "get_posting_reaction_totals", location, method="GET", schema=schemas.REACTION_TOTALS_INFO_SCHEMA
         )
-        return types.ReactionTotalsInfo.from_json(data)
+        result = types.ReactionTotalsInfo.from_json(data)
+        assert result is not None
+        return result
 
     def search_posting_reaction_totals(self, filter: types.ReactionTotalsFilter) -> List[types.ReactionTotalsInfo]:
         """
@@ -1766,7 +1977,9 @@ class MoeraNode(Caller):
         include = comma_separated_flags({"source": with_source})
         params = {"include": include}
         data = self.call("get_profile", location, method="GET", params=params, schema=schemas.PROFILE_INFO_SCHEMA)
-        return types.ProfileInfo.from_json(data)
+        result = types.ProfileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_profile(self, profile: types.ProfileAttributes) -> types.ProfileInfo:
         """
@@ -1777,7 +1990,9 @@ class MoeraNode(Caller):
         """
         location = "/profile"
         data = self.call("update_profile", location, method="PUT", body=profile, schema=schemas.PROFILE_INFO_SCHEMA)
-        return types.ProfileInfo.from_json(data)
+        result = types.ProfileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def verify_email(self) -> types.Result:
         """
@@ -1785,7 +2000,9 @@ class MoeraNode(Caller):
         """
         location = "/profile/email/verify"
         data = self.call("verify_email", location, method="POST", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_delete_node_request_status(self) -> types.DeleteNodeStatus:
         """
@@ -1795,7 +2012,9 @@ class MoeraNode(Caller):
         data = self.call(
             "get_delete_node_request_status", location, method="GET", schema=schemas.DELETE_NODE_STATUS_SCHEMA
         )
-        return types.DeleteNodeStatus.from_json(data)
+        result = types.DeleteNodeStatus.from_json(data)
+        assert result is not None
+        return result
 
     def send_delete_node_request(self, delete_node_text: types.DeleteNodeText) -> types.DeleteNodeStatus:
         """
@@ -1808,7 +2027,9 @@ class MoeraNode(Caller):
             "send_delete_node_request", location, method="POST", body=delete_node_text,
             schema=schemas.DELETE_NODE_STATUS_SCHEMA
         )
-        return types.DeleteNodeStatus.from_json(data)
+        result = types.DeleteNodeStatus.from_json(data)
+        assert result is not None
+        return result
 
     def cancel_delete_node_request(self) -> types.DeleteNodeStatus:
         """
@@ -1818,7 +2039,9 @@ class MoeraNode(Caller):
         data = self.call(
             "cancel_delete_node_request", location, method="DELETE", schema=schemas.DELETE_NODE_STATUS_SCHEMA
         )
-        return types.DeleteNodeStatus.from_json(data)
+        result = types.DeleteNodeStatus.from_json(data)
+        assert result is not None
+        return result
 
     def register_at_push_relay(self, attributes: types.PushRelayClientAttributes) -> types.Result:
         """
@@ -1830,7 +2053,9 @@ class MoeraNode(Caller):
         data = self.call(
             "register_at_push_relay", location, method="POST", body=attributes, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_recommended_postings(
         self, feed: str | None = None, sheriff: str | None = None, limit: int | None = None
@@ -1904,13 +2129,15 @@ class MoeraNode(Caller):
             every feed are tracked separately
         """
         location = "/recommendations/postings/accepted/{nodeName}/{postingId}".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id))
         )
         params = {"feed": feed}
         data = self.call(
             "accept_recommended_posting", location, method="POST", params=params, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def reject_recommended_posting(self, node_name: str, posting_id: str, feed: str | None = None) -> types.Result:
         """
@@ -1922,13 +2149,15 @@ class MoeraNode(Caller):
             every feed are tracked separately
         """
         location = "/recommendations/postings/rejected/{nodeName}/{postingId}".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id))
         )
         params = {"feed": feed}
         data = self.call(
             "reject_recommended_posting", location, method="POST", params=params, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_recommended_nodes_by_activity(
         self, sheriff: str | None = None, limit: int | None = None
@@ -1955,9 +2184,11 @@ class MoeraNode(Caller):
 
         :param node_name: name of the remote node
         """
-        location = "/recommendations/nodes/excluded/{nodeName}".format(nodeName=quote_plus(node_name))
+        location = "/recommendations/nodes/excluded/{nodeName}".format(nodeName=quote_plus(str(node_name)))
         data = self.call("exclude_node_from_recommendations", location, method="POST", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def allow_node_in_recommendations(self, node_name: str) -> types.Result:
         """
@@ -1965,9 +2196,11 @@ class MoeraNode(Caller):
 
         :param node_name: name of the remote node
         """
-        location = "/recommendations/nodes/excluded/{nodeName}".format(nodeName=quote_plus(node_name))
+        location = "/recommendations/nodes/excluded/{nodeName}".format(nodeName=quote_plus(str(node_name)))
         data = self.call("allow_node_in_recommendations", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def ask_remote_node(self, node_name: str, details: types.AskDescription) -> types.Result:
         """
@@ -1976,9 +2209,11 @@ class MoeraNode(Caller):
         :param node_name: name of the remote node
         :param details:
         """
-        location = "/nodes/{nodeName}/ask".format(nodeName=quote_plus(node_name))
+        location = "/nodes/{nodeName}/ask".format(nodeName=quote_plus(str(node_name)))
         data = self.call("ask_remote_node", location, method="POST", body=details, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def create_remote_comment(
         self, node_name: str, posting_id: str, comment: types.CommentSourceText
@@ -1991,13 +2226,15 @@ class MoeraNode(Caller):
         :param comment:
         """
         location = "/nodes/{nodeName}/postings/{postingId}/comments".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id))
         )
         data = self.call(
             "create_remote_comment", location, method="POST", src_bodies=True, body=comment,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def update_remote_comment(
         self, node_name: str, posting_id: str, comment_id: str, comment: types.CommentSourceText
@@ -2011,13 +2248,16 @@ class MoeraNode(Caller):
         :param comment:
         """
         location = "/nodes/{nodeName}/postings/{postingId}/comments/{commentId}".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id)),
+            commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "update_remote_comment", location, method="PUT", src_bodies=True, body=comment,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_remote_comment(self, node_name: str, posting_id: str, comment_id: str) -> types.Result:
         """
@@ -2028,10 +2268,13 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment on the remote node
         """
         location = "/nodes/{nodeName}/postings/{postingId}/comments/{commentId}".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id)),
+            commentId=quote_plus(str(comment_id))
         )
         data = self.call("delete_remote_comment", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def verify_remote_comment(self, node_name: str, posting_id: str, comment_id: str) -> types.AsyncOperationCreated:
         """
@@ -2042,12 +2285,15 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment on the remote node
         """
         location = "/nodes/{nodeName}/postings/{postingId}/comments/{commentId}/verify".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id)),
+            commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "verify_remote_comment", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated.from_json(data)
+        result = types.AsyncOperationCreated.from_json(data)
+        assert result is not None
+        return result
 
     def create_remote_comment_reaction(
         self, node_name: str, posting_id: str, comment_id: str, reaction: types.ReactionAttributes
@@ -2061,12 +2307,15 @@ class MoeraNode(Caller):
         :param reaction:
         """
         location = "/nodes/{nodeName}/postings/{postingId}/comments/{commentId}/reactions".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id)),
+            commentId=quote_plus(str(comment_id))
         )
         data = self.call(
             "create_remote_comment_reaction", location, method="POST", body=reaction, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_remote_comment_reaction(self, node_name: str, posting_id: str, comment_id: str) -> types.Result:
         """
@@ -2077,10 +2326,13 @@ class MoeraNode(Caller):
         :param comment_id: ID of the comment on the remote node
         """
         location = "/nodes/{nodeName}/postings/{postingId}/comments/{commentId}/reactions".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id)),
+            commentId=quote_plus(str(comment_id))
         )
         data = self.call("delete_remote_comment_reaction", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def verify_remote_comment_reaction(
         self, node_name: str, posting_id: str, comment_id: str, owner_name: str
@@ -2094,13 +2346,15 @@ class MoeraNode(Caller):
         :param owner_name: reaction owner node name
         """
         location = "/nodes/{nodeName}/postings/{postingId}/comments/{commentId}/reactions/{ownerName}/verify".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), commentId=quote_plus(comment_id),
-            ownerName=quote_plus(owner_name)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id)),
+            commentId=quote_plus(str(comment_id)), ownerName=quote_plus(str(owner_name))
         )
         data = self.call(
             "verify_remote_comment_reaction", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated.from_json(data)
+        result = types.AsyncOperationCreated.from_json(data)
+        assert result is not None
+        return result
 
     def download_remote_media(
         self, node_name: str, id: str, attributes: types.MediaDownloadAttributes
@@ -2113,13 +2367,15 @@ class MoeraNode(Caller):
         :param attributes:
         """
         location = "/nodes/{nodeName}/media/private/{id}/download".format(
-            nodeName=quote_plus(node_name), id=quote_plus(id)
+            nodeName=quote_plus(str(node_name)), id=quote_plus(str(id))
         )
         data = self.call(
             "download_remote_media", location, method="POST", body=attributes,
             schema=schemas.PRIVATE_MEDIA_FILE_INFO_SCHEMA
         )
-        return types.PrivateMediaFileInfo.from_json(data)
+        result = types.PrivateMediaFileInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_remote_posting(self, node_name: str, posting: types.PostingSourceText) -> types.Result:
         """
@@ -2128,12 +2384,14 @@ class MoeraNode(Caller):
         :param node_name: name of the remote node
         :param posting:
         """
-        location = "/nodes/{nodeName}/postings".format(nodeName=quote_plus(node_name))
+        location = "/nodes/{nodeName}/postings".format(nodeName=quote_plus(str(node_name)))
         data = self.call(
             "create_remote_posting", location, method="POST", src_bodies=True, body=posting,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def update_remote_posting(
         self, node_name: str, posting_id: str, posting: types.PostingSourceText
@@ -2146,13 +2404,15 @@ class MoeraNode(Caller):
         :param posting:
         """
         location = "/nodes/{nodeName}/postings/{postingId}".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id))
         )
         data = self.call(
             "update_remote_posting", location, method="PUT", src_bodies=True, body=posting,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_remote_posting(self, node_name: str, posting_id: str) -> types.Result:
         """
@@ -2162,10 +2422,12 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting on the remote node
         """
         location = "/nodes/{nodeName}/postings/{postingId}".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id))
         )
         data = self.call("delete_remote_posting", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def verify_remote_posting(self, node_name: str, id: str) -> types.AsyncOperationCreated:
         """
@@ -2174,11 +2436,15 @@ class MoeraNode(Caller):
         :param node_name: name of the remote node
         :param id: ID of the posting on the remote node
         """
-        location = "/nodes/{nodeName}/postings/{id}/verify".format(nodeName=quote_plus(node_name), id=quote_plus(id))
+        location = "/nodes/{nodeName}/postings/{id}/verify".format(
+            nodeName=quote_plus(str(node_name)), id=quote_plus(str(id))
+        )
         data = self.call(
             "verify_remote_posting", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated.from_json(data)
+        result = types.AsyncOperationCreated.from_json(data)
+        assert result is not None
+        return result
 
     def verify_remote_posting_revision(
         self, node_name: str, id: str, revision_id: str
@@ -2191,12 +2457,14 @@ class MoeraNode(Caller):
         :param revision_id: ID of the posting revision
         """
         location = "/nodes/{nodeName}/postings/{id}/revisions/{revisionId}/verify".format(
-            nodeName=quote_plus(node_name), id=quote_plus(id), revisionId=quote_plus(revision_id)
+            nodeName=quote_plus(str(node_name)), id=quote_plus(str(id)), revisionId=quote_plus(str(revision_id))
         )
         data = self.call(
             "verify_remote_posting_revision", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated.from_json(data)
+        result = types.AsyncOperationCreated.from_json(data)
+        assert result is not None
+        return result
 
     def create_remote_posting_reaction(
         self, node_name: str, posting_id: str, reaction: types.ReactionAttributes
@@ -2209,12 +2477,14 @@ class MoeraNode(Caller):
         :param reaction:
         """
         location = "/nodes/{nodeName}/postings/{postingId}/reactions".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id))
         )
         data = self.call(
             "create_remote_posting_reaction", location, method="POST", body=reaction, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_remote_posting_reaction(self, node_name: str, posting_id: str) -> types.Result:
         """
@@ -2224,10 +2494,12 @@ class MoeraNode(Caller):
         :param posting_id: ID of the posting on the remote node
         """
         location = "/nodes/{nodeName}/postings/{postingId}/reactions".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id))
         )
         data = self.call("delete_remote_posting_reaction", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def verify_remote_posting_reaction(
         self, node_name: str, posting_id: str, owner_name: str
@@ -2240,12 +2512,15 @@ class MoeraNode(Caller):
         :param owner_name: reaction owner node name
         """
         location = "/nodes/{nodeName}/postings/{postingId}/reactions/{ownerName}/verify".format(
-            nodeName=quote_plus(node_name), postingId=quote_plus(posting_id), ownerName=quote_plus(owner_name)
+            nodeName=quote_plus(str(node_name)), postingId=quote_plus(str(posting_id)),
+            ownerName=quote_plus(str(owner_name))
         )
         data = self.call(
             "verify_remote_posting_reaction", location, method="POST", schema=schemas.ASYNC_OPERATION_CREATED_SCHEMA
         )
-        return types.AsyncOperationCreated.from_json(data)
+        result = types.AsyncOperationCreated.from_json(data)
+        assert result is not None
+        return result
 
     def create_remote_sheriff_order(
         self, node_name: str, sheriff_order: types.SheriffOrderAttributes
@@ -2256,11 +2531,13 @@ class MoeraNode(Caller):
         :param node_name: name of the remote node
         :param sheriff_order:
         """
-        location = "/nodes/{nodeName}/sheriff/orders".format(nodeName=quote_plus(node_name))
+        location = "/nodes/{nodeName}/sheriff/orders".format(nodeName=quote_plus(str(node_name)))
         data = self.call(
             "create_remote_sheriff_order", location, method="POST", body=sheriff_order, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_remote_sheriff_order(self, node_name: str, id: str) -> types.SheriffOrderInfo:
         """
@@ -2269,11 +2546,15 @@ class MoeraNode(Caller):
         :param node_name: name of the remote node
         :param id: ID of the order
         """
-        location = "/nodes/{nodeName}/sheriff/orders/{id}".format(nodeName=quote_plus(node_name), id=quote_plus(id))
+        location = "/nodes/{nodeName}/sheriff/orders/{id}".format(
+            nodeName=quote_plus(str(node_name)), id=quote_plus(str(id))
+        )
         data = self.call(
             "get_remote_sheriff_order", location, method="GET", auth=False, schema=schemas.SHERIFF_ORDER_INFO_SCHEMA
         )
-        return types.SheriffOrderInfo.from_json(data)
+        result = types.SheriffOrderInfo.from_json(data)
+        assert result is not None
+        return result
 
     def search_nodes(self, filter: types.SearchNodeFilter) -> types.SearchNodePageInfo:
         """
@@ -2292,7 +2573,9 @@ class MoeraNode(Caller):
         data = self.call(
             "search_nodes", location, method="POST", body=filter, schema=schemas.SEARCH_NODE_PAGE_INFO_SCHEMA
         )
-        return types.SearchNodePageInfo.from_json(data)
+        result = types.SearchNodePageInfo.from_json(data)
+        assert result is not None
+        return result
 
     def search_node_suggestions(
         self, query: str | None = None, sheriff: str | None = None, limit: int | None = None
@@ -2334,7 +2617,9 @@ class MoeraNode(Caller):
             "search_entries_by_hashtag", location, method="POST", body=filter, bodies=True,
             schema=schemas.SEARCH_HASHTAG_SLICE_INFO_SCHEMA
         )
-        return types.SearchHashtagSliceInfo.from_json(data)
+        result = types.SearchHashtagSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def search_entries_by_text(self, filter: types.SearchTextFilter) -> types.SearchTextPageInfo:
         """
@@ -2353,7 +2638,9 @@ class MoeraNode(Caller):
             "search_entries_by_text", location, method="POST", body=filter, bodies=True,
             schema=schemas.SEARCH_TEXT_PAGE_INFO_SCHEMA
         )
-        return types.SearchTextPageInfo.from_json(data)
+        result = types.SearchTextPageInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_settings(self, settings: List[types.SettingInfo]) -> types.Result:
         """
@@ -2368,7 +2655,9 @@ class MoeraNode(Caller):
         """
         location = "/settings"
         data = self.call("update_settings", location, method="PUT", body=settings, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_client_settings(self, prefix: str | None = None) -> List[types.SettingInfo]:
         """
@@ -2421,7 +2710,9 @@ class MoeraNode(Caller):
         data = self.call(
             "update_node_settings_metadata", location, method="PUT", body=metadata, schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_sheriff_complaint_groups_slice(
         self, after: int | None = None, before: int | None = None, limit: int | None = None,
@@ -2444,7 +2735,9 @@ class MoeraNode(Caller):
             "get_sheriff_complaint_groups_slice", location, method="GET", auth=False, params=params,
             schema=schemas.SHERIFF_COMPLAINT_GROUPS_SLICE_INFO_SCHEMA
         )
-        return types.SheriffComplaintGroupsSliceInfo.from_json(data)
+        result = types.SheriffComplaintGroupsSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_sheriff_complaint_group(self, id: str) -> types.SheriffComplaintGroupInfo:
         """
@@ -2452,12 +2745,14 @@ class MoeraNode(Caller):
 
         :param id: ID of the group of complaints
         """
-        location = "/sheriff/complaints/groups/{id}".format(id=quote_plus(id))
+        location = "/sheriff/complaints/groups/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "get_sheriff_complaint_group", location, method="GET", auth=False,
             schema=schemas.SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA
         )
-        return types.SheriffComplaintGroupInfo.from_json(data)
+        result = types.SheriffComplaintGroupInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_sheriff_complaints_by_group(self, id: str) -> List[types.SheriffComplaintInfo]:
         """
@@ -2465,7 +2760,7 @@ class MoeraNode(Caller):
 
         :param id: ID of the group of complaints
         """
-        location = "/sheriff/complaints/groups/{id}/complaints".format(id=quote_plus(id))
+        location = "/sheriff/complaints/groups/{id}/complaints".format(id=quote_plus(str(id)))
         data = self.call(
             "get_sheriff_complaints_by_group", location, method="GET", auth=False,
             schema=schemas.SHERIFF_COMPLAINT_INFO_ARRAY_SCHEMA
@@ -2481,12 +2776,14 @@ class MoeraNode(Caller):
         :param id: ID of the group of complaints
         :param decision:
         """
-        location = "/sheriff/complaints/groups/{id}".format(id=quote_plus(id))
+        location = "/sheriff/complaints/groups/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "update_sheriff_complaint_group", location, method="PUT", body=decision,
             schema=schemas.SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA
         )
-        return types.SheriffComplaintGroupInfo.from_json(data)
+        result = types.SheriffComplaintGroupInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_sheriff_complaint(self, complaint: types.SheriffComplaintText) -> types.SheriffComplaintInfo:
         """
@@ -2499,7 +2796,9 @@ class MoeraNode(Caller):
             "create_sheriff_complaint", location, method="POST", body=complaint,
             schema=schemas.SHERIFF_COMPLAINT_INFO_SCHEMA
         )
-        return types.SheriffComplaintInfo.from_json(data)
+        result = types.SheriffComplaintInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_sheriff_order(self, sheriff_order: types.SheriffOrderDetails) -> types.Result:
         """
@@ -2512,7 +2811,9 @@ class MoeraNode(Caller):
             "create_sheriff_order", location, method="POST", body=sheriff_order, auth=False,
             schema=schemas.RESULT_SCHEMA
         )
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_story(self, id: str) -> types.StoryInfo:
         """
@@ -2520,9 +2821,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the story
         """
-        location = "/stories/{id}".format(id=quote_plus(id))
+        location = "/stories/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_story", location, method="GET", bodies=True, schema=schemas.STORY_INFO_SCHEMA)
-        return types.StoryInfo.from_json(data)
+        result = types.StoryInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_story(self, id: str, story: types.StoryAttributes) -> types.StoryInfo:
         """
@@ -2531,11 +2834,13 @@ class MoeraNode(Caller):
         :param id: ID of the story
         :param story:
         """
-        location = "/stories/{id}".format(id=quote_plus(id))
+        location = "/stories/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "update_story", location, method="PUT", body=story, bodies=True, schema=schemas.STORY_INFO_SCHEMA
         )
-        return types.StoryInfo.from_json(data)
+        result = types.StoryInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_story(self, id: str) -> types.Result:
         """
@@ -2543,9 +2848,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the story
         """
-        location = "/stories/{id}".format(id=quote_plus(id))
+        location = "/stories/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_story", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_subscribers(
         self, node_name: str | None = None, type: types.SubscriptionType | None = None, feed_name: str | None = None,
@@ -2576,7 +2883,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_subscriber", location, method="POST", body=subscriber, schema=schemas.SUBSCRIBER_INFO_SCHEMA
         )
-        return types.SubscriberInfo.from_json(data)
+        result = types.SubscriberInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_subscriber(self, id: str) -> types.SubscriberInfo:
         """
@@ -2584,9 +2893,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the subscriber
         """
-        location = "/people/subscribers/{id}".format(id=quote_plus(id))
+        location = "/people/subscribers/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_subscriber", location, method="GET", schema=schemas.SUBSCRIBER_INFO_SCHEMA)
-        return types.SubscriberInfo.from_json(data)
+        result = types.SubscriberInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_subscriber(self, id: str, subscriber: types.SubscriberOverride) -> types.SubscriberInfo:
         """
@@ -2595,11 +2906,13 @@ class MoeraNode(Caller):
         :param id: ID of the subscriber
         :param subscriber:
         """
-        location = "/people/subscribers/{id}".format(id=quote_plus(id))
+        location = "/people/subscribers/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "update_subscriber", location, method="PUT", body=subscriber, schema=schemas.SUBSCRIBER_INFO_SCHEMA
         )
-        return types.SubscriberInfo.from_json(data)
+        result = types.SubscriberInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_subscriber(self, id: str) -> types.ContactInfo:
         """
@@ -2607,9 +2920,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the subscriber
         """
-        location = "/people/subscribers/{id}".format(id=quote_plus(id))
+        location = "/people/subscribers/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_subscriber", location, method="DELETE", schema=schemas.CONTACT_INFO_SCHEMA)
-        return types.ContactInfo.from_json(data)
+        result = types.ContactInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_subscriptions(
         self, node_name: str | None = None, type: types.SubscriptionType | None = None
@@ -2637,7 +2952,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_subscription", location, method="POST", body=subscription, schema=schemas.SUBSCRIPTION_INFO_SCHEMA
         )
-        return types.SubscriptionInfo.from_json(data)
+        result = types.SubscriptionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_subscription(self, id: str, subscription: types.SubscriptionOverride) -> types.SubscriptionInfo:
         """
@@ -2646,11 +2963,13 @@ class MoeraNode(Caller):
         :param id: ID of the subscription
         :param subscription:
         """
-        location = "/people/subscriptions/{id}".format(id=quote_plus(id))
+        location = "/people/subscriptions/{id}".format(id=quote_plus(str(id)))
         data = self.call(
             "update_subscription", location, method="PUT", body=subscription, schema=schemas.SUBSCRIPTION_INFO_SCHEMA
         )
-        return types.SubscriptionInfo.from_json(data)
+        result = types.SubscriptionInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_subscription(self, id: str) -> types.ContactInfo:
         """
@@ -2658,9 +2977,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the subscription
         """
-        location = "/people/subscriptions/{id}".format(id=quote_plus(id))
+        location = "/people/subscriptions/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_subscription", location, method="DELETE", schema=schemas.CONTACT_INFO_SCHEMA)
-        return types.ContactInfo.from_json(data)
+        result = types.ContactInfo.from_json(data)
+        assert result is not None
+        return result
 
     def search_subscriptions(self, filter: types.SubscriptionFilter) -> List[types.SubscriptionInfo]:
         """
@@ -2692,7 +3013,9 @@ class MoeraNode(Caller):
         data = self.call(
             "create_token", location, method="POST", body=token, auth=False, schema=schemas.TOKEN_INFO_SCHEMA
         )
-        return types.TokenInfo.from_json(data)
+        result = types.TokenInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_token_info(self, id: str) -> types.TokenInfo:
         """
@@ -2700,9 +3023,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the token
         """
-        location = "/tokens/{id}".format(id=quote_plus(id))
+        location = "/tokens/{id}".format(id=quote_plus(str(id)))
         data = self.call("get_token_info", location, method="GET", schema=schemas.TOKEN_INFO_SCHEMA)
-        return types.TokenInfo.from_json(data)
+        result = types.TokenInfo.from_json(data)
+        assert result is not None
+        return result
 
     def update_token(self, id: str, update: types.TokenUpdate) -> types.TokenInfo:
         """
@@ -2712,9 +3037,11 @@ class MoeraNode(Caller):
         :param id: ID of the token
         :param update:
         """
-        location = "/tokens/{id}".format(id=quote_plus(id))
+        location = "/tokens/{id}".format(id=quote_plus(str(id)))
         data = self.call("update_token", location, method="PUT", body=update, schema=schemas.TOKEN_INFO_SCHEMA)
-        return types.TokenInfo.from_json(data)
+        result = types.TokenInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_token(self, id: str) -> types.Result:
         """
@@ -2722,9 +3049,11 @@ class MoeraNode(Caller):
 
         :param id: ID of the token
         """
-        location = "/tokens/{id}".format(id=quote_plus(id))
+        location = "/tokens/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_token", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_user_list_general(self, name: str) -> types.UserListInfo:
         """
@@ -2732,11 +3061,13 @@ class MoeraNode(Caller):
 
         :param name: the name of the list
         """
-        location = "/user-lists/{name}".format(name=quote_plus(name))
+        location = "/user-lists/{name}".format(name=quote_plus(str(name)))
         data = self.call(
             "get_user_list_general", location, method="GET", auth=False, schema=schemas.USER_LIST_INFO_SCHEMA
         )
-        return types.UserListInfo.from_json(data)
+        result = types.UserListInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_user_list_slice(
         self, name: str, after: int | None = None, before: int | None = None, limit: int | None = None
@@ -2751,13 +3082,15 @@ class MoeraNode(Caller):
         :param before: filter items created at or before this moment
         :param limit: maximum number of items returned
         """
-        location = "/user-lists/{name}/items".format(name=quote_plus(name))
+        location = "/user-lists/{name}/items".format(name=quote_plus(str(name)))
         params = {"after": after, "before": before, "limit": limit}
         data = self.call(
             "get_user_list_slice", location, method="GET", auth=False, params=params,
             schema=schemas.USER_LIST_SLICE_INFO_SCHEMA
         )
-        return types.UserListSliceInfo.from_json(data)
+        result = types.UserListSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_user_list_item(self, name: str, node_name: str) -> types.UserListItemInfo:
         """
@@ -2766,11 +3099,15 @@ class MoeraNode(Caller):
         :param name: the name of the list
         :param node_name: the node name to get information about
         """
-        location = "/user-lists/{name}/items/{nodeName}".format(name=quote_plus(name), nodeName=quote_plus(node_name))
+        location = "/user-lists/{name}/items/{nodeName}".format(
+            name=quote_plus(str(name)), nodeName=quote_plus(str(node_name))
+        )
         data = self.call(
             "get_user_list_item", location, method="GET", auth=False, schema=schemas.USER_LIST_ITEM_INFO_SCHEMA
         )
-        return types.UserListItemInfo.from_json(data)
+        result = types.UserListItemInfo.from_json(data)
+        assert result is not None
+        return result
 
     def create_user_list_item(self, name: str, item: types.UserListItemAttributes) -> types.UserListItemInfo:
         """
@@ -2779,11 +3116,13 @@ class MoeraNode(Caller):
         :param name: the name of the list
         :param item:
         """
-        location = "/user-lists/{name}/items".format(name=quote_plus(name))
+        location = "/user-lists/{name}/items".format(name=quote_plus(str(name)))
         data = self.call(
             "create_user_list_item", location, method="POST", body=item, schema=schemas.USER_LIST_ITEM_INFO_SCHEMA
         )
-        return types.UserListItemInfo.from_json(data)
+        result = types.UserListItemInfo.from_json(data)
+        assert result is not None
+        return result
 
     def delete_user_list_item(self, name: str, node_name: str) -> types.Result:
         """
@@ -2792,9 +3131,13 @@ class MoeraNode(Caller):
         :param name: the name of the list
         :param node_name: the node name to delete
         """
-        location = "/user-lists/{name}/items/{nodeName}".format(name=quote_plus(name), nodeName=quote_plus(node_name))
+        location = "/user-lists/{name}/items/{nodeName}".format(
+            name=quote_plus(str(name)), nodeName=quote_plus(str(node_name))
+        )
         data = self.call("delete_user_list_item", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def get_visited_nodes(self, query: str | None = None, limit: int | None = None) -> List[types.SearchNodeInfo]:
         """
@@ -2824,7 +3167,9 @@ class MoeraNode(Caller):
         """
         location = "/people/visited"
         data = self.call("record_visited_node", location, method="POST", body=node, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def delete_visited_node(self, node_name: str) -> types.Result:
         """
@@ -2832,9 +3177,11 @@ class MoeraNode(Caller):
 
         :param node_name: name of the visited node
         """
-        location = "/people/visited/{nodeName}".format(nodeName=quote_plus(node_name))
+        location = "/people/visited/{nodeName}".format(nodeName=quote_plus(str(node_name)))
         data = self.call("delete_visited_node", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def record_visit(self, visit: types.VisitDetails) -> types.Result:
         """
@@ -2844,7 +3191,9 @@ class MoeraNode(Caller):
         """
         location = "/visits"
         data = self.call("record_visit", location, method="POST", body=visit, schema=schemas.RESULT_SCHEMA)
-        return types.Result.from_json(data)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
 
     def who_am_i(self) -> types.WhoAmI:
         """
@@ -2852,4 +3201,6 @@ class MoeraNode(Caller):
         """
         location = "/whoami"
         data = self.call("who_am_i", location, method="GET", auth=False, schema=schemas.WHO_AM_I_SCHEMA)
-        return types.WhoAmI.from_json(data)
+        result = types.WhoAmI.from_json(data)
+        assert result is not None
+        return result

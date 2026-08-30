@@ -3107,7 +3107,10 @@ POSTING_INFO_SCHEMA: Any = {
             "type": ["boolean", "null"]
         },
         "externalSourceUri": {
-            "type": ["string", "null"]
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
         },
     },
     "required": [

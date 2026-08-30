@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from base64 import b64decode
-from typing import Any, TypeVar, get_type_hints, get_args, Mapping, List
+from typing import Any, TypeVar, get_type_hints, get_args, Mapping, List, Self
 
 from camel_converter import dict_to_snake, to_camel
 
@@ -11,7 +11,7 @@ class Structure:
         self.__dict__.update(kwargs)
 
     @classmethod
-    def from_json(cls, data) -> Structure | None:
+    def from_json(cls, data) -> Self | None:
         if data is None:
             return None
         data = dict_to_snake(data)

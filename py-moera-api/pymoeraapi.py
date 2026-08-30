@@ -524,7 +524,7 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
                         print('Unknown parameter "{param}" referenced in location "{url}"'
                               .format(param=name, url=request['url']))
                         exit(1)
-                    uparams.append(f'{name}=quote_plus({url_params[name]})')
+                    uparams.append(f'{name}=quote_plus(str({url_params[name]}))')
                     del url_params[name]
                 location = params_wrap(
                     f'{ind(2)}location = "{location}".format(%s)\n',
@@ -583,7 +583,9 @@ def generate_calls(api: Any, structs: Mapping[str, Structure], afile: TextIO) ->
             elif result_array:
                 afile.write(f"{ind(2)}return structure_list(data, {result})\n")
             else:
-                afile.write(f"{ind(2)}return {result}.from_json(data)\n")
+                afile.write(f"{ind(2)}result = {result}.from_json(data)\n")
+                afile.write(f"{ind(2)}assert result is not None\n")
+                afile.write(f"{ind(2)}return result\n")
 
 
 PREAMBLE_TYPES = '''# This file is generated
