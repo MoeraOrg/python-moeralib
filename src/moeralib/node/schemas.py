@@ -618,6 +618,9 @@ CONTACT_INFO_SCHEMA: Any = {
         "fullName": {
             "type": ["string", "null"]
         },
+        "nodeSourceUri": {
+            "type": ["string", "null"]
+        },
         "gender": {
             "type": ["string", "null"]
         },
@@ -664,6 +667,9 @@ CREDENTIALS_CREATED_SCHEMA: Any = {
     "properties": {
         "created": {
             "type": "boolean"
+        },
+        "loginDisabled": {
+            "type": ["boolean", "null"]
         },
     },
     "required": [
@@ -1218,6 +1224,9 @@ POSTING_SOURCE_INFO_SCHEMA: Any = {
         "fullName": {
             "type": ["string", "null"]
         },
+        "nodeSourceUri": {
+            "type": ["string", "null"]
+        },
         "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "feedName": {
             "type": "string"
@@ -1330,6 +1339,9 @@ PROFILE_INFO_SCHEMA: Any = {
         "fullName": {
             "type": ["string", "null"]
         },
+        "sourceUri": {
+            "type": ["string", "null"]
+        },
         "gender": {
             "type": ["string", "null"]
         },
@@ -1407,6 +1419,9 @@ REACTION_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "ownerFullName": {
+            "type": ["string", "null"]
+        },
+        "ownerSourceUri": {
             "type": ["string", "null"]
         },
         "ownerGender": {
@@ -1541,6 +1556,9 @@ RECOMMENDED_POSTING_INFO_SCHEMA: Any = {
         "ownerFullName": {
             "type": ["string", "null"]
         },
+        "ownerSourceUri": {
+            "type": ["string", "null"]
+        },
         "ownerAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "heading": {
             "type": "string"
@@ -1617,6 +1635,9 @@ RECOMMENDED_NODE_INFO_SCHEMA: Any = {
             "type": "string"
         },
         "fullName": {
+            "type": ["string", "null"]
+        },
+        "nodeSourceUri": {
             "type": ["string", "null"]
         },
         "title": {
@@ -1776,6 +1797,9 @@ REPLIED_TO_SCHEMA: Any = {
         "fullName": {
             "type": ["string", "null"]
         },
+        "sourceUri": {
+            "type": ["string", "null"]
+        },
         "gender": {
             "type": ["string", "null"]
         },
@@ -1852,6 +1876,9 @@ SEARCH_NODE_INFO_SCHEMA: Any = {
         "fullName": {
             "type": ["string", "null"]
         },
+        "nodeSourceUri": {
+            "type": ["string", "null"]
+        },
         "title": {
             "type": ["string", "null"]
         },
@@ -1904,6 +1931,9 @@ SEARCH_REPLIED_TO_SCHEMA: Any = {
             "type": "string"
         },
         "fullName": {
+            "type": ["string", "null"]
+        },
+        "sourceUri": {
             "type": ["string", "null"]
         },
         "avatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
@@ -1965,6 +1995,9 @@ SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA: Any = {
         "remoteNodeFullName": {
             "type": ["string", "null"]
         },
+        "remoteNodeSourceUri": {
+            "type": ["string", "null"]
+        },
         "remoteFeedName": {
             "type": "string"
         },
@@ -1978,6 +2011,9 @@ SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "remotePostingOwnerFullName": {
+            "type": ["string", "null"]
+        },
+        "remotePostingOwnerSourceUri": {
             "type": ["string", "null"]
         },
         "remotePostingOwnerGender": {
@@ -1996,6 +2032,9 @@ SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "remoteCommentOwnerFullName": {
+            "type": ["string", "null"]
+        },
+        "remoteCommentOwnerSourceUri": {
             "type": ["string", "null"]
         },
         "remoteCommentOwnerGender": {
@@ -2083,6 +2122,9 @@ SHERIFF_COMPLAINT_INFO_SCHEMA: Any = {
         "ownerFullName": {
             "type": ["string", "null"]
         },
+        "ownerSourceUri": {
+            "type": ["string", "null"]
+        },
         "ownerGender": {
             "type": ["string", "null"]
         },
@@ -2129,6 +2171,9 @@ SHERIFF_ORDER_INFO_SCHEMA: Any = {
         "nodeFullName": {
             "type": ["string", "null"]
         },
+        "nodeSourceUri": {
+            "type": ["string", "null"]
+        },
         "feedName": {
             "type": "string"
         },
@@ -2142,6 +2187,9 @@ SHERIFF_ORDER_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "postingOwnerFullName": {
+            "type": ["string", "null"]
+        },
+        "postingOwnerSourceUri": {
             "type": ["string", "null"]
         },
         "postingOwnerGender": {
@@ -2160,6 +2208,9 @@ SHERIFF_ORDER_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "commentOwnerFullName": {
+            "type": ["string", "null"]
+        },
+        "commentOwnerSourceUri": {
             "type": ["string", "null"]
         },
         "commentOwnerGender": {
@@ -2282,6 +2333,9 @@ STORY_SUMMARY_ENTRY_SCHEMA: Any = {
         "ownerFullName": {
             "type": ["string", "null"]
         },
+        "ownerSourceUri": {
+            "type": ["string", "null"]
+        },
         "ownerGender": {
             "type": ["string", "null"]
         },
@@ -2309,6 +2363,9 @@ STORY_SUMMARY_NODE_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "ownerFullName": {
+            "type": ["string", "null"]
+        },
+        "ownerSourceUri": {
             "type": ["string", "null"]
         },
         "ownerGender": {
@@ -2345,6 +2402,9 @@ STORY_SUMMARY_REACTION_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "ownerFullName": {
+            "type": ["string", "null"]
+        },
+        "ownerSourceUri": {
             "type": ["string", "null"]
         },
         "ownerGender": {
@@ -2472,9 +2532,6 @@ TOKEN_INFO_SCHEMA: Any = {
             "items": {
                 "type": "string"
             }
-        },
-        "pluginName": {
-            "type": ["string", "null"]
         },
         "createdAt": {
             "type": "integer"
@@ -2622,6 +2679,9 @@ WHO_AM_I_SCHEMA: Any = {
         "fullName": {
             "type": ["string", "null"]
         },
+        "sourceUri": {
+            "type": ["string", "null"]
+        },
         "gender": {
             "type": ["string", "null"]
         },
@@ -2646,6 +2706,9 @@ ACTIVITY_REACTION_INFO_SCHEMA: Any = {
             "type": "string"
         },
         "remoteFullName": {
+            "type": ["string", "null"]
+        },
+        "remoteSourceUri": {
             "type": ["string", "null"]
         },
         "remoteAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
@@ -2806,12 +2869,6 @@ FEATURES_SCHEMA: Any = {
     "type": "object",
     "properties": {
         "posting": POSTING_FEATURES_SCHEMA,
-        "plugins": {
-            "type": ["array", "null"],
-            "items": {
-                "type": "string"
-            }
-        },
         "feedWidth": {
             "type": "integer"
         },
@@ -2971,6 +3028,9 @@ POSTING_INFO_SCHEMA: Any = {
         "receiverFullName": {
             "type": ["string", "null"]
         },
+        "receiverSourceUri": {
+            "type": ["string", "null"]
+        },
         "receiverGender": {
             "type": ["string", "null"]
         },
@@ -2983,6 +3043,9 @@ POSTING_INFO_SCHEMA: Any = {
             "type": "string"
         },
         "ownerFullName": {
+            "type": ["string", "null"]
+        },
+        "ownerSourceUri": {
             "type": ["string", "null"]
         },
         "ownerGender": {
@@ -3230,6 +3293,9 @@ SEARCH_ENTRY_INFO_SCHEMA: Any = {
         "ownerFullName": {
             "type": ["string", "null"]
         },
+        "ownerSourceUri": {
+            "type": ["string", "null"]
+        },
         "ownerAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "bodyPreview": {
             "type": "string"
@@ -3412,6 +3478,9 @@ COMMENT_INFO_SCHEMA: Any = {
             "type": "string"
         },
         "ownerFullName": {
+            "type": ["string", "null"]
+        },
+        "ownerSourceUri": {
             "type": ["string", "null"]
         },
         "ownerGender": {
@@ -3662,6 +3731,9 @@ DRAFT_INFO_SCHEMA: Any = {
         "ownerFullName": {
             "type": ["string", "null"]
         },
+        "ownerSourceUri": {
+            "type": ["string", "null"]
+        },
         "ownerAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "rejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
         "commentRejectedReactions": to_nullable_object_schema(REJECTED_REACTIONS_SCHEMA),
@@ -3777,6 +3849,9 @@ STORY_INFO_SCHEMA: Any = {
         "summaryFullName": {
             "type": ["string", "null"]
         },
+        "summarySourceUri": {
+            "type": ["string", "null"]
+        },
         "summaryAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
         "summary": {
             "type": ["string", "null"]
@@ -3794,6 +3869,9 @@ STORY_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "remoteFullName": {
+            "type": ["string", "null"]
+        },
+        "remoteSourceUri": {
             "type": ["string", "null"]
         },
         "remotePostingId": {
@@ -3862,51 +3940,6 @@ FEED_SLICE_INFO_SCHEMA: Any = {
     ],
     "additionalProperties": False
 }
-
-PLUGIN_INFO_SCHEMA: Any = {
-    "type": "object",
-    "properties": {
-        "nodeId": {
-            "type": "string"
-        },
-        "local": {
-            "type": "boolean"
-        },
-        "name": {
-            "type": "string"
-        },
-        "title": {
-            "type": ["string", "null"]
-        },
-        "description": {
-            "type": ["string", "null"]
-        },
-        "location": {
-            "type": ["string", "null"]
-        },
-        "acceptedEvents": {
-            "type": ["array", "null"],
-            "items": {
-                "type": "string"
-            }
-        },
-        "settings": {
-            "type": ["array", "null"],
-            "items": SETTING_META_INFO_SCHEMA
-        },
-        "tokenId": {
-            "type": ["string", "null"]
-        },
-    },
-    "required": [
-        "nodeId",
-        "local",
-        "name",
-    ],
-    "additionalProperties": False
-}
-
-PLUGIN_INFO_ARRAY_SCHEMA = array_schema(PLUGIN_INFO_SCHEMA)
 
 PUSH_CONTENT_SCHEMA: Any = {
     "type": "object",

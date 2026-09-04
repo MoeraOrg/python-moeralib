@@ -33,7 +33,7 @@ PushRelayType = Literal["fcm"]
 Scope = Literal[
     "none", "identify", "other", "view-content", "add-post", "update-post", "add-comment", "update-comment", "react",
     "delete-own-content", "delete-others-content", "view-people", "block", "friend", "remote-identify", "drafts",
-    "view-feeds", "update-feeds", "name", "plugins", "view-profile", "update-profile", "sheriff", "view-settings",
+    "view-feeds", "update-feeds", "name", "view-profile", "update-profile", "sheriff", "view-settings",
     "update-settings", "subscribe", "tokens", "user-lists", "grant", "upload-public-media", "upload-private-media",
     "lease-media", "view-all", "all"
 ]
@@ -58,7 +58,6 @@ SCOPE_VALUES: Mapping[Scope, int] = {
     "view-feeds": 0x00008000,
     "update-feeds": 0x00010000,
     "name": 0x00020000,
-    "plugins": 0x00040000,
     "view-profile": 0x00080000,
     "update-profile": 0x00100000,
     "sheriff": 0x00200000,
@@ -72,7 +71,7 @@ SCOPE_VALUES: Mapping[Scope, int] = {
     "upload-private-media": 0x20000000,
     "lease-media": 0x40000000,
     "view-all": 0x00088404,
-    "all": 0x7ffffffd,
+    "all": 0x7ffbfffd,
 }
 
 SearchContentUpdateType = Literal[
@@ -987,6 +986,8 @@ class ContactFilter(Structure):
 class ContactInfo(Structure):
     node_name: str
     full_name: str | None = None
+    node_source_uri: str | None = None
+    """source URI of the node identity"""
     gender: str | None = None
     title: str | None = None
     avatar: AvatarImage | None = None
@@ -1016,8 +1017,10 @@ class ContactInfo(Structure):
 
 
 class Credentials(Structure):
-    login: str
-    password: str
+    login: str | None = None
+    password: str | None = None
+    login_disabled: bool | None = None
+    """if ``True``, disable login and password reset"""
 
 
 class CredentialsChange(Structure):
@@ -1032,6 +1035,8 @@ class CredentialsChange(Structure):
 class CredentialsCreated(Structure):
     created: bool
     """``True`` if the credentials are initialized already, ``False`` otherwise"""
+    login_disabled: bool | None = None
+    """``True`` if login and password reset are disabled"""
 
 
 class CredentialsResetToken(Structure):
@@ -1317,6 +1322,8 @@ class NotificationPacket(Structure):
     """name of the sending node"""
     full_name: str | None = None
     """full name of the sending node"""
+    node_source_uri: str | None = None
+    """source URI of the node identity"""
     gender: str | None = None
     """gender of the sending node"""
     avatar: AvatarImage | None = None
@@ -1386,34 +1393,6 @@ class PeopleGeneralInfo(Structure):
     """the supported operations and the corresponding principals"""
 
 
-class PluginContext(Structure):
-    root_admin: bool
-    """``True``, if the client has authenticated as root admin, ``False`` otherwise"""
-    admin: bool
-    """``True``, if the client has authenticated as node admin, ``False`` otherwise"""
-    auth_categories: List[str]
-    """
-    the list of permissions granted to the client, if it has authenticated as node admin; see ``TokenInfo.permissions``
-    for the list of possible values
-    """
-    client_name: str
-    """node name of the client"""
-    remote_address: str
-    """IP address of the client"""
-    user_agent: str
-    """user agent (browser) used by the client"""
-    user_agent_os: str
-    """operating system used by the client"""
-    node_id: str
-    """ID of the current node"""
-    node_name: str
-    """node name of the current node"""
-    domain_name: str
-    """domain name of the current node"""
-    origin_url: str
-    """full URL of the request"""
-
-
 class PostingFeatures(Structure):
     post: bool | None = None
     """``True`` if the client is allowed to create postings, ``False`` otherwise"""
@@ -1432,6 +1411,8 @@ class PostingSourceInfo(Structure):
     """name of the remote node"""
     full_name: str | None = None
     """full name of the remote node"""
+    node_source_uri: str | None = None
+    """source URI of the node identity"""
     avatar: AvatarImage | None = None
     """avatar of the remote node"""
     feed_name: str
@@ -1515,6 +1496,8 @@ class PrivateMediaFileInfo(Structure):
 class ProfileAttributes(Structure):
     full_name: str | None = None
     """node owner's full name"""
+    source_uri: str | None = None
+    """source URI of the node identity"""
     gender: str | None = None
     """node owner's gender"""
     email: str | None = None
@@ -1539,6 +1522,8 @@ class ProfileAttributes(Structure):
 class ProfileInfo(Structure):
     full_name: str | None = None
     """node owner's full name"""
+    source_uri: str | None = None
+    """source URI of the node identity"""
     gender: str | None = None
     """node owner's gender"""
     email: str | None = None
@@ -1614,6 +1599,8 @@ class ReactionDescription(Structure):
     """reaction owner's node name"""
     owner_full_name: str | None = None
     """reaction owner's full name"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """reaction owner's gender"""
     owner_avatar: AvatarDescription | None = None
@@ -1642,6 +1629,8 @@ class ReactionInfo(Structure):
     """reaction owner's node name"""
     owner_full_name: str | None = None
     """reaction owner's full name"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """reaction owner's gender"""
     owner_avatar: AvatarImage | None = None
@@ -1744,6 +1733,8 @@ class RecommendedPostingInfo(Structure):
     """node name of the posting's owner"""
     owner_full_name: str | None = None
     """full name of the posting's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_avatar: AvatarImage | None = None
     """avatar of the posting's owner"""
     heading: str
@@ -1783,6 +1774,8 @@ class RecommendedNodeInfo(Structure):
     node_name: str
     full_name: str | None = None
     """node owner's full name"""
+    node_source_uri: str | None = None
+    """source URI of the node identity"""
     title: str | None = None
     """node title"""
     avatar: AvatarImage | None = None
@@ -1916,6 +1909,8 @@ class RepliedTo(Structure):
     """node name of the comment's owner"""
     full_name: str | None = None
     """full name of the comment's owner"""
+    source_uri: str | None = None
+    """source URI of the node identity"""
     gender: str | None = None
     """gender of the comment's owner"""
     avatar: AvatarImage | None = None
@@ -2060,6 +2055,8 @@ class SearchNodeInfo(Structure):
     node_name: str
     full_name: str | None = None
     """node owner's full name"""
+    node_source_uri: str | None = None
+    """source URI of the node identity"""
     title: str | None = None
     """node title"""
     avatar: AvatarImage | None = None
@@ -2143,6 +2140,8 @@ class SearchRepliedTo(Structure):
     """node name of the comment's owner"""
     full_name: str | None = None
     """full name of the comment's owner"""
+    source_uri: str | None = None
+    """source URI of the node identity"""
     avatar: AvatarImage | None = None
     """avatar of the comment's owner"""
     heading: str | None = None
@@ -2237,6 +2236,8 @@ class SheriffComplaintGroupInfo(Structure):
     """name of the node the complaints are related to"""
     remote_node_full_name: str | None = None
     """full name of the node the complaints are related to"""
+    remote_node_source_uri: str | None = None
+    """source URI of the node identity"""
     remote_feed_name: str
     """name of the feed the complaints are related to"""
     remote_posting_id: str | None = None
@@ -2247,6 +2248,8 @@ class SheriffComplaintGroupInfo(Structure):
     """posting owner's node name"""
     remote_posting_owner_full_name: str | None = None
     """posting owner's full name"""
+    remote_posting_owner_source_uri: str | None = None
+    """source URI of the node identity"""
     remote_posting_owner_gender: str | None = None
     """posting owner's gender"""
     remote_posting_heading: str | None = None
@@ -2259,6 +2262,8 @@ class SheriffComplaintGroupInfo(Structure):
     """comment owner's node name"""
     remote_comment_owner_full_name: str | None = None
     """comment owner's full name"""
+    remote_comment_owner_source_uri: str | None = None
+    """source URI of the node identity"""
     remote_comment_owner_gender: str | None = None
     """comment owner's gender"""
     remote_comment_heading: str | None = None
@@ -2300,6 +2305,8 @@ class SheriffComplaintInfo(Structure):
     """complaint owner's node name"""
     owner_full_name: str | None = None
     """complaint owner's full name"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """complaint owner's gender"""
     group: SheriffComplaintGroupInfo | None = None
@@ -2317,12 +2324,16 @@ class SheriffComplaintInfo(Structure):
 class SheriffComplaintText(Structure):
     owner_full_name: str | None = None
     """complaint owner's full name"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """complaint owner's gender"""
     node_name: str
     """name of the node the complaint is related to"""
     full_name: str | None = None
     """full name of the node the complaint is related to"""
+    node_source_uri: str | None = None
+    """source URI of the node identity"""
     feed_name: str
     """name of the feed the complaint is related to"""
     posting_id: str | None = None
@@ -2331,6 +2342,8 @@ class SheriffComplaintText(Structure):
     """posting owner's node name"""
     posting_owner_full_name: str | None = None
     """posting owner's full name"""
+    posting_owner_source_uri: str | None = None
+    """source URI of the node identity"""
     posting_owner_gender: str | None = None
     """posting owner's gender"""
     posting_heading: str | None = None
@@ -2341,6 +2354,8 @@ class SheriffComplaintText(Structure):
     """comment owner's node name"""
     comment_owner_full_name: str | None = None
     """comment owner's full name"""
+    comment_owner_source_uri: str | None = None
+    """source URI of the node identity"""
     comment_owner_gender: str | None = None
     """comment owner's gender"""
     comment_heading: str | None = None
@@ -2408,6 +2423,8 @@ class SheriffOrderInfo(Structure):
     """name of the node the order was sent to"""
     node_full_name: str | None = None
     """full name of the node the order was sent to"""
+    node_source_uri: str | None = None
+    """source URI of the node identity"""
     feed_name: str
     """name of the feed the order is related to"""
     posting_id: str | None = None
@@ -2418,6 +2435,8 @@ class SheriffOrderInfo(Structure):
     """posting owner's node name"""
     posting_owner_full_name: str | None = None
     """posting owner's full name"""
+    posting_owner_source_uri: str | None = None
+    """source URI of the node identity"""
     posting_owner_gender: str | None = None
     """posting owner's gender"""
     posting_heading: str | None = None
@@ -2430,6 +2449,8 @@ class SheriffOrderInfo(Structure):
     """comment owner's node name"""
     comment_owner_full_name: str | None = None
     """comment owner's full name"""
+    comment_owner_source_uri: str | None = None
+    """source URI of the node identity"""
     comment_owner_gender: str | None = None
     """comment owner's gender"""
     comment_heading: str | None = None
@@ -2503,6 +2524,8 @@ class StorySummaryEntry(Structure):
     """entry owner's name"""
     owner_full_name: str | None = None
     """entry owner's full name"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """entry owner's gender"""
     heading: str | None = None
@@ -2518,6 +2541,8 @@ class StorySummaryNode(Structure):
     """node owner's name"""
     owner_full_name: str | None = None
     """node owner's full name"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """node owner's gender"""
 
@@ -2536,6 +2561,8 @@ class StorySummaryReaction(Structure):
     """reaction owner's name"""
     owner_full_name: str | None = None
     """reaction owner's full name"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """reaction owner's gender"""
     emoji: int | None = None
@@ -2669,8 +2696,6 @@ class TokenInfo(Structure):
     """a user-readable name of the token"""
     permissions: List[Scope] | None = None
     """the list of permissions granted to the token"""
-    plugin_name: str | None = None
-    """a plugin the token belongs to; if set, only this plugin may use the token"""
     created_at: Timestamp
     """token creation timestamp"""
     deadline: Timestamp | None = None
@@ -2769,6 +2794,8 @@ class WhoAmI(Structure):
     """``True`` if node name is about to be changed"""
     full_name: str | None = None
     """node owner's full name"""
+    source_uri: str | None = None
+    """source URI of the node identity"""
     gender: str | None = None
     """node owner's gender"""
     title: str | None = None
@@ -2791,6 +2818,8 @@ class ActivityReactionInfo(Structure):
     """name of the remote node"""
     remote_full_name: str | None = None
     """full name of the remote node"""
+    remote_source_uri: str | None = None
+    """source URI of the node identity"""
     remote_avatar: AvatarImage | None = None
     """avatar of the remote node"""
     remote_posting_id: str
@@ -2906,8 +2935,6 @@ class ContactWithRelationships(Structure):
 class Features(Structure):
     posting: PostingFeatures
     """features of a posting"""
-    plugins: List[str] | None = None
-    """list of names of plugins enabled for the node"""
     feed_width: int
     """width of the feed in pixels"""
     friend_groups: FriendGroupsFeatures | None = None
@@ -3018,6 +3045,8 @@ class PostingInfo(Structure):
     """name of the node where the posting was published (for cached copies of remote postings only)"""
     receiver_full_name: str | None = None
     """full name of the node where the posting was published (for cached copies of remote postings only)"""
+    receiver_source_uri: str | None = None
+    """source URI of the node identity"""
     receiver_gender: str | None = None
     """gender of the node where the posting was published (for cached copies of remote postings only)"""
     receiver_avatar: AvatarImage | None = None
@@ -3030,6 +3059,8 @@ class PostingInfo(Structure):
     """node name of the posting's owner"""
     owner_full_name: str | None = None
     """full name of the posting's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """gender of the posting's owner"""
     owner_avatar: AvatarImage | None = None
@@ -3186,6 +3217,8 @@ class PostingRevisionInfo(Structure):
 class PostingSourceText(Structure):
     owner_full_name: str | None = None
     """full name of the posting's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_avatar: AvatarDescription | None = None
     """avatar of the posting's owner"""
     body_src: Body | None = None
@@ -3219,7 +3252,15 @@ class PostingText(Structure):
     owner_name: str | None = None
     """node name of the posting's owner"""
     owner_full_name: str | None = None
-    """full name of the posting's owner"""
+    """
+    full name of the posting's owner; if omitted, the node profile value is used when creating a posting and the
+    current posting value is preserved when updating it; an explicitly empty string is stored as empty
+    """
+    owner_source_uri: str | None = None
+    """
+    source URI of the posting owner's identity; if omitted, the node profile value is used when creating a posting and
+    the current posting value is preserved when updating it; an explicitly empty string is stored as empty
+    """
     owner_gender: str | None = None
     """gender of the posting's owner"""
     owner_avatar: AvatarDescription | None = None
@@ -3286,6 +3327,8 @@ class SearchEntryInfo(Structure):
     """node name of the entry's owner"""
     owner_full_name: str | None = None
     """full name of the entry's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_avatar: AvatarImage | None = None
     """avatar of the entry's owner"""
     body_preview: Body
@@ -3407,6 +3450,8 @@ class CommentInfo(Structure):
     """node name of the comment's owner"""
     owner_full_name: str | None = None
     """full name of the comment's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """gender of the comment's owner"""
     owner_avatar: AvatarImage | None = None
@@ -3555,6 +3600,8 @@ class CommentsSliceInfo(Structure):
 class CommentSourceText(Structure):
     owner_full_name: str | None = None
     """full name of the comment's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_avatar: AvatarDescription | None = None
     """avatar of the comment's owner"""
     body_src: Body | None = None
@@ -3593,6 +3640,8 @@ class CommentText(Structure):
     """node name of the comment's owner"""
     owner_full_name: str | None = None
     """full name of the comment's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_gender: str | None = None
     """gender of the comment's owner"""
     owner_avatar: AvatarDescription | None = None
@@ -3663,6 +3712,8 @@ class DraftInfo(Structure):
     """draft purging timestamp - the time when the draft will be purged from the database, if not updated"""
     owner_full_name: str | None = None
     """full name of the posting's/comment's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_avatar: AvatarImage | None = None
     """avatar of the posting's/comment's owner"""
     rejected_reactions: RejectedReactions | None = None
@@ -3712,6 +3763,8 @@ class DraftText(Structure):
     """ID of the comment replied to"""
     owner_full_name: str | None = None
     """full name of the posting's/comment's owner"""
+    owner_source_uri: str | None = None
+    """source URI of the node identity"""
     owner_avatar: AvatarDescription | None = None
     """avatar of the posting's/comment's owner"""
     rejected_reactions: RejectedReactions | None = None
@@ -3809,6 +3862,8 @@ class StoryInfo(Structure):
     """name of the node related to the summary of the story"""
     summary_full_name: str | None = None
     """full name of the node related to the summary of the story"""
+    summary_source_uri: str | None = None
+    """source URI of the node identity"""
     summary_avatar: AvatarImage | None = None
     """avatar of the summary of the story"""
     summary: str | None = None
@@ -3827,6 +3882,8 @@ class StoryInfo(Structure):
     """name of the node this story is about"""
     remote_full_name: str | None = None
     """full name of the node this story is about"""
+    remote_source_uri: str | None = None
+    """source URI of the node identity"""
     remote_posting_id: str | None = None
     """ID of the posting at remote node this story is about"""
     remote_comment_id: str | None = None
@@ -3855,47 +3912,6 @@ class FeedSliceInfo(Structure):
     """total number of stories in the feed before this slice"""
     total_in_future: int
     """total number of stories in the feed after this slice"""
-
-
-class PluginDescription(Structure):
-    name: str
-    """a unique plugin name; can contain only small latin letters, digits or hyphen"""
-    title: str | None = None
-    """user-readable title of the plugin"""
-    description: str | None = None
-    """user-readable description of the purpose of the plugin"""
-    location: str | None = None
-    """URL of the plugin; used by the node to call the plugin API"""
-    accepted_events: List[str] | None = None
-    """list of types of internal events the plugin wants to receive; Read more about internal events."""
-    options: List[SettingDescriptor] | None = None
-    """
-    plugin settings to be added to the list of node settings, the settings appear in the list with a prefix
-    ``plugin.&lt;plugin name>.``
-    """
-
-
-class PluginInfo(Structure):
-    node_id: str
-    """ID of the node this plugin is connected to"""
-    local: bool
-    """
-    ``True`` if the plugin is enabled for a particular node only, ``False``, if it is enabled for the whole server
-    """
-    name: str
-    """a unique plugin name"""
-    title: str | None = None
-    """user-readable title of the plugin"""
-    description: str | None = None
-    """user-readable description of the purpose of the plugin"""
-    location: str | None = None
-    """URL of the plugin; used by the node to call the plugin API"""
-    accepted_events: List[str] | None = None
-    """list of types of internal events the plugin wants to receive; Read more about internal events."""
-    settings: List[SettingMetaInfo] | None = None
-    """plugin settings to be added to the list of node settings"""
-    token_id: str | None = None
-    """ID of the token used to authenticate the plugin"""
 
 
 class PushContent(Structure):

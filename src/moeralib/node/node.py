@@ -1630,51 +1630,6 @@ class MoeraNode(Caller):
         assert result is not None
         return result
 
-    def register_plugin(self, plugin: types.PluginDescription) -> types.PluginInfo:
-        """
-        Register the plugin. If the plugin authenticates as root admin, the plugin is registered at the server level.
-        If the plugin authenticates as node admin, the plugin is registered at the node level.
-
-        :param plugin:
-        """
-        location = "/plugins"
-        data = self.call("register_plugin", location, method="POST", body=plugin, schema=schemas.PLUGIN_INFO_SCHEMA)
-        result = types.PluginInfo.from_json(data)
-        assert result is not None
-        return result
-
-    def get_plugins(self) -> List[types.PluginInfo]:
-        """
-        Get information about all plugins registered for the node and server.
-        """
-        location = "/plugins"
-        data = self.call("get_plugins", location, method="GET", schema=schemas.PLUGIN_INFO_ARRAY_SCHEMA)
-        return structure_list(data, types.PluginInfo)
-
-    def get_plugin(self, plugin_name: str) -> types.PluginInfo:
-        """
-        Get information about the plugin.
-
-        :param plugin_name: name of the plugin
-        """
-        location = "/plugins/{pluginName}".format(pluginName=quote_plus(str(plugin_name)))
-        data = self.call("get_plugin", location, method="GET", schema=schemas.PLUGIN_INFO_SCHEMA)
-        result = types.PluginInfo.from_json(data)
-        assert result is not None
-        return result
-
-    def unregister_plugin(self, plugin_name: str) -> types.Result:
-        """
-        Unregister the plugin.
-
-        :param plugin_name: name of the plugin
-        """
-        location = "/plugins/{pluginName}".format(pluginName=quote_plus(str(plugin_name)))
-        data = self.call("unregister_plugin", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
-        result = types.Result.from_json(data)
-        assert result is not None
-        return result
-
     def create_posting(self, posting: types.PostingText) -> types.PostingInfo:
         """
         Create a new posting from the text given and publish it in the given feeds (if any). The heading and the
@@ -1983,8 +1938,9 @@ class MoeraNode(Caller):
 
     def update_profile(self, profile: types.ProfileAttributes) -> types.ProfileInfo:
         """
-        Update the profile. Fields that are not set in the request body are left intact. Fields that are set to an
-        empty value are reset to their defaults.
+        To update a profile attribute, include the field with its new value. For a partial update, include only the
+        fields to be changed; omitted fields remain unchanged. To delete an attribute, include the field with an empty
+        value, which resets it to its default.
 
         :param profile:
         """

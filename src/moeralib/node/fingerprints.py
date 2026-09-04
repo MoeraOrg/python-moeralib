@@ -186,6 +186,28 @@ def create_media_grant_fingerprint0(
     return fingerprint_bytes({'version': 0, 'object_type': 'MEDIA_GRANT'} | locals(), MEDIA_GRANT_FINGERPRINT0_SCHEMA)
 
 
+NOTIFICATION_PACKET_FINGERPRINT2_SCHEMA: FingerprintSchema = [
+    ('version', 'number'),
+    ('object_type', 'string'),
+    ('id', 'string'),
+    ('node_name', 'string'),
+    ('full_name', 'string'),
+    ('node_source_uri', 'string'),
+    ('created_at', 'number'),
+    ('type', 'string'),
+    ('notification', 'string'),
+]
+
+
+def create_notification_packet_fingerprint2(
+    id: str | None, node_name: str | None, full_name: str | None, node_source_uri: str | None,
+    created_at: Timestamp | None, type: str | None, notification: str | None
+) -> bytes:
+    return fingerprint_bytes(
+        {'version': 2, 'object_type': 'NOTIFICATION_PACKET'} | locals(), NOTIFICATION_PACKET_FINGERPRINT2_SCHEMA
+    )
+
+
 NOTIFICATION_PACKET_FINGERPRINT1_SCHEMA: FingerprintSchema = [
     ('version', 'number'),
     ('object_type', 'string'),
