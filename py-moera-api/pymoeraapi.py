@@ -201,6 +201,7 @@ PY_TYPES = {
     'timestamp': 'Timestamp',
     'byte[]': 'bytes',
     'UUID': 'str',
+    'principal': 'PrincipalValue',
     'String -> int': 'Mapping[str, int]'
 }
 
@@ -225,6 +226,7 @@ SCHEMA_TYPES = {
     'timestamp': ('integer', False),
     'byte[]': ('string', False),
     'UUID': ('string', False),
+    'principal': ('string', False),
     'String -> int': schema_map_string_int
 }
 

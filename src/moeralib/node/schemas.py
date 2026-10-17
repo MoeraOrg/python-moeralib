@@ -16,6 +16,9 @@ COMMENT_OPERATIONS_SCHEMA: Any = {
         "delete": {
             "type": ["string", "null"]
         },
+        "viewExternalSource": {
+            "type": ["string", "null"]
+        },
         "viewReactions": {
             "type": ["string", "null"]
         },
@@ -161,7 +164,16 @@ POSTING_OPERATIONS_SCHEMA: Any = {
         "delete": {
             "type": ["string", "null"]
         },
+        "viewExternalSource": {
+            "type": ["string", "null"]
+        },
         "viewComments": {
+            "type": ["string", "null"]
+        },
+        "viewSharings": {
+            "type": ["string", "null"]
+        },
+        "viewTotalSharings": {
             "type": ["string", "null"]
         },
         "addComment": {
@@ -1983,6 +1995,90 @@ SETTING_VALUE_CHOICE_SCHEMA: Any = {
     "additionalProperties": False
 }
 
+SHARING_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "sharingType": {
+            "type": "string"
+        },
+        "remoteNodeName": {
+            "type": "string"
+        },
+        "remoteFullName": {
+            "type": ["string", "null"]
+        },
+        "remoteSourceUri": {
+            "type": ["string", "null"]
+        },
+        "remoteGender": {
+            "type": ["string", "null"]
+        },
+        "remoteAvatar": to_nullable_object_schema(AVATAR_IMAGE_SCHEMA),
+        "remoteFeedName": {
+            "type": ["string", "null"]
+        },
+        "remoteStoryId": {
+            "type": ["string", "null"]
+        },
+        "remoteStoryMoment": {
+            "type": ["integer", "null"]
+        },
+        "remotePostingId": {
+            "type": ["string", "null"]
+        },
+        "postingId": {
+            "type": "string"
+        },
+        "postingRevisionId": {
+            "type": ["string", "null"]
+        },
+        "moment": {
+            "type": "integer"
+        },
+        "createdAt": {
+            "type": "integer"
+        },
+    },
+    "required": [
+        "id",
+        "sharingType",
+        "remoteNodeName",
+        "postingId",
+        "moment",
+        "createdAt",
+    ],
+    "additionalProperties": False
+}
+
+SHARINGS_SLICE_INFO_SCHEMA: Any = {
+    "type": "object",
+    "properties": {
+        "before": {
+            "type": "integer"
+        },
+        "after": {
+            "type": "integer"
+        },
+        "total": {
+            "type": "integer"
+        },
+        "sharings": {
+            "type": "array",
+            "items": SHARING_INFO_SCHEMA
+        },
+    },
+    "required": [
+        "before",
+        "after",
+        "total",
+        "sharings",
+    ],
+    "additionalProperties": False
+}
+
 SHERIFF_COMPLAINT_GROUP_INFO_SCHEMA: Any = {
     "type": "object",
     "properties": {
@@ -3090,6 +3186,9 @@ POSTING_INFO_SCHEMA: Any = {
         "deletedAt": {
             "type": ["integer", "null"]
         },
+        "earliestPublishedAt": {
+            "type": ["integer", "null"]
+        },
         "receiverCreatedAt": {
             "type": ["integer", "null"]
         },
@@ -3097,6 +3196,9 @@ POSTING_INFO_SCHEMA: Any = {
             "type": ["integer", "null"]
         },
         "receiverDeletedAt": {
+            "type": ["integer", "null"]
+        },
+        "receiverPublishedAt": {
             "type": ["integer", "null"]
         },
         "revisionCreatedAt": {
@@ -3161,6 +3263,9 @@ POSTING_INFO_SCHEMA: Any = {
             "items": POSTING_SOURCE_INFO_SCHEMA
         },
         "totalComments": {
+            "type": ["integer", "null"]
+        },
+        "totalSharings": {
             "type": ["integer", "null"]
         },
         "viewCount": {
@@ -3329,6 +3434,9 @@ SEARCH_ENTRY_INFO_SCHEMA: Any = {
         "createdAt": {
             "type": "integer"
         },
+        "earliestPublishedAt": {
+            "type": ["integer", "null"]
+        },
         "operations": to_nullable_object_schema(SEARCH_ENTRY_OPERATIONS_SCHEMA),
         "moment": {
             "type": "integer"
@@ -3446,6 +3554,13 @@ STORY_SUMMARY_DATA_SCHEMA: Any = {
             "items": STORY_SUMMARY_REACTION_SCHEMA
         },
         "totalReactions": {
+            "type": ["integer", "null"]
+        },
+        "sharings": {
+            "type": ["array", "null"],
+            "items": STORY_SUMMARY_NODE_SCHEMA
+        },
+        "totalSharings": {
             "type": ["integer", "null"]
         },
         "feedName": {
@@ -3578,6 +3693,12 @@ COMMENT_INFO_SCHEMA: Any = {
         "clientReaction": to_nullable_object_schema(CLIENT_REACTION_INFO_SCHEMA),
         "seniorReaction": to_nullable_object_schema(CLIENT_REACTION_INFO_SCHEMA),
         "reactions": to_nullable_object_schema(REACTION_TOTALS_INFO_SCHEMA),
+        "externalSourceUri": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
+        },
     },
     "required": [
         "id",
@@ -3874,6 +3995,9 @@ STORY_INFO_SCHEMA: Any = {
         "remoteSourceUri": {
             "type": ["string", "null"]
         },
+        "remoteStoryMoment": {
+            "type": ["integer", "null"]
+        },
         "remotePostingId": {
             "type": ["string", "null"]
         },
@@ -3884,6 +4008,12 @@ STORY_INFO_SCHEMA: Any = {
             "type": ["string", "null"]
         },
         "operations": to_nullable_object_schema(STORY_OPERATIONS_SCHEMA),
+        "externalSourceUri": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            }
+        },
     },
     "required": [
         "id",
@@ -3895,6 +4025,8 @@ STORY_INFO_SCHEMA: Any = {
     ],
     "additionalProperties": False
 }
+
+STORY_INFO_ARRAY_SCHEMA = array_schema(STORY_INFO_SCHEMA)
 
 COMMENT_CREATED_SCHEMA: Any = {
     "type": "object",

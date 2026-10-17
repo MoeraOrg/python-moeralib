@@ -1664,7 +1664,9 @@ class MoeraNode(Caller):
 
     def update_posting(self, id: str, posting: types.PostingText) -> types.PostingInfo:
         """
-        Update the posting, creating a new revision of it. The text is processed just like in the ``POST`` request.
+        Update the posting, creating a new revision of it. The text is processed just like in the ``POST`` request. If
+        the posting is not original (a cached copy of a remote posting), only its permissions can be changed; all other
+        fields are ignored and no new revision is created.
 
         :param id: ID of the posting
         :param posting:
@@ -1704,6 +1706,19 @@ class MoeraNode(Caller):
         """
         location = "/postings/{id}".format(id=quote_plus(str(id)))
         data = self.call("delete_posting", location, method="DELETE", schema=schemas.RESULT_SCHEMA)
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
+
+    def republish_posting(self, id: str, attributes: types.PostingRepublishAttributes) -> types.Result:
+        """
+        Update the posting visibility if requested and publish it in the specified feeds.
+
+        :param id: ID of the posting
+        :param attributes:
+        """
+        location = "/postings/{id}/republish".format(id=quote_plus(str(id)))
+        data = self.call("republish_posting", location, method="POST", body=attributes, schema=schemas.RESULT_SCHEMA)
         result = types.Result.from_json(data)
         assert result is not None
         return result
@@ -1921,6 +1936,28 @@ class MoeraNode(Caller):
             schema=schemas.REACTION_TOTALS_INFO_ARRAY_SCHEMA
         )
         return structure_list(data, types.ReactionTotalsInfo)
+
+    def get_posting_sharings(
+        self, posting_id: str, before: int | None = None, limit: int | None = None
+    ) -> types.SharingsSliceInfo:
+        """
+        Get a slice of the sharings of the posting, delimited by the ``before`` moment and the given ``limit``. If
+        ``before`` is not provided, the latest sharings are returned. The node may decide to return fewer sharings than
+        the given ``limit``. The sharings are always sorted by moment, descending. The list is empty when viewing
+        sharings is not permitted. The total is zero when viewing the sharing counter is not permitted.
+
+        :param posting_id: ID of the posting
+        :param before: filter sharings created at or before this moment
+        :param limit: maximum number of sharings returned
+        """
+        location = "/postings/{postingId}/sharings".format(postingId=quote_plus(str(posting_id)))
+        params = {"before": before, "limit": limit}
+        data = self.call(
+            "get_posting_sharings", location, method="GET", params=params, schema=schemas.SHARINGS_SLICE_INFO_SCHEMA
+        )
+        result = types.SharingsSliceInfo.from_json(data)
+        assert result is not None
+        return result
 
     def get_profile(self, with_source: bool = False) -> types.ProfileInfo:
         """
@@ -2385,6 +2422,26 @@ class MoeraNode(Caller):
         assert result is not None
         return result
 
+    def republish_remote_posting(
+        self, node_name: str, id: str, attributes: types.RemotePostingRepublishAttributes
+    ) -> types.Result:
+        """
+        Download the posting from the remote node and publish it in the specified feeds.
+
+        :param node_name: name of the remote node
+        :param id: ID of the posting on the remote node
+        :param attributes:
+        """
+        location = "/nodes/{nodeName}/postings/{id}/republish".format(
+            nodeName=quote_plus(str(node_name)), id=quote_plus(str(id))
+        )
+        data = self.call(
+            "republish_remote_posting", location, method="POST", body=attributes, schema=schemas.RESULT_SCHEMA
+        )
+        result = types.Result.from_json(data)
+        assert result is not None
+        return result
+
     def verify_remote_posting(self, node_name: str, id: str) -> types.AsyncOperationCreated:
         """
         Verify the signature of the given posting.
@@ -2770,6 +2827,20 @@ class MoeraNode(Caller):
         result = types.Result.from_json(data)
         assert result is not None
         return result
+
+    def get_stories_by_external_source(self, external: str) -> List[types.StoryInfo]:
+        """
+        Get all stories coming from the given external source.
+
+        :param external: URI of the external source of the story
+        """
+        location = "/stories".format()
+        params = {"external": external}
+        data = self.call(
+            "get_stories_by_external_source", location, method="GET", params=params, bodies=True,
+            schema=schemas.STORY_INFO_ARRAY_SCHEMA
+        )
+        return structure_list(data, types.StoryInfo)
 
     def get_story(self, id: str) -> types.StoryInfo:
         """

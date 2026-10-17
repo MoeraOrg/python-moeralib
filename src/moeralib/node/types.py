@@ -100,6 +100,8 @@ SheriffOrderReason = Literal[
     "unlawful", "defamatory", "threat", "spam", "scam", "malware", "copyright", "impersonating", "privacy", "other"
 ]
 
+SharingType = Literal["republish"]
+
 SourceFormat = Literal["plain-text", "html", "markdown", "html/visual", "application"]
 
 StoryType = Literal[
@@ -109,7 +111,7 @@ StoryType = Literal[
     "comment-reaction-added-positive", "comment-reaction-task-failed", "comment-update-task-failed", "defrosting",
     "friend-added", "friend-deleted", "friend-group-deleted", "mention-comment", "mention-posting", "posting-added",
     "posting-media-reaction-added-negative", "posting-media-reaction-added-positive", "posting-media-reaction-failed",
-    "posting-post-task-failed", "posting-reaction-task-failed", "posting-subscribe-task-failed",
+    "posting-post-task-failed", "posting-reaction-task-failed", "posting-shared", "posting-subscribe-task-failed",
     "posting-update-task-failed", "posting-updated", "premoderated-comment-accepted", "premoderated-comment-rejected",
     "reaction-added-negative", "reaction-added-positive", "reminder-avatar", "reminder-email", "reminder-full-name",
     "reminder-sheriff-allow", "remote-comment-added", "reply-comment", "search-report", "sheriff-complaint-added",
@@ -146,6 +148,13 @@ class CommentOperations(Structure):
     def delete_or_default(self) -> PrincipalValue:
         """delete the comment (this property always returns default value instead of ``None``)"""
         return self.delete if self.delete is not None else "private"
+    view_external_source: PrincipalValue | None = None
+    """view the comment's external source URIs"""
+
+    @property
+    def view_external_source_or_default(self) -> PrincipalValue:
+        """view the comment's external source URIs (this property always returns default value instead of ``None``)"""
+        return self.view_external_source if self.view_external_source is not None else "public"
     view_reactions: PrincipalValue | None = None
     """view the comment's reactions"""
 
@@ -428,6 +437,13 @@ class PostingOperations(Structure):
     def delete_or_default(self) -> PrincipalValue:
         """delete the posting (this property always returns default value instead of ``None``)"""
         return self.delete if self.delete is not None else "private"
+    view_external_source: PrincipalValue | None = None
+    """view the posting's external source URIs"""
+
+    @property
+    def view_external_source_or_default(self) -> PrincipalValue:
+        """view the posting's external source URIs (this property always returns default value instead of ``None``)"""
+        return self.view_external_source if self.view_external_source is not None else "public"
     view_comments: PrincipalValue | None = None
     """view the posting's comments"""
 
@@ -435,6 +451,20 @@ class PostingOperations(Structure):
     def view_comments_or_default(self) -> PrincipalValue:
         """view the posting's comments (this property always returns default value instead of ``None``)"""
         return self.view_comments if self.view_comments is not None else "public"
+    view_sharings: PrincipalValue | None = None
+    """view the posting's sharings"""
+
+    @property
+    def view_sharings_or_default(self) -> PrincipalValue:
+        """view the posting's sharings (this property always returns default value instead of ``None``)"""
+        return self.view_sharings if self.view_sharings is not None else "public"
+    view_total_sharings: PrincipalValue | None = None
+    """view the number of the posting's sharings"""
+
+    @property
+    def view_total_sharings_or_default(self) -> PrincipalValue:
+        """view the number of the posting's sharings (this property always returns default value instead of ``None``)"""
+        return self.view_total_sharings if self.view_total_sharings is not None else "public"
     add_comment: PrincipalValue | None = None
     """add a comment to the posting"""
 
@@ -2219,6 +2249,50 @@ class SettingValueChoice(Structure):
     """the value"""
 
 
+class SharingInfo(Structure):
+    id: str
+    """ID of the sharing"""
+    sharing_type: SharingType
+    """type of sharing"""
+    remote_node_name: str
+    """name of the node that shared the posting"""
+    remote_full_name: str | None = None
+    """full name of the sharing node"""
+    remote_source_uri: str | None = None
+    """source URI of the sharing node identity"""
+    remote_gender: str | None = None
+    """gender of the sharing node owner"""
+    remote_avatar: AvatarImage | None = None
+    """avatar of the sharing node"""
+    remote_feed_name: str | None = None
+    """name of the feed containing the shared posting"""
+    remote_story_id: str | None = None
+    """ID of the story containing the shared posting"""
+    remote_story_moment: int | None = None
+    """moment of the story containing the shared posting"""
+    remote_posting_id: str | None = None
+    """ID of the shared posting on the remote node"""
+    posting_id: str
+    """ID of the original posting"""
+    posting_revision_id: str | None = None
+    """ID of the shared revision of the original posting"""
+    moment: int
+    """moment of the sharing, used for pagination"""
+    created_at: Timestamp
+    """creation timestamp of the sharing record"""
+
+
+class SharingsSliceInfo(Structure):
+    before: int
+    """the slice contains all sharings before this moment, inclusive. May be the far future."""
+    after: int
+    """the slice contains all sharings after this moment, exclusive. May be the far past."""
+    total: int
+    """total number of sharings in the whole list; zero when viewing the counter is not permitted"""
+    sharings: List[SharingInfo]
+    """the sharings"""
+
+
 class SheriffComplaintDecisionText(Structure):
     reject: bool
     """``True``, if the complaints in the group are to be rejected, ``False`` otherwise"""
@@ -2503,6 +2577,11 @@ class StoryAttributes(Structure):
     """value of the ``read`` flag (``None``, if the flag is not changed)"""
     satisfied: bool | None = None
     """value of the ``satisfied`` flag (``None``, if the flag is not changed)"""
+    external_source_uri: List[str] | None = None
+    """
+    URIs of the external sources the story was received from; used by software that automatically forwards stories from
+    other social networks
+    """
 
 
 class StorySummaryBlocked(Structure):
@@ -3096,12 +3175,18 @@ class PostingInfo(Structure):
     """posting editing timestamp - the last time the posting was updated"""
     deleted_at: Timestamp | None = None
     """posting deletion timestamp - the time when the posting was deleted"""
+    earliest_published_at: Timestamp | None = None
+    """earliest publication timestamp of the posting in the timeline feed"""
     receiver_created_at: Timestamp | None = None
     """original posting creation timestamp (for cached copies of remote postings only)"""
     receiver_edited_at: Timestamp | None = None
     """original posting editing timestamp (for cached copies of remote postings only)"""
     receiver_deleted_at: Timestamp | None = None
     """original posting deletion timestamp (for cached copies of remote postings only)"""
+    receiver_published_at: Timestamp | None = None
+    """
+    earliest timeline publication timestamp of the original posting (for cached copies of remote postings only)
+    """
     revision_created_at: Timestamp
     """creation timestamp of the current revision of the posting"""
     receiver_revision_created_at: Timestamp | None = None
@@ -3153,6 +3238,8 @@ class PostingInfo(Structure):
     """details of the sources the posting was received from (for cached copies of remote postings only)"""
     total_comments: int | None = None
     """total number of comments to the posting"""
+    total_sharings: int | None = None
+    """total number of sharings of the posting; zero if absent"""
     view_count: int | None = None
     """number of posting views (for admin only)"""
     recommended: bool | None = None
@@ -3163,7 +3250,7 @@ class PostingInfo(Structure):
     external_source_uri: List[str] | None = None
     """
     URIs of the external sources the posting was received from; used by software that automatically forwards postings
-    from other social networks (for admin only)
+    from other social networks
     """
 
 
@@ -3212,6 +3299,13 @@ class PostingRevisionInfo(Structure):
     """details of the existing reaction (if any) of the client's owner"""
     reactions: ReactionTotalsInfo | None = None
     """reactions summary of the posting revision"""
+
+
+class PostingRepublishAttributes(Structure):
+    posting_view: PrincipalValue | None = None
+    """new visibility of the posting, if it needs to be changed"""
+    publications: List[StoryAttributes]
+    """list of new publications in feeds"""
 
 
 class PostingSourceText(Structure):
@@ -3305,7 +3399,7 @@ class PostingText(Structure):
     external_source_uri: List[str] | None = None
     """
     URIs of the external sources the posting was received from; used by software that automatically forwards postings
-    from other social networks (for admin only)
+    from other social networks
     """
 
 
@@ -3314,6 +3408,15 @@ class ReactionCreated(Structure):
     """details of the reaction created"""
     totals: ReactionTotalsInfo
     """summary of reactions after the creation"""
+
+
+class RemotePostingRepublishAttributes(Structure):
+    remote_feed_name: str
+    """name of the feed on the remote node the posting is being republished from"""
+    posting_view: PrincipalValue | None = None
+    """visibility of the new posting, overriding the default"""
+    publications: List[StoryAttributes]
+    """list of publications in feeds to be made after downloading the posting"""
 
 
 class SearchEntryInfo(Structure):
@@ -3358,6 +3461,8 @@ class SearchEntryInfo(Structure):
     """information about the comment this comment is replying to"""
     created_at: Timestamp
     """entry creation timestamp - the real time when the entry was created"""
+    earliest_published_at: Timestamp | None = None
+    """earliest timeline publication timestamp of the posting at its source node (postings only)"""
     operations: SearchEntryOperations | None = None
     """the supported operations and the corresponding principals"""
     moment: int
@@ -3428,6 +3533,10 @@ class StorySummaryData(Structure):
     """list of reactions"""
     total_reactions: int | None = None
     """total number of reactions"""
+    sharings: List[StorySummaryNode] | None = None
+    """nodes that shared the posting, newest first"""
+    total_sharings: int | None = None
+    """total number of sharings in the instant group"""
     feed_name: str | None = None
     """name of a feed"""
     subscription_reason: SubscriptionReason | None = None
@@ -3534,6 +3643,11 @@ class CommentInfo(Structure):
     """details of the existing reaction (if any) of the posting's owner ("senior") to the comment"""
     reactions: ReactionTotalsInfo | None = None
     """summary of reactions to the comment"""
+    external_source_uri: List[str] | None = None
+    """
+    URIs of the external sources the comment was received from; used by software that automatically forwards comments
+    from other social networks
+    """
 
 
 class CommentRevisionInfo(Structure):
@@ -3689,6 +3803,11 @@ class CommentText(Structure):
     """
     the operations and the corresponding principals that are overridden by the posting's owner ("senior"); only the
     senior may set this
+    """
+    external_source_uri: List[str] | None = None
+    """
+    URIs of the external sources the comment was received from; used by software that automatically forwards comments
+    from other social networks
     """
 
 
@@ -3884,6 +4003,11 @@ class StoryInfo(Structure):
     """full name of the node this story is about"""
     remote_source_uri: str | None = None
     """source URI of the node identity"""
+    remote_story_moment: int | None = None
+    """
+    moment of the story containing the shared posting on the remote node; set only for ``posting-shared`` stories
+    associated with a sharing
+    """
     remote_posting_id: str | None = None
     """ID of the posting at remote node this story is about"""
     remote_comment_id: str | None = None
@@ -3892,6 +4016,11 @@ class StoryInfo(Structure):
     """ID of the media at remote node this story is about"""
     operations: StoryOperations | None = None
     """the supported operations and the corresponding principals"""
+    external_source_uri: List[str] | None = None
+    """
+    URIs of the external sources the story was received from; used by software that automatically forwards stories from
+    other social networks; visible only to administrators with ``view-content`` scope
+    """
 
 
 class CommentCreated(Structure):
